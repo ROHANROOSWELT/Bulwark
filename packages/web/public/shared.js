@@ -480,8 +480,12 @@ async function triggerTick() {
   }
   try {
     const res = await fetch("/api/tick", { method: "POST" });
-    const data = await res.json();
-    showToast(`Scan complete: ${data.scanned} positions scanned, ${data.underwritten} underwritten.`, "success");
+    const details = [
+      `${data.scanned ?? 0} scanned`,
+      `${data.proposed ?? 0} proposed`,
+      `${data.executed ?? 0} executed`,
+    ].join(", ");
+    showToast(`Guardian tick complete (${details}).`, "success");
     await fetchDeskState();
   } catch (err) {
     console.error("Tick failed:", err);

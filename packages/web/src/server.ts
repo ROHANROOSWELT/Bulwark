@@ -48,7 +48,13 @@ export async function handleRequest(
   const guardian = options.guardian ?? getDefaultGuardian();
   const watchlist = options.watchlist ?? ["0x0000000000000000000000000000000000000001"];
 
-  const rawUrl = (req.headers["x-matched-path"] as string) || (req.headers["x-vercel-matched-path"] as string) || req.url || "/";
+  let rawUrl = req.url || "/";
+  if ((!rawUrl || rawUrl === "/") && req.headers["x-matched-path"]) {
+    const matched = req.headers["x-matched-path"] as string;
+    if (!matched.includes("[") && !matched.includes("]")) {
+      rawUrl = matched;
+    }
+  }
   const url = new URL(rawUrl, `http://${req.headers.host || "localhost"}`);
   const pathname = url.pathname;
   const method = req.method || "GET";
@@ -197,6 +203,31 @@ export async function handleRequest(
       }
 
       // ── API Routes ─────────────────────────────────────────────────────────
+      // 0. GET /api or /api/health
+      if (method === "GET" && (pathname === "/api" || pathname === "/api/" || pathname === "/api/health")) {
+        await guardian.init();
+        sendJson(200, {
+          name: "BULWARK Protocol API",
+          status: "operational",
+          version: SERVER_VERSION,
+          chainId: guardian.config.chainId,
+          hasKey: guardian.client.hasKey(),
+          endpoints: [
+            "GET  /api/state",
+            "GET  /api/doctor",
+            "POST /api/scan",
+            "POST /api/tick",
+            "POST /api/grants/propose",
+            "POST /api/grants/:id/approve",
+            "POST /api/grants/:id/dry",
+            "POST /api/grants/:id/execute",
+            "POST /api/grants/:id/revoke",
+            "POST /api/proof/verify",
+            "GET  /api/audit/export"
+          ]
+        });
+        return;
+      }
 
       // 1. GET /api/state
       if (method === "GET" && pathname === "/api/state") {

@@ -55,6 +55,11 @@ export class BulwarkStore {
   public readonly baseDir: string;
   private isInitialized = false;
 
+  private static memoryGrants: Map<string, RescueGrantV2[]> = new Map();
+  private static memoryExecs: Map<string, ExecutionRecord[]> = new Map();
+  private static memoryCap: Map<string, CapacityLedger> = new Map();
+  private static memoryAudit: Map<string, AuditRecord[]> = new Map();
+
   constructor(baseDir = ".bulwark") {
     this.baseDir = baseDir;
   }
@@ -68,14 +73,20 @@ export class BulwarkStore {
       const seedFiles = ["grants.json", "executions.json", "capacity.json", "audit.jsonl"];
       for (const file of seedFiles) {
         const dest = join(this.baseDir, file);
-        const src = join(process.cwd(), ".bulwark", file);
+        let src = join(process.cwd(), "fixtures", file);
         try {
           await fs.access(dest);
         } catch {
           try {
             const content = await fs.readFile(src, "utf8");
             await fs.writeFile(dest, content, "utf8");
-          } catch {}
+          } catch {
+            try {
+              src = join(process.cwd(), ".bulwark", file);
+              const fallbackContent = await fs.readFile(src, "utf8");
+              await fs.writeFile(dest, fallbackContent, "utf8");
+            } catch {}
+          }
         }
       }
     }
@@ -99,11 +110,14 @@ export class BulwarkStore {
     try {
       await fs.access(capPath);
     } catch {
+      const defaultBalance = process.env.BULWARK_DESK_BALANCE_USD
+        ? parseFloat(process.env.BULWARK_DESK_BALANCE_USD)
+        : (process.env.VERCEL ? 50000 : 0);
       const defaultCap: CapacityLedger = {
-        deskWalletAddress: "0x0000000000000000000000000000000000000000",
-        deskBalanceUsd: 0,
+        deskWalletAddress: process.env.BULWARK_DESK_WALLET ?? "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+        deskBalanceUsd: isNaN(defaultBalance) ? 0 : defaultBalance,
         reservedUsd: 0,
-        availableUsd: 0,
+        availableUsd: isNaN(defaultBalance) ? 0 : defaultBalance,
         reservations: {},
         lastUpdated: new Date().toISOString(),
       };
@@ -131,7 +145,9 @@ export class BulwarkStore {
   public async getGrants(): Promise<RescueGrantV2[]> {
     await this.init();
     const data = await fs.readFile(join(this.baseDir, "grants.json"), "utf8");
-    return JSON.parse(data) as RescueGrantV2[];
+    const grants = JSON.parse(data) as RescueGrantV2[];
+    BulwarkStore.memoryGrants.set(this.baseDir, grants);
+    return grants;
   }
 
   public async getGrant(id: string): Promise<RescueGrantV2 | undefined> {
@@ -148,6 +164,7 @@ export class BulwarkStore {
     } else {
       grants.push(grant);
     }
+    BulwarkStore.memoryGrants.set(this.baseDir, grants);
     await this.atomicWrite(join(this.baseDir, "grants.json"), JSON.stringify(grants, null, 2));
   }
 
@@ -156,7 +173,9 @@ export class BulwarkStore {
   public async getExecutions(): Promise<ExecutionRecord[]> {
     await this.init();
     const data = await fs.readFile(join(this.baseDir, "executions.json"), "utf8");
-    return JSON.parse(data) as ExecutionRecord[];
+    const execs = JSON.parse(data) as ExecutionRecord[];
+    BulwarkStore.memoryExecs.set(this.baseDir, execs);
+    return execs;
   }
 
   public async getExecution(executionId: string): Promise<ExecutionRecord | undefined> {
@@ -173,6 +192,7 @@ export class BulwarkStore {
     } else {
       execs.push(record);
     }
+    BulwarkStore.memoryExecs.set(this.baseDir, execs);
     await this.atomicWrite(join(this.baseDir, "executions.json"), JSON.stringify(execs, null, 2));
   }
 
@@ -181,7 +201,16 @@ export class BulwarkStore {
   public async getCapacity(): Promise<CapacityLedger> {
     await this.init();
     const data = await fs.readFile(join(this.baseDir, "capacity.json"), "utf8");
-    return JSON.parse(data) as CapacityLedger;
+    const ledger = JSON.parse(data) as CapacityLedger;
+    if (process.env.VERCEL && ledger.deskBalanceUsd === 0) {
+      const fallback = process.env.BULWARK_DESK_BALANCE_USD
+        ? parseFloat(process.env.BULWARK_DESK_BALANCE_USD)
+        : 50000;
+      ledger.deskBalanceUsd = isNaN(fallback) ? 50000 : fallback;
+      ledger.availableUsd = Math.max(0, ledger.deskBalanceUsd - ledger.reservedUsd);
+    }
+    BulwarkStore.memoryCap.set(this.baseDir, ledger);
+    return ledger;
   }
 
   /**
@@ -196,6 +225,7 @@ export class BulwarkStore {
     ledger.reservedUsd = Object.values(ledger.reservations).reduce((a, b) => a + b, 0);
     ledger.availableUsd = Math.max(0, ledger.deskBalanceUsd - ledger.reservedUsd);
     ledger.lastUpdated = new Date().toISOString();
+    BulwarkStore.memoryCap.set(this.baseDir, ledger);
     await this.atomicWrite(join(this.baseDir, "capacity.json"), JSON.stringify(ledger, null, 2));
     return ledger;
   }
@@ -224,6 +254,7 @@ export class BulwarkStore {
     ledger.reservedUsd = newReserved;
     ledger.availableUsd = Math.max(0, ledger.deskBalanceUsd - ledger.reservedUsd);
     ledger.lastUpdated = new Date().toISOString();
+    BulwarkStore.memoryCap.set(this.baseDir, ledger);
     await this.atomicWrite(join(this.baseDir, "capacity.json"), JSON.stringify(ledger, null, 2));
 
     await this.appendAudit({
@@ -247,6 +278,7 @@ export class BulwarkStore {
       ledger.reservedUsd = Object.values(ledger.reservations).reduce((a, b) => a + b, 0);
       ledger.availableUsd = Math.max(0, ledger.deskBalanceUsd - ledger.reservedUsd);
       ledger.lastUpdated = new Date().toISOString();
+      BulwarkStore.memoryCap.set(this.baseDir, ledger);
       await this.atomicWrite(join(this.baseDir, "capacity.json"), JSON.stringify(ledger, null, 2));
 
       await this.appendAudit({
@@ -265,15 +297,24 @@ export class BulwarkStore {
 
   public async appendAudit(record: AuditRecord): Promise<void> {
     await this.init();
+    const logs = BulwarkStore.memoryAudit.get(this.baseDir) ?? [];
+    logs.push(record);
+    BulwarkStore.memoryAudit.set(this.baseDir, logs);
     const line = JSON.stringify(record) + "\n";
     await fs.appendFile(join(this.baseDir, "audit.jsonl"), line, "utf8");
   }
 
   public async getAuditLogs(limit = 100): Promise<AuditRecord[]> {
     await this.init();
-    const content = await fs.readFile(join(this.baseDir, "audit.jsonl"), "utf8");
-    const lines = content.trim().split("\n").filter(Boolean);
-    const records = lines.map((l) => JSON.parse(l) as AuditRecord);
-    return records.slice(-limit);
+    try {
+      const content = await fs.readFile(join(this.baseDir, "audit.jsonl"), "utf8");
+      const lines = content.trim().split("\n").filter(Boolean);
+      const records = lines.map((l) => JSON.parse(l) as AuditRecord);
+      BulwarkStore.memoryAudit.set(this.baseDir, records);
+      return records.slice(-limit);
+    } catch {
+      const cached = BulwarkStore.memoryAudit.get(this.baseDir) ?? [];
+      return cached.slice(-limit);
+    }
   }
 }

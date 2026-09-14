@@ -6,6 +6,7 @@
     { "source": "/dashboard", "destination": "/overview.html" },
     { "source": "/console", "destination": "/overview.html" },
     { "source": "/diagnostics", "destination": "/settings.html" },
-    { "source": "/documentation", "destination": "/docs.html" }
+    { "source": "/documentation", "destination": "/docs.html" },
+    { "source": "/api/(.*)", "destination": "/api/[...path]" }
   ]
 }

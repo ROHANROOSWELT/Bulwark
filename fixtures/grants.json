@@ -1,0 +1,77 @@
+[
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0x384ab67c6d57694474997ad784f5604d3abc50b08f5308d0b8a9376b75d02cd3",
+    "createdAt": "2026-09-14T12:00:00.000Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 11155111,
+      "positionOwner": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29",
+      "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.2,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-28T12:00:00.000Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "armed",
+      "creationSnapshot": {
+        "hf": 1.18,
+        "debtUsd": 500,
+        "priceUsd": 1,
+        "debtTokenBalance": "500000000",
+        "timestamp": "2026-09-14T12:00:00.000Z"
+      },
+      "capacityReservedUsd": 15,
+      "dailySpentUsd": 0,
+      "totalSpentUsd": 0,
+      "executionCount": 0,
+      "statusReason": "Capacity reserved; ready for execution"
+    },
+    "grantHash": "0x384ab67c6d57694474997ad784f5604d3abc50b08f5308d0b8a9376b75d02cd3",
+    "grantId": "bg_384ab67c6d576944",
+    "approvedAt": "2026-09-14T12:05:00.000Z",
+    "approvedBy": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29"
+  }
+]

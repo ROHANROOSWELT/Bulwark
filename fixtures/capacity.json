@@ -1,0 +1,10 @@
+{
+  "deskWalletAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  "deskBalanceUsd": 50000,
+  "reservedUsd": 15,
+  "availableUsd": 49985,
+  "reservations": {
+    "bg_384ab67c6d576944": 15
+  },
+  "lastUpdated": "2026-09-14T12:00:00.000Z"
+}
