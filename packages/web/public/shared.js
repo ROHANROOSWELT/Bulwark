@@ -3,6 +3,21 @@
  * Manages global header, navigation state, desk KPIs, toasts, and Web3 wallet connections.
  */
 
+// ── EIP-6963 Multi-Provider Discovery Map ───────────────────────────────────
+const eip6963Providers = new Map();
+
+if (typeof window !== "undefined") {
+  window.addEventListener("eip6963:announceProvider", (event) => {
+    if (event.detail && event.detail.info && event.detail.provider) {
+      eip6963Providers.set(event.detail.info.rdns, event.detail);
+      if (typeof detectInstalledWallets === "function") {
+        detectInstalledWallets();
+      }
+    }
+  });
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+}
+
 // ── Web3 Wallet State & Metadata ──────────────────────────────────────────
 const WALLET_METADATA = {
   metamask: {
@@ -10,27 +25,45 @@ const WALLET_METADATA = {
     avatar: "MM",
     downloadUrl: "https://metamask.io/download/",
     check: () => {
-      if (typeof window === "undefined" || !window.ethereum) return false;
+      if (typeof window === "undefined") return false;
+      if (eip6963Providers.has("io.metamask")) return true;
+      if (!window.ethereum) return false;
       if (window.ethereum.providers) {
-        return window.ethereum.providers.some((p) => p.isMetaMask);
+        return window.ethereum.providers.some((p) => p.isMetaMask && !p.isOKExWallet && !p.isRabby);
       }
-      return !!window.ethereum.isMetaMask;
+      return !!window.ethereum.isMetaMask && !window.ethereum.isOKExWallet && !window.ethereum.isRabby;
     },
     getProvider: () => {
-      if (typeof window === "undefined" || !window.ethereum) return null;
-      if (window.ethereum.providers) {
-        return window.ethereum.providers.find((p) => p.isMetaMask) || null;
+      if (typeof window === "undefined") return null;
+      if (eip6963Providers.has("io.metamask")) {
+        return eip6963Providers.get("io.metamask").provider;
       }
-      return window.ethereum.isMetaMask ? window.ethereum : null;
+      if (!window.ethereum) return null;
+      if (window.ethereum.providers) {
+        return window.ethereum.providers.find((p) => p.isMetaMask && !p.isOKExWallet && !p.isRabby) || null;
+      }
+      return (window.ethereum.isMetaMask && !window.ethereum.isOKExWallet && !window.ethereum.isRabby) ? window.ethereum : null;
     },
   },
   okx: {
     name: "OKX Wallet",
     avatar: "OKX",
     downloadUrl: "https://www.okx.com/web3",
-    check: () => typeof window !== "undefined" && !!(window.okxwallet || window.ethereum?.isOKExWallet),
+    check: () => {
+      if (typeof window === "undefined") return false;
+      if (eip6963Providers.has("com.okex.wallet")) return true;
+      if (window.okxwallet) return true;
+      if (window.ethereum?.isOKExWallet) return true;
+      if (window.ethereum?.providers) {
+        return window.ethereum.providers.some((p) => p.isOKExWallet);
+      }
+      return false;
+    },
     getProvider: () => {
       if (typeof window === "undefined") return null;
+      if (eip6963Providers.has("com.okex.wallet")) {
+        return eip6963Providers.get("com.okex.wallet").provider;
+      }
       if (window.okxwallet) return window.okxwallet;
       if (window.ethereum?.providers) {
         return window.ethereum.providers.find((p) => p.isOKExWallet) || null;
@@ -42,9 +75,21 @@ const WALLET_METADATA = {
     name: "Coinbase Wallet",
     avatar: "CB",
     downloadUrl: "https://www.coinbase.com/wallet",
-    check: () => typeof window !== "undefined" && !!(window.coinbaseWalletExtension || window.ethereum?.isCoinbaseWallet),
+    check: () => {
+      if (typeof window === "undefined") return false;
+      if (eip6963Providers.has("com.coinbase.wallet")) return true;
+      if (window.coinbaseWalletExtension) return true;
+      if (window.ethereum?.isCoinbaseWallet) return true;
+      if (window.ethereum?.providers) {
+        return window.ethereum.providers.some((p) => p.isCoinbaseWallet);
+      }
+      return false;
+    },
     getProvider: () => {
       if (typeof window === "undefined") return null;
+      if (eip6963Providers.has("com.coinbase.wallet")) {
+        return eip6963Providers.get("com.coinbase.wallet").provider;
+      }
       if (window.coinbaseWalletExtension) return window.coinbaseWalletExtension;
       if (window.ethereum?.providers) {
         return window.ethereum.providers.find((p) => p.isCoinbaseWallet) || null;
@@ -56,9 +101,21 @@ const WALLET_METADATA = {
     name: "Rabby Wallet",
     avatar: "RB",
     downloadUrl: "https://rabby.io/",
-    check: () => typeof window !== "undefined" && !!(window.rabby || window.ethereum?.isRabby),
+    check: () => {
+      if (typeof window === "undefined") return false;
+      if (eip6963Providers.has("io.rabby")) return true;
+      if (window.rabby) return true;
+      if (window.ethereum?.isRabby) return true;
+      if (window.ethereum?.providers) {
+        return window.ethereum.providers.some((p) => p.isRabby);
+      }
+      return false;
+    },
     getProvider: () => {
       if (typeof window === "undefined") return null;
+      if (eip6963Providers.has("io.rabby")) {
+        return eip6963Providers.get("io.rabby").provider;
+      }
       if (window.rabby) return window.rabby;
       if (window.ethereum?.providers) {
         return window.ethereum.providers.find((p) => p.isRabby) || null;
@@ -79,6 +136,7 @@ let connectedWallet = {
   address: null,
   chainId: null,
   provider: null,
+  balanceEth: null,
 };
 
 function getWalletProvider(type) {
@@ -110,9 +168,9 @@ async function connectWallet(type) {
   const provider = getWalletProvider(type);
   if (!provider) {
     if (meta.downloadUrl) {
-      showWalletError(`${meta.name} not detected. Click here to install: <a href="${meta.downloadUrl}" target="_blank" rel="noopener" style="color:var(--accent-cyan);">${meta.downloadUrl}</a>`);
+      showWalletError(`${meta.name} extension not detected. <a href="${meta.downloadUrl}" target="_blank" rel="noopener" style="color:var(--accent); font-weight:700; text-decoration:underline;">Click here to install ${meta.name} &rarr;</a>`);
     } else {
-      showWalletError("No EIP-1193 Web3 provider found in browser.");
+      showWalletError("No EIP-1193 compatible Web3 provider found in this browser.");
     }
     return;
   }
@@ -120,18 +178,25 @@ async function connectWallet(type) {
   try {
     const accounts = await provider.request({ method: "eth_requestAccounts" });
     if (!accounts || accounts.length === 0) {
-      showWalletError("No Ethereum account authorized.");
+      showWalletError("No Ethereum account authorized. Please unlock your wallet and approve the connection request.");
       return;
     }
 
     const chainIdHex = await provider.request({ method: "eth_chainId" });
     const chainId = parseInt(chainIdHex, 16);
 
+    let balanceEth = null;
+    try {
+      const balanceHex = await provider.request({ method: "eth_getBalance", params: [accounts[0], "latest"] });
+      balanceEth = (parseInt(balanceHex, 16) / 1e18).toFixed(4);
+    } catch {}
+
     connectedWallet = {
       type,
       address: accounts[0],
       chainId,
       provider,
+      balanceEth,
     };
 
     localStorage.setItem("bulwark_wallet_type", type);
@@ -140,7 +205,11 @@ async function connectWallet(type) {
     showToast(`Connected ${meta.name} (${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)})`, "success");
   } catch (err) {
     console.error("Wallet connection failed:", err);
-    showWalletError(err.message || "Failed to connect to wallet.");
+    if (err.code === 4001) {
+      showWalletError("Connection rejected by user in wallet prompt.");
+    } else {
+      showWalletError(err.message || "Failed to connect to wallet.");
+    }
   }
 }
 
@@ -386,9 +455,10 @@ function highlightActiveNav() {
   const path = window.location.pathname;
   document.querySelectorAll(".nav-tab").forEach((tab) => {
     const href = tab.getAttribute("href");
-    if (href === path || (href === "/" && (path === "" || path === "/index.html" || path === "/dashboard"))) {
+    const isOverview = href === "/overview" && (path === "/overview" || path === "/index.html" || path === "/dashboard" || path === "/console");
+    if (href === path || isOverview) {
       tab.classList.add("active");
-    } else if (href !== "/" && path.startsWith(href)) {
+    } else if (href !== "/" && href !== "/overview" && path.startsWith(href)) {
       tab.classList.add("active");
     } else {
       tab.classList.remove("active");

@@ -109,12 +109,12 @@ export function createWebServer(options: WebServerOptions = {}): http.Server {
     try {
       // ── Static Routes ──────────────────────────────────────────────────────
       if (method === "GET" || method === "HEAD") {
-        if (pathname === "/" || pathname === "/index.html" || pathname === "/dashboard") {
-          serveFile(path.join(PUBLIC_DIR, "index.html"), "text/html");
+        if (pathname === "/" || pathname === "/landing" || pathname === "/landing.html" || pathname === "/home") {
+          serveFile(path.join(PUBLIC_DIR, "landing.html"), "text/html");
           return;
         }
-        if (pathname === "/landing" || pathname === "/landing.html" || pathname === "/home") {
-          serveFile(path.join(PUBLIC_DIR, "landing.html"), "text/html");
+        if (pathname === "/overview" || pathname === "/index.html" || pathname === "/dashboard" || pathname === "/console") {
+          serveFile(path.join(PUBLIC_DIR, "index.html"), "text/html");
           return;
         }
         if (pathname === "/positions" || pathname === "/positions.html") {
