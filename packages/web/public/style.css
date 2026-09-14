@@ -176,9 +176,8 @@ body::before {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #818cf8 50%, #c084fc 100%);
-  opacity: 0.85;
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.7);
+  background-color: var(--accent);
+  opacity: 0.75;
   animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
@@ -188,8 +187,7 @@ body::before {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #818cf8 50%, #c084fc 100%);
-  box-shadow: 0 0 6px rgba(99, 102, 241, 0.9);
+  background-color: var(--accent);
 }
 
 @keyframes ping {
@@ -199,7 +197,7 @@ body::before {
   }
 }
 
-/* ── Frosted Glass App Header (MacBook Liquid Glass Pill Nav) ── */
+/* ── Frosted Glass App Header (MacBook Liquid Glass Nav) ── */
 header.app-header {
   height: 56px;
   margin: 12px 24px 6px 24px;
@@ -214,57 +212,9 @@ header.app-header {
   position: relative;
   z-index: 50;
   box-shadow: 
-    0 10px 30px -5px rgba(37, 99, 235, 0.08),
-    0 2px 10px 0 rgba(147, 51, 234, 0.04),
+    0 4px 20px -2px rgba(15, 23, 42, 0.05),
     var(--mac-glass-specular);
-  isolation: isolate;
-  border: 1px solid rgba(99, 102, 241, 0.16);
-}
-
-/* Circling animated combination gradient border on header */
-header.app-header::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--liquid-angle, 0deg),
-    #2563eb 0%,
-    #4f46e5 22%,
-    #9333ea 48%,
-    #ec4899 70%,
-    #06b6d4 88%,
-    #2563eb 100%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 1.5px;
-  pointer-events: none;
-  animation: liquidBorderSpin 8s linear infinite;
-  z-index: 1;
-  opacity: 0.75;
-}
-
-/* Soft radiant aura circling header */
-header.app-header::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--liquid-angle, 0deg),
-    #2563eb 0%,
-    #4f46e5 22%,
-    #9333ea 48%,
-    #ec4899 70%,
-    #2563eb 100%
-  );
-  filter: blur(14px);
-  opacity: 0.16;
-  pointer-events: none;
-  z-index: -1;
-  animation: liquidBorderSpin 8s linear infinite;
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .logo-area {
@@ -285,16 +235,13 @@ header.app-header::after {
   font-weight: 800;
   font-size: 16px;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4338ca 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
 }
 
 .logo-dot {
-  background: linear-gradient(135deg, #3b82f6 0%, #818cf8 50%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.8));
+  color: var(--accent);
 }
 
 .sub-tag {
@@ -333,16 +280,13 @@ header.app-header::after {
 
 .nav-tab:hover {
   color: var(--text-primary);
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(15, 23, 42, 0.05);
 }
 
 .nav-tab.active {
   color: #ffffff !important;
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%) !important;
-  box-shadow: 
-    0 4px 14px rgba(79, 70, 229, 0.4),
-    0 0 16px rgba(124, 58, 237, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  background: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15) !important;
   border: none !important;
   font-weight: 700;
 }
@@ -354,23 +298,23 @@ header.app-header::after {
   font-size: 11px;
   padding: 5px 12px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(99, 102, 241, 0.22);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05), var(--mac-glass-specular);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04), var(--mac-glass-specular);
   transition: all 0.2s;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.95);
   color: var(--text-primary);
-  border-color: rgba(147, 51, 234, 0.4);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+  border-color: rgba(203, 213, 225, 1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 /* ── Buttons (MacBook Liquid Glass) ──────────────────────────────────────────────────── */
 .btn-primary {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+  background: #0f172a;
   color: #ffffff;
   font-weight: 700;
   font-size: 12px;
@@ -378,26 +322,18 @@ header.app-header::after {
   padding: 7px 18px;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 
-    0 4px 16px rgba(15, 23, 42, 0.25),
-    0 0 16px rgba(79, 70, 229, 0.25),
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-family: var(--font-sans);
-  position: relative;
-  isolation: isolate;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #1e1b4b 100%);
-  box-shadow: 
-    0 8px 24px rgba(15, 23, 42, 0.3),
-    0 0 24px rgba(147, 51, 234, 0.45),
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+  background: #1e293b;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22);
 }
 
 .btn-primary:active {
@@ -720,10 +656,7 @@ main.dashboard-grid.command-center {
   font-weight: 800;
   line-height: 1.18;
   letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #4338ca 70%, #7e22ce 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.25));
+  color: var(--text-primary);
 }
 
 .hero-copy {
@@ -810,10 +743,7 @@ main.dashboard-grid.command-center {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 35%, #7e22ce 70%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3));
+  color: var(--text-muted);
 }
 
 .protection-flow-track {
@@ -850,20 +780,18 @@ main.dashboard-grid.command-center {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 800;
-  color: #ffffff;
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);
+  color: var(--accent);
+  background: rgba(37, 99, 235, 0.08);
   padding: 2px 7px;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  border: 1px solid rgba(37, 99, 235, 0.15);
 }
 
 .stage-name {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 40%, #7e22ce 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .stage-desc {
@@ -1019,11 +947,8 @@ main.dashboard-grid.command-center {
 }
 
 .card-subtitle-tag.highlight {
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 40%, #9333ea 80%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
   font-weight: 800;
-  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3));
 }
 
 .card-headline {
@@ -1035,10 +960,7 @@ main.dashboard-grid.command-center {
 
 .card-headline.large {
   font-size: 18px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #4338ca 70%, #7e22ce 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.25));
+  color: var(--text-primary);
 }
 
 /* Left Card: Health Factor visual focal point */
@@ -1072,10 +994,7 @@ main.dashboard-grid.command-center {
   line-height: 1.1;
   letter-spacing: -0.04em;
   margin: 6px 0;
-  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 35%, #7e22ce 70%, #be185d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.35));
+  color: var(--text-primary);
 }
 
 .hf-focal-status {
@@ -1143,10 +1062,7 @@ main.dashboard-grid.command-center {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 35%, #7e22ce 70%, #be185d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 6px rgba(99, 102, 241, 0.3));
+  color: var(--text-primary);
 }
 
 .step-sub {
@@ -1391,10 +1307,7 @@ main.dashboard-grid.command-center {
   font-size: 42px;
   font-weight: 800;
   letter-spacing: -0.05em;
-  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 35%, #7e22ce 70%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 12px rgba(99, 102, 241, 0.35));
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -2632,7 +2545,7 @@ main.dashboard-grid.landing-container {
 .btn-hero-primary {
   padding: 15px 34px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+  background: #0f172a;
   color: #ffffff;
   font-weight: 800;
   font-size: 14px;
@@ -2641,23 +2554,15 @@ main.dashboard-grid.landing-container {
   align-items: center;
   gap: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 8px 24px rgba(15, 23, 42, 0.28),
-    0 0 20px rgba(79, 70, 229, 0.35),
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  position: relative;
-  isolation: isolate;
 }
 
 .btn-hero-primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #1e1b4b 100%);
-  box-shadow: 
-    0 12px 32px rgba(15, 23, 42, 0.35),
-    0 0 30px rgba(147, 51, 234, 0.5),
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  background: #1e293b;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
 }
 
 .btn-hero-secondary {
@@ -2729,12 +2634,11 @@ main.dashboard-grid.landing-container {
 }
 
 .chip-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #818cf8 50%, #c084fc 100%);
+  background-color: var(--accent);
   display: inline-block;
-  box-shadow: 0 0 6px rgba(99, 102, 241, 0.7);
 }
 
 .scroll-prompt {
@@ -2872,10 +2776,7 @@ main.dashboard-grid.landing-container {
   font-weight: 800;
   letter-spacing: -0.03em;
   margin-bottom: 6px;
-  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 35%, #7e22ce 70%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.3));
+  color: var(--text-primary);
 }
 
 .stat-lbl {
