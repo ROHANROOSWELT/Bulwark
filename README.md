@@ -1,4 +1,4 @@
-# 🛡️ BULWARK: Autonomous Agent Backstop Economy
+# BULWARK: Autonomous Agent Backstop Economy
 
 <div align="center">
 
