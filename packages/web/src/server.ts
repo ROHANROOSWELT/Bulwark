@@ -113,6 +113,10 @@ export function createWebServer(options: WebServerOptions = {}): http.Server {
           serveFile(path.join(PUBLIC_DIR, "index.html"), "text/html");
           return;
         }
+        if (pathname === "/landing" || pathname === "/landing.html" || pathname === "/home") {
+          serveFile(path.join(PUBLIC_DIR, "landing.html"), "text/html");
+          return;
+        }
         if (pathname === "/positions" || pathname === "/positions.html") {
           serveFile(path.join(PUBLIC_DIR, "positions.html"), "text/html");
           return;

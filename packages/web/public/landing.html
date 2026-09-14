@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BULWARK — Autonomous Backstop Economy &middot; Liquid Protection</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="landing-page">
+
+  <!-- Global Floating App Header -->
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="/landing" class="logo-link">
+        <span class="live-dot" title="Autonomous Guardian Node Online">
+          <span class="live-dot-ping"></span>
+          <span class="live-dot-core"></span>
+        </span>
+        <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
+      </a>
+      <span id="chainChip" class="chip chip-chain">[CHAIN READ] Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">[UNAVAILABLE] KEY NOT DETECTED</span>
+    </div>
+    <nav class="nav-bar">
+      <a href="/landing" class="nav-tab active">Landing</a>
+      <a href="/" class="nav-tab">Overview</a>
+      <a href="/positions" class="nav-tab">Positions</a>
+      <a href="/grants" class="nav-tab">Grants Desk</a>
+      <a href="/executions" class="nav-tab">Executions</a>
+      <a href="/audit" class="nav-tab">Audit Trail</a>
+      <a href="/verify" class="nav-tab">PoAA /verify</a>
+      <a href="/settings" class="nav-tab">Diagnostics</a>
+    </nav>
+    <div class="header-status">
+      <a href="/" class="btn-primary" style="text-decoration: none; padding: 7px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+        <span>Launch App</span>
+        <span>&rarr;</span>
+      </a>
+      <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
+        <span class="wallet-btn-icon" id="walletBtnIcon">⚡</span>
+        <span id="walletBtnLabel">Connect Wallet</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hidden desk KPI container so shared.js can update live state without error -->
+  <div style="display: none;">
+    <span id="deskBalanceVal">$0.00</span>
+    <span id="availableCapVal">$0.00</span>
+    <span id="reservedCapVal">$0.00</span>
+    <span id="verifiedRescuesVal">0</span>
+    <span id="capitalDeployedVal">$0.00</span>
+    <button id="tickBtn"></button>
+  </div>
+
+  <div class="landing-container">
+
+    <!-- ── Hero Section ─────────────────────────────────────────────────────── -->
+    <section class="landing-hero">
+      <div class="hero-badge">
+        <span class="live-dot" style="margin: 0;">
+          <span class="live-dot-ping"></span>
+          <span class="live-dot-core"></span>
+        </span>
+        <span>Autonomous Risk Backstop &middot; Aave Liquidity Guardian</span>
+      </div>
+
+      <h1 class="hero-title">
+        Deterministic<br>
+        <span class="text-gradient">Risk Backstop.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Autonomous liquidity protection with mathematically proven agency. Preemptive debt repayment, invariant risk clamping, and cryptographic Proof of Authorized Agency executed by KeeperHub.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/" class="btn-hero-primary">
+          <span>Launch Operations Console</span>
+          <span>&rarr;</span>
+        </a>
+        <a href="/verify" class="btn-hero-secondary">
+          <span>⚡ Verify PoAA Proof</span>
+        </a>
+        <a href="/positions" class="btn-hero-secondary">
+          <span>🛡️ Explore Positions</span>
+        </a>
+      </div>
+
+      <div class="hero-floats">
+        <div class="float-chip">
+          <span style="color: var(--accent-emerald);">●</span>
+          <span>Aave Health Factor Floor 1.05 &bull; Target 1.50</span>
+        </div>
+        <div class="float-chip">
+          <span style="color: var(--accent-cyan);">⚡</span>
+          <span>KeeperHub Calldata Simulation &bull; Zero Revert</span>
+        </div>
+        <div class="float-chip">
+          <span style="color: var(--accent-indigo);">📜</span>
+          <span>11-Step Cryptographic PoAA Validation</span>
+        </div>
+        <div class="float-chip">
+          <span style="color: var(--accent-amber);">🔒</span>
+          <span>Zero Secret Leakage Policy Invariant</span>
+        </div>
+      </div>
+
+      <a href="#stats" class="scroll-prompt">
+        <span>Scroll to Explore</span>
+        <div class="scroll-line"></div>
+      </a>
+    </section>
+
+    <!-- ── Protocol Stats Banner ────────────────────────────────────────────── -->
+    <section id="stats" class="stats-banner">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val text-gradient" id="landingDeskCap">$500,000.00</div>
+          <div class="stat-lbl">Underwriting Capacity</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color: var(--accent-cyan);">&lt; 1.25 HF</div>
+          <div class="stat-lbl">Autonomous Trigger Floor</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color: var(--accent-emerald);">100%</div>
+          <div class="stat-lbl">Cryptographic PoAA Rate</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color: #a78bfa;">Sepolia</div>
+          <div class="stat-lbl">Active Network (11155111)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Core Features / Pillars ───────────────────────────────────────────── -->
+    <section id="features" class="landing-section">
+      <div class="section-head">
+        <div class="section-pill">Architectural Pillars</div>
+        <h2 class="section-title">Engineered for Zero-Trust Liquidity Defense</h2>
+        <p class="section-desc">
+          BULWARK combines mathematical debt optimization with cryptographic agency delegation, eliminating predatory liquidations before they happen.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div>
+            <div class="feature-icon-box" style="color: var(--accent-cyan);">🛡️</div>
+            <h3 class="feature-name">Deterministic Debt Repayment</h3>
+            <p class="feature-text">
+              Real-time monitoring of Aave lending positions across every new block. When health factors breach safety bounds, the backstop autonomously calculates the exact debt repayment required to restore health to 1.50 HF.
+            </p>
+          </div>
+          <div class="feature-badge-row">
+            <span class="feature-micro-badge">Autonomous Scan</span>
+            <span class="feature-micro-badge">Atomic Repay</span>
+            <span class="feature-micro-badge">Zero-Custody</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div>
+            <div class="feature-icon-box" style="color: var(--accent-emerald);">📜</div>
+            <h3 class="feature-name">Proof of Authorized Agency (PoAA)</h3>
+            <p class="feature-text">
+              Every single executed backstop produces an unforgeable, self-contained JSON proof bundle. Anyone can independently verify 11 cryptographic checks—including policy hash, intent hash, and on-chain transaction receipts.
+            </p>
+          </div>
+          <div class="feature-badge-row">
+            <span class="feature-micro-badge">Keccak-256 Hashes</span>
+            <span class="feature-micro-badge">11/11 Checks</span>
+            <span class="feature-micro-badge">Independent Verifier</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div>
+            <div class="feature-icon-box" style="color: var(--accent-indigo);">⚖️</div>
+            <h3 class="feature-name">Bounded Policy & Triage Clamping</h3>
+            <p class="feature-text">
+              Authority is strictly bounded by deterministic parameters: max debt change, daily capital caps, price bands, and expiration timestamps. Any AI or LLM triage advice is mathematically clamped to valid candidate plans.
+            </p>
+          </div>
+          <div class="feature-badge-row">
+            <span class="feature-micro-badge">Hard Capital Caps</span>
+            <span class="feature-micro-badge">Adaptive Bands</span>
+            <span class="feature-micro-badge">Prompt Injection Proof</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div>
+            <div class="feature-icon-box" style="color: var(--accent-amber);">⚡</div>
+            <h3 class="feature-name">Zero-Trust KeeperHub Execution</h3>
+            <p class="feature-text">
+              Pre-flight simulation verifies transactions would succeed before broadcasting. Calldata is dispatched through KeeperHub with zero secret key leakage to client browsers and verified on-chain via dual RPC consensus.
+            </p>
+          </div>
+          <div class="feature-badge-row">
+            <span class="feature-micro-badge">Gas-Bounded</span>
+            <span class="feature-micro-badge">Revert-Free Dispatch</span>
+            <span class="feature-micro-badge">Dual Consensus</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Interactive Architecture Pipeline ─────────────────────────────────── -->
+    <section class="landing-section">
+      <div class="section-head">
+        <div class="section-pill">Execution Lifecycle</div>
+        <h2 class="section-title">From Invariant Breach to Cryptographic Proof</h2>
+        <p class="section-desc">
+          How BULWARK transparently monitors, approves, simulates, executes, and proves every liquidity backstop action.
+        </p>
+      </div>
+
+      <div class="pipeline-steps">
+        <div class="pipeline-card">
+          <span class="step-num-pill">Step 01</span>
+          <h4 class="step-heading">Invariant Breach</h4>
+          <p class="step-text">
+            Continuous off-chain observation detects an Aave position falling below the configured threshold (e.g. HF &lt; 1.25).
+          </p>
+        </div>
+
+        <div class="pipeline-card">
+          <span class="step-num-pill">Step 02</span>
+          <h4 class="step-heading">Math Optimization</h4>
+          <p class="step-text">
+            Calculates exact candidate debt repayment to restore health factor to 1.50 HF within active RescueGrant daily caps.
+          </p>
+        </div>
+
+        <div class="pipeline-card">
+          <span class="step-num-pill">Step 03</span>
+          <h4 class="step-heading">KeeperHub Dispatch</h4>
+          <p class="step-text">
+            Pre-flight simulation verifies gas and execution safety. Atomic calldata is broadcasted and confirmed on-chain.
+          </p>
+        </div>
+
+        <div class="pipeline-card">
+          <span class="step-num-pill">Step 04</span>
+          <h4 class="step-heading">PoAA Generation</h4>
+          <p class="step-text">
+            Pre/post position state and transaction receipts are bundled into a cryptographic PoAA proof, published to public audit trail.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Interactive PoAA Proof Simulator Widget ────────────────────────────── -->
+    <section class="landing-section">
+      <div class="section-head">
+        <div class="section-pill">Interactive Demonstration</div>
+        <h2 class="section-title">Experience Real-Time PoAA Verification</h2>
+        <p class="section-desc">
+          Test the 11-step mathematical validation pipeline directly in your browser.
+        </p>
+      </div>
+
+      <div class="simulator-box">
+        <div class="simulator-header">
+          <div>
+            <div style="font-size: 16px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">PoAA Cryptographic Verifier Engine</div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Bundle: <code style="color: var(--accent-cyan);">bundle_golden_sepolia_77189</code></div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="simRunBtn" class="btn-primary" style="padding: 10px 20px; font-size: 13px;">
+              ▶ Run Verification Simulation
+            </button>
+            <a href="/verify" class="btn-secondary" style="text-decoration: none; padding: 10px 18px; font-size: 13px; display: inline-flex; align-items: center;">
+              Open Full Verifier &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="sim-checks-list" id="simChecksContainer">
+          <div class="sim-check-item" data-check="1">
+            <span>1. Schema & Structure Validity</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="2">
+            <span>2. Grant ID & Hash Integrity</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="3">
+            <span>3. Authority Scope & Allowed Action</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="4">
+            <span>4. Capital & Per-Action Cap Bounding</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="5">
+            <span>5. HF Trigger Condition Match</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="6">
+            <span>6. Expiration & Temporal Validity</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="7">
+            <span>7. Price Band & Market Limits</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="8">
+            <span>8. Intent Hash Match</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="9">
+            <span>9. Policy Hash Consensus</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="10">
+            <span>10. Execution Receipt & Tx Hash</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+          <div class="sim-check-item" data-check="11" style="grid-column: span 2;">
+            <span>11. Position Delta & Health Factor Improvement (1.18 &rarr; 1.95 HF)</span>
+            <span class="sim-check-icon" style="color: rgba(255,255,255,0.3);">READY</span>
+          </div>
+        </div>
+
+        <div id="simVerdict" class="verdict-banner verdict-proven sim-verdict-area">
+          PROVEN: All 11 Cryptographic & Mathematical Invariants Satisfied
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Liquidation Comparison Matrix ────────────────────────────────────── -->
+    <section class="landing-section">
+      <div class="section-head">
+        <div class="section-pill">Comparative Advantage</div>
+        <h2 class="section-title">Predatory Liquidation vs. BULWARK Backstop</h2>
+        <p class="section-desc">
+          See why delegated autonomous backstops preserve user capital and protocol stability.
+        </p>
+      </div>
+
+      <div class="comparison-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Feature / Metric</th>
+              <th>Predatory Liquidation</th>
+              <th>BULWARK Backstop Desk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Penalty Penalty / Fee</strong></td>
+              <td class="comp-bad">5% &ndash; 15% Collateral Bonus Seized</td>
+              <td class="comp-good">0.50% &ndash; 1.00% Risk Premium</td>
+            </tr>
+            <tr>
+              <td><strong>Collateral Disposition</strong></td>
+              <td class="comp-bad">Aggressively dumped on DEX / AMM</td>
+              <td class="comp-good">Zero collateral seized; non-custodial debt repayment</td>
+            </tr>
+            <tr>
+              <td><strong>Execution Visibility</strong></td>
+              <td class="comp-bad">MEV sandwich bots & frontrunning</td>
+              <td class="comp-good">Gas-bounded KeeperHub execution with deterministic simulation</td>
+            </tr>
+            <tr>
+              <td><strong>Cryptographic Audit</strong></td>
+              <td class="comp-bad">None; post-factum explorer analysis</td>
+              <td class="comp-good">100% Verifiable PoAA Bundle with 11 mathematical checks</td>
+            </tr>
+            <tr>
+              <td><strong>Position Health Restored</strong></td>
+              <td class="comp-bad">Barely above 1.00 HF (vulnerable to re-liquidation)</td>
+              <td class="comp-good">Targeted recovery to 1.50 HF buffer zone</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Call to Action Banner ────────────────────────────────────────────── -->
+    <section class="landing-section" style="padding-bottom: 120px;">
+      <div class="cta-box">
+        <div class="section-pill" style="margin-bottom: 20px;">Ready to Deploy</div>
+        <h2 style="font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 20px; line-height: 1.1;">
+          Secure Your Lending Positions <br>
+          <span class="text-gradient">With Autonomous Proof.</span>
+        </h2>
+        <p style="font-size: 16px; color: rgba(255,255,255,0.7); max-width: 620px; margin: 0 auto 36px; line-height: 1.6;">
+          Connect your Web3 wallet, propose a bounded RescueGrant, and let the autonomous guardian backstop your Aave portfolio around the clock.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <a href="/" class="btn-hero-primary">
+            <span>Launch Operations Console</span>
+            <span>&rarr;</span>
+          </a>
+          <a href="https://github.com/ROHANROOSWELT/Bulwark" target="_blank" class="btn-hero-secondary">
+            <span>Explore on GitHub ↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Landing Page Footer ──────────────────────────────────────────────── -->
+    <footer class="landing-footer">
+      <div class="footer-grid">
+        <div>
+          <a href="/landing" class="logo-link" style="margin-bottom: 16px; display: inline-flex;">
+            <span class="live-dot">
+              <span class="live-dot-ping"></span>
+              <span class="live-dot-core"></span>
+            </span>
+            <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
+          </a>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; max-width: 320px; margin-top: 12px;">
+            Deterministic Aave backstop economy executed by KeeperHub with cryptographic Proof of Authorized Agency.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="/landing" class="footer-link">Landing Experience</a></li>
+            <li><a href="/" class="footer-link">Operations Dashboard</a></li>
+            <li><a href="/positions" class="footer-link">Monitored Positions</a></li>
+            <li><a href="/grants" class="footer-link">Grants Desk</a></li>
+            <li><a href="/executions" class="footer-link">Execution Engine</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Verification & Tools</h4>
+          <ul class="footer-links">
+            <li><a href="/verify" class="footer-link">PoAA Public Verifier</a></li>
+            <li><a href="/audit" class="footer-link">Cryptographic Audit Trail</a></li>
+            <li><a href="/settings" class="footer-link">System Diagnostics</a></li>
+            <li><a href="/api/state" target="_blank" class="footer-link">Clean State API</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Community & Code</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/ROHANROOSWELT/Bulwark" target="_blank" class="footer-link">GitHub Repository</a></li>
+            <li><a href="https://sepolia.etherscan.io" target="_blank" class="footer-link">Sepolia Etherscan</a></li>
+            <li><a href="https://aave.com" target="_blank" class="footer-link">Aave Protocol</a></li>
+            <li><a href="https://keeperhub.com" target="_blank" class="footer-link">KeeperHub Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 BULWARK Protocol. Open-source under MIT. Deterministic Non-Custodial Architecture.</span>
+        <span>Chain: Sepolia 11155111 &bull; Execution: KeeperHub Autonomous Relay</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Wallet Connection Modal (Managed by shared.js) -->
+  <div class="wallet-modal-backdrop" id="walletModalBackdrop">
+    <div class="wallet-modal-card">
+      <div class="wallet-modal-header">
+        <div class="wallet-modal-title">Connect Web3 Wallet</div>
+        <button class="wallet-modal-close" id="closeWalletModalBtn">&times;</button>
+      </div>
+
+      <div class="wallet-status-box" id="walletConnectedBox" style="display: none;">
+        <div class="wallet-connected-badge">
+          <span class="wallet-chain-dot"></span>
+          <span>Connected to Sepolia (11155111)</span>
+        </div>
+        <div class="wallet-address-display" id="connectedAddressDisplay">0x...</div>
+        <div class="wallet-balance-display" id="connectedBalanceDisplay">0.0000 ETH</div>
+        <div class="wallet-modal-actions">
+          <button class="btn-primary" id="scanConnectedPosBtn">View My Positions &rarr;</button>
+          <button class="btn-secondary" id="disconnectWalletBtn">Disconnect</button>
+        </div>
+      </div>
+
+      <div class="wallet-wrong-network-banner" id="wrongNetworkBanner" style="display: none;">
+        <span>Wrong Network! Please switch to Ethereum Sepolia.</span>
+        <button class="btn-primary" id="switchNetworkBtn" style="padding: 4px 10px; font-size: 11px;">Switch Network</button>
+      </div>
+
+      <div class="wallet-error-banner" id="walletErrorBanner" style="display: none;"></div>
+
+      <div class="wallet-grid" id="walletOptionsList">
+        <div class="wallet-option" data-wallet="metamask">
+          <div class="wallet-icon-wrap">🦊</div>
+          <div class="wallet-info">
+            <div class="wallet-name">MetaMask</div>
+            <div class="wallet-subtext" id="status-metamask">Detecting...</div>
+          </div>
+        </div>
+
+        <div class="wallet-option" data-wallet="okx">
+          <div class="wallet-icon-wrap">⬛</div>
+          <div class="wallet-info">
+            <div class="wallet-name">OKX Wallet</div>
+            <div class="wallet-subtext" id="status-okx">Detecting...</div>
+          </div>
+        </div>
+
+        <div class="wallet-option" data-wallet="coinbase">
+          <div class="wallet-icon-wrap">🔵</div>
+          <div class="wallet-info">
+            <div class="wallet-name">Coinbase Wallet</div>
+            <div class="wallet-subtext" id="status-coinbase">Detecting...</div>
+          </div>
+        </div>
+
+        <div class="wallet-option" data-wallet="rabby">
+          <div class="wallet-icon-wrap">🐰</div>
+          <div class="wallet-info">
+            <div class="wallet-name">Rabby Wallet</div>
+            <div class="wallet-subtext" id="status-rabby">Detecting...</div>
+          </div>
+        </div>
+
+        <div class="wallet-option" data-wallet="injected">
+          <div class="wallet-icon-wrap">🌐</div>
+          <div class="wallet-info">
+            <div class="wallet-name">Browser Injected</div>
+            <div class="wallet-subtext" id="status-injected">Detecting...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Shared Application Scripts -->
+  <script src="/shared.js"></script>
+
+  <!-- Interactive PoAA Proof Simulator Script -->
+  <script>
+    (function() {
+      const runBtn = document.getElementById("simRunBtn");
+      const checks = document.querySelectorAll(".sim-check-item");
+      const verdict = document.getElementById("simVerdict");
+      let running = false;
+
+      if (!runBtn) return;
+
+      runBtn.addEventListener("click", () => {
+        if (running) return;
+        running = true;
+        runBtn.disabled = true;
+        runBtn.textContent = "Verifying Cryptographic Invariants...";
+        verdict.style.display = "none";
+
+        // Reset checks
+        checks.forEach(item => {
+          item.classList.remove("passed");
+          const icon = item.querySelector(".sim-check-icon");
+          if (icon) {
+            icon.textContent = "CHECKING...";
+            icon.style.color = "var(--accent-cyan)";
+          }
+        });
+
+        // Sequentially pass checks with smooth timing
+        checks.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add("passed");
+            const icon = item.querySelector(".sim-check-icon");
+            if (icon) {
+              icon.textContent = "✓ SATISFIED";
+              icon.style.color = "var(--accent-emerald)";
+            }
+
+            if (index === checks.length - 1) {
+              setTimeout(() => {
+                verdict.style.display = "block";
+                runBtn.disabled = false;
+                runBtn.textContent = "▶ Re-run Simulation";
+                running = false;
+              }, 250);
+            }
+          }, (index + 1) * 90);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
