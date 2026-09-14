@@ -83,8 +83,11 @@
         </label>
         <textarea id="bundleText" class="bundle-input" placeholder='Paste full PoaaBundle JSON here (e.g. { "bundleVersion": "2.0", "grant": {...}, ... })'></textarea>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
-          <input type="file" id="fileInput" accept=".json" style="color: var(--text-muted); font-size: 11px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="file" id="fileInput" accept=".json" style="color: var(--text-muted); font-size: 11px;">
+            <button id="loadLiveProofBtn" class="btn-secondary" style="font-size: 11px; padding: 6px 12px; border-color: #10b981; color: #10b981;">⚡ Load Live On-Chain Rescue Proof</button>
+          </div>
           <button id="verifyBtn" class="btn-primary">Verify 11/11 Checks</button>
         </div>
       </div>

@@ -281,6 +281,22 @@ export async function handleRequest(
         return;
       }
 
+      // GET /api/proof/bundle/latest
+      if (method === "GET" && pathname === "/api/proof/bundle/latest") {
+        try {
+          const poaaPath = path.join(process.cwd(), ".bulwark", "poaa_latest.json");
+          if (fs.existsSync(poaaPath)) {
+            const content = JSON.parse(fs.readFileSync(poaaPath, "utf-8"));
+            sendJson(200, content);
+            return;
+          }
+          sendJson(404, { error: "No latest PoAA bundle found" });
+        } catch (e: any) {
+          sendJson(500, { error: e?.message || "Failed to load bundle" });
+        }
+        return;
+      }
+
       // 4. POST /api/scan
       if (method === "POST" && pathname === "/api/scan") {
         const body = await readBody<{ address?: string; chainId?: number }>();

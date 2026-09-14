@@ -9,6 +9,27 @@ const verdictBanner = document.getElementById("verdictBanner");
 const checksList = document.getElementById("checksList");
 const checksContainer = document.getElementById("checksContainer");
 
+const loadLiveProofBtn = document.getElementById("loadLiveProofBtn");
+
+if (loadLiveProofBtn) {
+  loadLiveProofBtn.addEventListener("click", async () => {
+    try {
+      loadLiveProofBtn.disabled = true;
+      loadLiveProofBtn.textContent = "Loading Proof...";
+      const res = await fetch("/api/proof/bundle/latest");
+      if (!res.ok) throw new Error("Could not load latest proof bundle");
+      const bundle = await res.json();
+      bundleText.value = JSON.stringify(bundle, null, 2);
+      verifyBtn.click();
+    } catch (err) {
+      alert("Error loading proof: " + err.message);
+    } finally {
+      loadLiveProofBtn.disabled = false;
+      loadLiveProofBtn.textContent = "⚡ Load Live On-Chain Rescue Proof";
+    }
+  });
+}
+
 fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;

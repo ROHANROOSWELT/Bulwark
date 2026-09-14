@@ -109,15 +109,22 @@ export class BulwarkStore {
     const capPath = join(this.baseDir, "capacity.json");
     try {
       await fs.access(capPath);
+      const capContent = await fs.readFile(capPath, "utf8");
+      const existingCap = JSON.parse(capContent) as CapacityLedger;
+      if (existingCap.deskBalanceUsd === 0) {
+        existingCap.deskBalanceUsd = 50000;
+        existingCap.availableUsd = 50000 - (existingCap.reservedUsd || 0);
+        await this.atomicWrite(capPath, JSON.stringify(existingCap, null, 2));
+      }
     } catch {
       const defaultBalance = process.env.BULWARK_DESK_BALANCE_USD
         ? parseFloat(process.env.BULWARK_DESK_BALANCE_USD)
-        : (process.env.VERCEL ? 50000 : 0);
+        : 50000;
       const defaultCap: CapacityLedger = {
         deskWalletAddress: process.env.BULWARK_DESK_WALLET ?? "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-        deskBalanceUsd: isNaN(defaultBalance) ? 0 : defaultBalance,
+        deskBalanceUsd: isNaN(defaultBalance) ? 50000 : defaultBalance,
         reservedUsd: 0,
-        availableUsd: isNaN(defaultBalance) ? 0 : defaultBalance,
+        availableUsd: isNaN(defaultBalance) ? 50000 : defaultBalance,
         reservations: {},
         lastUpdated: new Date().toISOString(),
       };
