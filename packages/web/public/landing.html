@@ -37,7 +37,7 @@
         <span>&rarr;</span>
       </a>
       <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
-        <span class="wallet-btn-icon" id="walletBtnIcon">⚡</span>
+        
         <span id="walletBtnLabel">Connect Wallet</span>
       </button>
     </div>
@@ -80,10 +80,10 @@
           <span>&rarr;</span>
         </a>
         <a href="/verify" class="btn-hero-secondary">
-          <span>⚡ Verify PoAA Proof</span>
+          <span>Verify PoAA Proof</span>
         </a>
         <a href="/positions" class="btn-hero-secondary">
-          <span>🛡️ Explore Positions</span>
+          <span>Explore Positions</span>
         </a>
       </div>
 
@@ -143,7 +143,7 @@
       <div class="features-grid">
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--accent-cyan);">🛡️</div>
+            <div class="feature-icon-box" style="color: var(--accent-cyan);">SH</div>
             <h3 class="feature-name">Deterministic Debt Repayment</h3>
             <p class="feature-text">
               Real-time monitoring of Aave lending positions across every new block. When health factors breach safety bounds, the backstop autonomously calculates the exact debt repayment required to restore health to 1.50 HF.
@@ -158,7 +158,7 @@
 
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--accent-emerald);">📜</div>
+            <div class="feature-icon-box" style="color: var(--accent-emerald);">AU</div>
             <h3 class="feature-name">Proof of Authorized Agency (PoAA)</h3>
             <p class="feature-text">
               Every single executed backstop produces an unforgeable, self-contained JSON proof bundle. Anyone can independently verify 11 cryptographic checks—including policy hash, intent hash, and on-chain transaction receipts.
@@ -188,7 +188,7 @@
 
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--accent-amber);">⚡</div>
+            <div class="feature-icon-box" style="color: var(--accent-amber);">EX</div>
             <h3 class="feature-name">Zero-Trust KeeperHub Execution</h3>
             <p class="feature-text">
               Pre-flight simulation verifies transactions would succeed before broadcasting. Calldata is dispatched through KeeperHub with zero secret key leakage to client browsers and verified on-chain via dual RPC consensus.
@@ -486,7 +486,7 @@
 
       <div class="wallet-grid" id="walletOptionsList">
         <div class="wallet-option" data-wallet="metamask">
-          <div class="wallet-icon-wrap">🦊</div>
+          <div class="wallet-icon-wrap">MM</div>
           <div class="wallet-info">
             <div class="wallet-name">MetaMask</div>
             <div class="wallet-subtext" id="status-metamask">Detecting...</div>
@@ -494,7 +494,7 @@
         </div>
 
         <div class="wallet-option" data-wallet="okx">
-          <div class="wallet-icon-wrap">⬛</div>
+          <div class="wallet-icon-wrap">OKX</div>
           <div class="wallet-info">
             <div class="wallet-name">OKX Wallet</div>
             <div class="wallet-subtext" id="status-okx">Detecting...</div>
@@ -502,7 +502,7 @@
         </div>
 
         <div class="wallet-option" data-wallet="coinbase">
-          <div class="wallet-icon-wrap">🔵</div>
+          <div class="wallet-icon-wrap">CB</div>
           <div class="wallet-info">
             <div class="wallet-name">Coinbase Wallet</div>
             <div class="wallet-subtext" id="status-coinbase">Detecting...</div>
@@ -510,7 +510,7 @@
         </div>
 
         <div class="wallet-option" data-wallet="rabby">
-          <div class="wallet-icon-wrap">🐰</div>
+          <div class="wallet-icon-wrap">RB</div>
           <div class="wallet-info">
             <div class="wallet-name">Rabby Wallet</div>
             <div class="wallet-subtext" id="status-rabby">Detecting...</div>
@@ -518,7 +518,7 @@
         </div>
 
         <div class="wallet-option" data-wallet="injected">
-          <div class="wallet-icon-wrap">🌐</div>
+          <div class="wallet-icon-wrap">WEB3</div>
           <div class="wallet-info">
             <div class="wallet-name">Browser Injected</div>
             <div class="wallet-subtext" id="status-injected">Detecting...</div>
@@ -566,7 +566,7 @@
             item.classList.add("passed");
             const icon = item.querySelector(".sim-check-icon");
             if (icon) {
-              icon.textContent = "✓ SATISFIED";
+              icon.textContent = "SATISFIED";
               icon.style.color = "var(--accent-emerald)";
             }
 

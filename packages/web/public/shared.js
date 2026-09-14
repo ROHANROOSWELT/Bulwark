@@ -7,7 +7,7 @@
 const WALLET_METADATA = {
   metamask: {
     name: "MetaMask",
-    avatar: "🦊",
+    avatar: "MM",
     downloadUrl: "https://metamask.io/download/",
     check: () => {
       if (typeof window === "undefined" || !window.ethereum) return false;
@@ -26,7 +26,7 @@ const WALLET_METADATA = {
   },
   okx: {
     name: "OKX Wallet",
-    avatar: "⬛",
+    avatar: "OKX",
     downloadUrl: "https://www.okx.com/web3",
     check: () => typeof window !== "undefined" && !!(window.okxwallet || window.ethereum?.isOKExWallet),
     getProvider: () => {
@@ -40,7 +40,7 @@ const WALLET_METADATA = {
   },
   coinbase: {
     name: "Coinbase Wallet",
-    avatar: "🔵",
+    avatar: "CB",
     downloadUrl: "https://www.coinbase.com/wallet",
     check: () => typeof window !== "undefined" && !!(window.coinbaseWalletExtension || window.ethereum?.isCoinbaseWallet),
     getProvider: () => {
@@ -54,7 +54,7 @@ const WALLET_METADATA = {
   },
   rabby: {
     name: "Rabby Wallet",
-    avatar: "🐰",
+    avatar: "RB",
     downloadUrl: "https://rabby.io/",
     check: () => typeof window !== "undefined" && !!(window.rabby || window.ethereum?.isRabby),
     getProvider: () => {
@@ -68,7 +68,7 @@ const WALLET_METADATA = {
   },
   injected: {
     name: "Browser Injected",
-    avatar: "⚡",
+    avatar: "W3",
     check: () => typeof window !== "undefined" && !!window.ethereum,
     getProvider: () => (typeof window !== "undefined" ? window.ethereum || null : null),
   },
