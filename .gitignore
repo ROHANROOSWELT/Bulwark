@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.bulwark*/
+.bulwark/
+test/reports/*.json
+test/reports/*.log
+test/reports/*.txt
+!test/reports/.gitkeep
+coverage/
+.DS_Store
+*.pem
+*.key

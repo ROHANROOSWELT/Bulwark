@@ -1,0 +1,28 @@
+{
+  "name": "bulwark",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BULWARK — the agent backstop economy for live Aave positions, executed deterministically by KeeperHub.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.3.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "type-check": "pnpm -r --filter './packages/*' type-check",
+    "test": "vitest run --config vitest.config.ts",
+    "test:unit": "vitest run --config vitest.config.ts test/unit",
+    "test:integration": "vitest run --config vitest.config.ts test/integration",
+    "test:e2e": "vitest run --config vitest.config.ts test/e2e",
+    "test:failure": "vitest run --config vitest.config.ts test/failure",
+    "test:security": "vitest run --config vitest.config.ts test/security",
+    "smoke": "bash scripts/smoke.sh",
+    "cli": "node packages/cli/dist/index.js",
+    "agent": "node packages/agent/dist/index.js",
+    "web": "node packages/web/dist/server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.5"
+  }
+}

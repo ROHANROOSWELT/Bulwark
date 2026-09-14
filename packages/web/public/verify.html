@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proof of Authorized Agency (PoAA) — Independent Verifier</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo-area">
+      <span class="logo-tag">BULWARK</span>
+      <span class="sub-tag">| Proof of Authorized Agency (PoAA) Independent Verifier</span>
+    </div>
+    <div class="header-status">
+      <a href="/" class="nav-link">&larr; Back to Ops Console</a>
+    </div>
+  </header>
+
+  <div class="verify-container">
+    <div class="verify-box">
+      <h2 style="margin-bottom: 8px; font-size: 16px;">Independent PoAA Bundle Verification</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 12px;">
+        Verify mathematical and factual proof that the autonomous agent acted strictly within owner-authorized limits.
+        Evaluates the 11-check cryptographic and on-chain verification chain.
+        <strong>No login, no trust in the desk required.</strong>
+      </p>
+
+      <label style="font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">
+        Paste PoAA JSON Bundle or Upload File:
+      </label>
+      <textarea id="bundleText" class="bundle-input" placeholder='Paste full PoaaBundle JSON here (e.g. { "bundleVersion": "2.0", "grant": {...}, ... })'></textarea>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+        <input type="file" id="fileInput" accept=".json" style="color: var(--text-muted); font-size: 11px;">
+        <button id="verifyBtn" class="btn-primary">Verify 11/11 Checks</button>
+      </div>
+    </div>
+
+    <!-- Verdict Result Banner -->
+    <div id="verdictBanner" style="display: none;" class="verdict-banner"></div>
+
+    <!-- 11 Checks List -->
+    <div id="checksList" style="display: none;" class="verify-box">
+      <h3 style="margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Verification Breakdown</h3>
+      <div id="checksContainer"></div>
+    </div>
+  </div>
+
+  <script src="/verify.js"></script>
+</body>
+</html>

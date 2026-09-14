@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BULWARK — Autonomous Backstop Economy Ops Console</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Global App Header -->
+  <header class="app-header">
+    <div class="logo-area">
+      <span class="logo-tag">BULWARK</span>
+      <span class="sub-tag">| Deterministic Aave Backstop &middot; Executed by KeeperHub</span>
+      <span id="chainChip" class="chip chip-chain">[CHAIN READ] Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">[UNAVAILABLE] KEY NOT DETECTED</span>
+    </div>
+    <div class="header-status">
+      <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
+      <a href="/verify" class="nav-link" title="Verify Proof of Authorized Agency">PoAA /verify</a>
+    </div>
+  </header>
+
+  <!-- Desk KPI Top Bar -->
+  <div class="desk-kpi-bar">
+    <div class="kpi-item">
+      <span class="kpi-label">Desk Balance:</span>
+      <span id="deskBalanceVal" class="kpi-value">$0.00</span>
+      <span class="chip chip-chain">[CHAIN READ]</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Available Capacity:</span>
+      <span id="availableCapVal" class="kpi-value">$0.00</span>
+      <span class="chip chip-policy">[POLICY INVARIANT]</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Reserved Capacity:</span>
+      <span id="reservedCapVal" class="kpi-value">$0.00</span>
+      <span class="chip chip-policy">[POLICY INVARIANT]</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Verified Rescues:</span>
+      <span id="verifiedRescuesVal" class="kpi-value">0</span>
+      <span class="chip chip-dual">[DUAL VERIFIED]</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Capital Deployed:</span>
+      <span id="capitalDeployedVal" class="kpi-value">$0.00</span>
+      <span class="chip chip-keeperhub">[KEEPERHUB FACT]</span>
+    </div>
+  </div>
+
+  <!-- Main 4-Panel Zero-Scroll Dashboard -->
+  <main class="dashboard-grid">
+    <!-- Panel 1: Positions -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">1. Monitored Positions</span>
+        <span class="chip chip-chain">[CHAIN READ]</span>
+      </div>
+      <div class="panel-body" id="positionsList">
+        <div class="card">
+          <div class="card-row">
+            <span class="card-key">Loading positions...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 2: RescueGrants -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">2. RescueGrants</span>
+        <span class="chip chip-policy">[POLICY INVARIANT]</span>
+      </div>
+      <div class="panel-body" id="grantsList">
+        <div class="card">
+          <div class="card-row">
+            <span class="card-key">Loading grants...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 3: Executions -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">3. KeeperHub Executions</span>
+        <span class="chip chip-keeperhub">[KEEPERHUB FACT]</span>
+      </div>
+      <div class="panel-body" id="executionsList">
+        <div class="card">
+          <div class="card-row">
+            <span class="card-key">Loading executions...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 4: Audit Trail -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">4. Append-Only Audit</span>
+        <span class="chip chip-compiler">[COMPILER DERIVED]</span>
+      </div>
+      <div class="panel-body" id="auditList">
+        <div class="card">
+          <div class="card-row">
+            <span class="card-key">Loading audit log...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

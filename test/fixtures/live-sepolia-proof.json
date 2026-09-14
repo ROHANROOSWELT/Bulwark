@@ -1,0 +1,217 @@
+{
+  "bundleVersion": "2.0",
+  "grant": {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0x384ab67c6d57694474997ad784f5604d3abc50b08f5308d0b8a9376b75d02cd3",
+    "createdAt": "2026-09-14T00:00:00.000Z",
+    "createdBy": "underwriter",
+    "approvedAt": "2026-09-14T00:05:00.000Z",
+    "approvedBy": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90",
+    "parties": {
+      "owner": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90",
+      "rescuer": "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+      "executor": "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
+    },
+    "position": {
+      "chainId": 11155111,
+      "positionOwner": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90",
+      "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.25,
+      "recoveryHf": 1.5,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T15:30:00.000Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "verified",
+      "creationSnapshot": {
+        "hf": 1.18,
+        "debtUsd": 500,
+        "priceUsd": 1,
+        "debtTokenBalance": "500000000",
+        "timestamp": "2026-09-14T00:00:00.000Z"
+      },
+      "capacityReservedUsd": 15,
+      "dailySpentUsd": 15,
+      "totalSpentUsd": 15,
+      "executionCount": 1
+    },
+    "grantHash": "0x920cd8de4fb6b95070e381d573cfcfe6bddb2625ee0f3b8a319f9ac30578220b",
+    "grantId": "bg_920cd8de4fb6b950"
+  },
+  "creationSnapshot": {
+    "hf": 1.18,
+    "debtUsd": 500,
+    "priceUsd": 1,
+    "debtTokenBalance": "500000000",
+    "timestamp": "2026-09-14T00:00:00.000Z"
+  },
+  "intent": {
+    "action": "repay",
+    "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+    "amountUsd": 15,
+    "chainId": 11155111,
+    "positionOwner": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90"
+  },
+  "intentHash": "0x453316b583adf08882ce36235734dea6e672d4587d0cfbfcf1b36483dcd14ea0",
+  "authorizedIntent": {
+    "grantId": "bg_920cd8de4fb6b950",
+    "authorityHash": "0xauth_sepolia_proven_11_checks",
+    "intentHash": "0x453316b583adf08882ce36235734dea6e672d4587d0cfbfcf1b36483dcd14ea0",
+    "action": "repay",
+    "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+    "authorizedAmountUsd": 15,
+    "amountWei": "15000000",
+    "repayMax": false,
+    "validUntil": "2026-09-14T01:00:00.000Z",
+    "checks": [
+      "allowlists_verified",
+      "policy_and_invalidation_checks_passed"
+    ]
+  },
+  "authorityHash": "0xauth_sepolia_proven_11_checks",
+  "execution": {
+    "executionId": "exec_sepolia_rescue_001",
+    "grantId": "bg_920cd8de4fb6b950",
+    "authorityHash": "0xauth_sepolia_proven_11_checks",
+    "action": "repay",
+    "amountUsd": 15,
+    "amountWei": "15000000",
+    "status": "verified",
+    "simulatedAt": "2026-09-14T00:09:30.000Z",
+    "submittedAt": "2026-09-14T00:10:00.000Z",
+    "minedAt": "2026-09-14T00:10:15.000Z",
+    "verifiedAt": "2026-09-14T00:10:20.000Z",
+    "txHash": "0x9a4f6d338f0d8a57e1b5b4a92c30ef2d174618e97f56a938c0bb482a17f69201",
+    "blockNumber": 6614200,
+    "gasUsed": "148200",
+    "preHealthFactor": 1.18,
+    "postHealthFactor": 1.45,
+    "receiptVerified": true,
+    "independentReceiptVerified": true
+  },
+  "receipts": [
+    {
+      "hash": "0x9a4f6d338f0d8a57e1b5b4a92c30ef2d174618e97f56a938c0bb482a17f69201",
+      "chainId": 11155111,
+      "verified": true,
+      "receiptStatus": "success",
+      "blockNumber": 6614200,
+      "gasUsed": "148200",
+      "verifiedAt": "2026-09-14T00:10:20.000Z"
+    }
+  ],
+  "snapshots": {
+    "before": {
+      "userAddress": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90",
+      "chainId": 11155111,
+      "poolAddress": "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951",
+      "debtAssetAddress": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+      "debtSymbol": "USDC",
+      "debtDecimals": 6,
+      "totalCollateralBase": "100000000000",
+      "totalDebtBase": "50000000000",
+      "availableBorrowsBase": "10000000000",
+      "currentLiquidationThresholdBps": 8000,
+      "ltvBps": 7500,
+      "healthFactorWad": "1180000000000000000",
+      "healthFactor": 1.18,
+      "totalCollateralUsd": 1000,
+      "totalDebtUsd": 500,
+      "debtTokenBalance": "500000000",
+      "debtTokenBalanceHuman": 500,
+      "assetPriceBase": "100000000",
+      "assetPriceUsd": 1,
+      "timestamp": "2026-09-14T00:09:00.000Z",
+      "sources": {
+        "userAccountData": "KEEPERHUB FACT",
+        "reserveTokens": "KEEPERHUB FACT",
+        "debtBalance": "KEEPERHUB FACT",
+        "price": "KEEPERHUB FACT",
+        "decimals": "KEEPERHUB FACT"
+      }
+    },
+    "after": {
+      "userAddress": "0x71C67e3240A288E8669e46a7A19fE65b4c107f90",
+      "chainId": 11155111,
+      "poolAddress": "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951",
+      "debtAssetAddress": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+      "debtSymbol": "USDC",
+      "debtDecimals": 6,
+      "totalCollateralBase": "100000000000",
+      "totalDebtBase": "50000000000",
+      "availableBorrowsBase": "10000000000",
+      "currentLiquidationThresholdBps": 8000,
+      "ltvBps": 7500,
+      "healthFactorWad": "1180000000000000000",
+      "healthFactor": 1.45,
+      "totalCollateralUsd": 1000,
+      "totalDebtUsd": 485,
+      "debtTokenBalance": "500000000",
+      "debtTokenBalanceHuman": 485,
+      "assetPriceBase": "100000000",
+      "assetPriceUsd": 1,
+      "timestamp": "2026-09-14T00:10:25.000Z",
+      "sources": {
+        "userAccountData": "KEEPERHUB FACT",
+        "reserveTokens": "KEEPERHUB FACT",
+        "debtBalance": "KEEPERHUB FACT",
+        "price": "KEEPERHUB FACT",
+        "decimals": "KEEPERHUB FACT"
+      }
+    }
+  },
+  "policy": {
+    "policyId": "bulwark_default_v2",
+    "maxUsdPerAction": 25,
+    "hfCritical": 1.2,
+    "hfTarget": 2,
+    "allowedChains": [
+      11155111,
+      8453,
+      1
+    ],
+    "allowedActions": [
+      "repay",
+      "add-collateral"
+    ],
+    "allowedDebtAssets": {
+      "1": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      ],
+      "8453": [
+        "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+      ],
+      "11155111": [
+        "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+        "0xc558dbdd856501fcd9aaf1e62eae57a9f0629a3c"
+      ]
+    }
+  },
+  "exportedAt": "2026-09-14T00:11:00.000Z"
+}
