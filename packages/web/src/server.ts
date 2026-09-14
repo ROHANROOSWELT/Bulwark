@@ -290,7 +290,17 @@ export async function handleRequest(
         }
         await guardian.init();
         try {
-          const snapshot = await guardian.scanPosition(body.address, body.chainId);
+          let chainId = body.chainId;
+          if (!chainId) {
+            try {
+              const baseSnap = await guardian.scanPosition(body.address, 84532);
+              if (baseSnap.totalDebtBase > 0n) {
+                sendJson(200, baseSnap);
+                return;
+              }
+            } catch {}
+          }
+          const snapshot = await guardian.scanPosition(body.address, chainId);
           sendJson(200, snapshot);
         } catch (scanErr: any) {
           sendJson(500, { error: scanErr.message || "Failed to scan position" });
@@ -313,7 +323,16 @@ export async function handleRequest(
         }
         await guardian.init();
         try {
-          const grant = await guardian.proposeRescueGrant(body.owner, body.chainId, {
+          let targetChain = body.chainId;
+          if (!targetChain) {
+            try {
+              const baseSnap = await guardian.scanPosition(body.owner, 84532);
+              if (baseSnap.totalDebtBase > 0n) {
+                targetChain = 84532;
+              }
+            } catch {}
+          }
+          const grant = await guardian.proposeRescueGrant(body.owner, targetChain, {
             capitalCapUsd: body.capitalCapUsd ? Number(body.capitalCapUsd) : undefined,
             perActionCapUsd: body.perActionCapUsd ? Number(body.perActionCapUsd) : undefined,
             expiresInHours: body.expiresInHours ? Number(body.expiresInHours) : undefined,
