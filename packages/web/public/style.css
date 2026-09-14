@@ -501,7 +501,7 @@ header.app-header {
   font-weight: 700;
 }
 
-/* ── Main 4-Panel Zero-Scroll Grid ─────────────────────────────────────────── */
+/* ── Main 4-Panel Zero-Scroll Grid (Base fallback) ─────────────────────────── */
 main.dashboard-grid {
   height: calc(100vh - 124px);
   display: grid;
@@ -511,6 +511,576 @@ main.dashboard-grid {
   overflow: hidden;
   position: relative;
   z-index: 10;
+}
+
+/* ── BULWARK Command Center Overview Layout ─────────────────────────────────── */
+main.dashboard-grid.command-center {
+  height: calc(100vh - 76px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 8px 24px 36px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 1. HERO SECTION: Two-column top section */
+.overview-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.hero-story-card {
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 26px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: var(--glass-shadow);
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+
+.hero-headline {
+  font-size: clamp(26px, 2.3vw, 34px);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+
+.hero-copy {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 580px;
+}
+
+/* Hero Flow Card: 4 connected stages */
+.hero-flow-card {
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--glass-shadow);
+}
+
+.flow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.flow-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-primary);
+}
+
+.protection-flow-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.flow-stage {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.flow-stage:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.15);
+}
+
+.stage-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.stage-name {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+}
+
+.stage-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+.flow-arrow {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* 2. PRIMARY THREE-COLUMN SECTION */
+.overview-triad {
+  display: grid;
+  grid-template-columns: 1fr 1.55fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.command-card {
+  background: var(--bg-panel);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--glass-shadow);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.command-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Center card: noticeable size, visually dominant focal point */
+.center-focal-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1.5px solid var(--accent-border);
+  box-shadow: 0 10px 32px rgba(78, 205, 196, 0.12), var(--glass-shadow);
+  padding: 24px 26px;
+  transform: scale(1.01);
+}
+
+.center-focal-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 14px 40px rgba(78, 205, 196, 0.2), var(--glass-shadow);
+  transform: scale(1.015);
+}
+
+.card-header-clean {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.card-subtitle-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.card-subtitle-tag.highlight {
+  color: var(--accent);
+}
+
+.card-headline {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.card-headline.large {
+  font-size: 18px;
+}
+
+/* Left Card: Health Factor visual focal point */
+.hf-focal-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.hf-focal-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-muted);
+}
+
+.hf-focal-number {
+  font-family: var(--font-mono);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin: 6px 0;
+}
+
+.hf-focal-status {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.pos-focal-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Center Card: Rescue Engine Stack */
+.rescue-engine-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  margin: 4px 0;
+}
+
+.engine-step {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.engine-step.highlight {
+  background: rgba(78, 205, 196, 0.08);
+  border: 1.5px solid var(--accent-border);
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.step-val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.step-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.engine-connector {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.engine-lifecycle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.lifecycle-box {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Right Card: Grant details & action buttons */
+.grant-focal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grant-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.grant-limits-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.grant-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+/* 3. BOTTOM SECTION: Two horizontal cards */
+.overview-dyad {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 18px;
+}
+
+.bottom-card {
+  padding: 22px 24px;
+}
+
+.exec-focal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exec-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.exec-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.exec-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.exec-stat-cell {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exec-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.exec-footer-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+/* Right PoAA Card */
+.poaa-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--accent-border);
+}
+
+.poaa-hero-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px 8px;
+  gap: 8px;
+}
+
+.poaa-hero-title {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.poaa-hero-score {
+  font-family: var(--font-mono);
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.poaa-hero-verdict {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 14px;
+  border-radius: var(--radius-full);
+}
+
+.poaa-hero-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  max-width: 400px;
+  margin: 2px 0 6px 0;
+  line-height: 1.4;
+}
+
+/* ── Responsive Behavior ───────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1080px) {
+  .overview-hero {
+    grid-template-columns: 1fr;
+  }
+  .overview-triad {
+    grid-template-columns: 1fr 1.35fr 1fr;
+    gap: 12px;
+  }
+  .engine-lifecycle-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .overview-dyad {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  main.dashboard-grid.command-center {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px 40px 14px;
+    gap: 16px;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .overview-hero,
+  .overview-triad,
+  .overview-dyad {
+    display: contents;
+  }
+
+  /* Exact stack ordering required by specification:
+     1. Story
+     2. Protection Flow
+     3. Monitored Position
+     4. Rescue Engine
+     5. RescueGrant
+     6. KeeperHub
+     7. PoAA
+  */
+  .hero-story-card     { order: 1; }
+  .hero-flow-card      { order: 2; }
+  #monitoredPosCard    { order: 3; }
+  #rescueEngineCard    { order: 4; }
+  #rescueGrantCard     { order: 5; }
+  #keeperhubExecCard   { order: 6; }
+  #poaaProofCard       { order: 7; }
+
+  .protection-flow-track {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+  .engine-lifecycle-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* ── Glass Panel Containers (liquid-glass reference, light edition) ── */

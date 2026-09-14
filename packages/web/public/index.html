@@ -8,6 +8,7 @@
 </head>
 <body>
   <!-- Global App Header -->
+  <!-- ── 1. COMPACT HORIZONTAL HEADER ──────────────────────────────────────── -->
   <header class="app-header">
     <div class="logo-area">
       <a href="/" class="logo-link">
@@ -17,9 +18,9 @@
         </span>
         <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
       </a>
-      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
-      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
+      <span class="sub-tag">Autonomous Backstop Economy</span>
     </div>
+
     <nav class="nav-bar">
       <a href="/landing" class="nav-tab">Landing</a>
       <a href="/" class="nav-tab active">Overview</a>
@@ -30,108 +31,212 @@
       <a href="/verify" class="nav-tab">PoAA /verify</a>
       <a href="/settings" class="nav-tab">Diagnostics</a>
     </nav>
+
     <div class="header-status">
+      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
       <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
       <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
-        
         <span id="walletBtnLabel">Connect Wallet</span>
       </button>
     </div>
   </header>
 
-  <!-- Desk KPI Top Bar -->
-  <div class="desk-kpi-bar">
-    <div class="kpi-item">
-      <span class="kpi-label">Desk Balance:</span>
-      <span id="deskBalanceVal" class="kpi-value">$0.00</span>
-    </div>
-    <div class="kpi-item">
-      <span class="kpi-label">Available Capacity:</span>
-      <span id="availableCapVal" class="kpi-value">$0.00</span>
-    </div>
-    <div class="kpi-item">
-      <span class="kpi-label">Reserved Capacity:</span>
-      <span id="reservedCapVal" class="kpi-value">$0.00</span>
-    </div>
-    <div class="kpi-item">
-      <span class="kpi-label">Verified Rescues:</span>
-      <span id="verifiedRescuesVal" class="kpi-value">0</span>
-    </div>
-    <div class="kpi-item">
-      <span class="kpi-label">Capital Deployed:</span>
-      <span id="capitalDeployedVal" class="kpi-value">$0.00</span>
-    </div>
-  </div>
+  <!-- ── 2. COMMAND CENTER MAIN VIEWPORT ────────────────────────────────────── -->
+  <main class="dashboard-grid command-center">
 
-  <!-- Main 4-Panel Zero-Scroll Dashboard -->
-  <main class="dashboard-grid">
-    <!-- Panel 1: Positions -->
-    <section class="panel">
-      <div class="panel-header">
-        <span class="panel-title">1. Monitored Positions</span>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <a href="/positions" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Deep Dive &rarr;</a>
+    <!-- ── 2. MAIN HERO AREA: Story (Left) + Protection Flow (Right) ──────────── -->
+    <section class="overview-hero">
+      <!-- LEFT: Product / Story Area -->
+      <div class="hero-story-card">
+        <div class="hero-eyebrow">
+          <span class="live-dot"><span class="live-dot-ping"></span><span class="live-dot-core"></span></span>
+          <span>Autonomous Backstop Economy Ops Console</span>
         </div>
+        <h1 class="hero-headline">
+          Deterministic <span class="text-gradient">Risk Backstop.</span>
+        </h1>
+        <p class="hero-copy">
+          Autonomous liquidity protection with mathematically proven agency. Preemptive debt repayment, invariant risk clamping, and cryptographic Proof of Authorized Agency executed by KeeperHub.
+        </p>
       </div>
-      <div class="panel-body" id="positionsList">
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Loading positions...</span>
+
+      <!-- RIGHT: Horizontal Lifecycle / Protection-Flow Component -->
+      <div class="hero-flow-card">
+        <div class="flow-header">
+          <span class="flow-title">Autonomous Protection Flow</span>
+          <span class="chip chip-policy">Zero-Revert Clamped</span>
+        </div>
+        <div class="protection-flow-track">
+          <!-- Stage 1 -->
+          <div class="flow-stage">
+            <div class="stage-num">01</div>
+            <div class="stage-name">DETECTED</div>
+            <div class="stage-desc">Aave Distress &bull; HF Breach</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <!-- Stage 2 -->
+          <div class="flow-stage">
+            <div class="stage-num">02</div>
+            <div class="stage-name">AUTHORIZED</div>
+            <div class="stage-desc">Owner EIP-712 Grant</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <!-- Stage 3 -->
+          <div class="flow-stage">
+            <div class="stage-num">03</div>
+            <div class="stage-name">EXECUTED</div>
+            <div class="stage-desc">KeeperHub Calldata</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <!-- Stage 4 -->
+          <div class="flow-stage">
+            <div class="stage-num">04</div>
+            <div class="stage-name">PROVEN</div>
+            <div class="stage-desc">11/11 PoAA Verified</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Panel 2: RescueGrants -->
-    <section class="panel">
-      <div class="panel-header">
-        <span class="panel-title">2. RescueGrants</span>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <a href="/grants" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Desk &rarr;</a>
+    <!-- ── 3. PRIMARY THREE-COLUMN SECTION: Position | Engine | Grant ────────── -->
+    <section class="overview-triad">
+
+      <!-- LEFT COLUMN: MONITORED POSITION ("What is at risk?") -->
+      <div class="command-card side-card" id="monitoredPosCard">
+        <div class="card-header-clean">
+          <div>
+            <span class="card-subtitle-tag">What is at risk?</span>
+            <h2 class="card-headline">Monitored Position</h2>
+          </div>
+          <a href="/positions" class="nav-link" style="padding: 2px 8px; font-size: 11px;">Deep Dive &rarr;</a>
+        </div>
+        <div id="positionsList" class="pos-focal-details">
+          <div class="card"><span class="card-key">Scanning on-chain positions...</span></div>
         </div>
       </div>
-      <div class="panel-body" id="grantsList">
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Loading grants...</span>
+
+      <!-- CENTER COLUMN: RESCUE ENGINE ("What does BULWARK decide?") - VISUAL FOCAL POINT -->
+      <div class="command-card center-focal-card" id="rescueEngineCard">
+        <div class="card-header-clean">
+          <div>
+            <span class="card-subtitle-tag highlight">What does BULWARK decide?</span>
+            <h2 class="card-headline large">Rescue Engine</h2>
+          </div>
+          <span class="chip chip-chain">On-Chain Math</span>
+        </div>
+
+        <!-- Center Structure: CURRENT HEALTH FACTOR ↓ TARGET HEALTH FACTOR ↓ REQUIRED RESCUE AMOUNT -->
+        <div class="rescue-engine-stack">
+          <div class="engine-step">
+            <div>
+              <span class="step-label">CURRENT HEALTH FACTOR</span>
+              <span id="engineCurrentHfSub" class="step-sub">Aave Position Snapshot</span>
+            </div>
+            <span id="engineCurrentHf" class="step-val">1.500</span>
+          </div>
+
+          <div class="engine-connector">&darr;</div>
+
+          <div class="engine-step">
+            <div>
+              <span class="step-label">TARGET HEALTH FACTOR</span>
+              <span class="step-sub">Policy Invariant Buffer Floor</span>
+            </div>
+            <span class="step-val" style="color: var(--accent);">1.500</span>
+          </div>
+
+          <div class="engine-connector">&darr;</div>
+
+          <div class="engine-step highlight">
+            <div>
+              <span class="step-label">REQUIRED RESCUE AMOUNT</span>
+              <span id="engineRequiredRescueSub" class="step-sub">Calculated Debt Repayment</span>
+            </div>
+            <span id="engineRequiredRescue" class="step-val" style="color: var(--accent-emerald); font-size: 24px;">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Existing rescue/policy lifecycle information underneath -->
+        <div class="engine-lifecycle-grid">
+          <div class="lifecycle-box">
+            <span class="kpi-label">Available Cap</span>
+            <span id="availableCapVal" class="kpi-value">$0.00</span>
+          </div>
+          <div class="lifecycle-box">
+            <span class="kpi-label">Reserved Cap</span>
+            <span id="reservedCapVal" class="kpi-value">$0.00</span>
+          </div>
+          <div class="lifecycle-box">
+            <span class="kpi-label">Desk Balance</span>
+            <span id="deskBalanceVal" class="kpi-value">$0.00</span>
+          </div>
+          <div class="lifecycle-box">
+            <span class="kpi-label">Policy State</span>
+            <span class="chip chip-policy">Clamped</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: RESCUEGRANT / AUTHORIZATION ("Is the rescue allowed?") -->
+      <div class="command-card side-card" id="rescueGrantCard">
+        <div class="card-header-clean">
+          <div>
+            <span class="card-subtitle-tag">Is the rescue allowed?</span>
+            <h2 class="card-headline">RescueGrant Authorization</h2>
+          </div>
+          <a href="/grants" class="nav-link" style="padding: 2px 8px; font-size: 11px;">Desk &rarr;</a>
+        </div>
+        <div id="grantsList" class="grant-focal-card">
+          <div class="card"><span class="card-key">Loading grants...</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. BOTTOM SECTION: KeeperHub Execution (Left) + PoAA Proof (Right) ── -->
+    <section class="overview-dyad">
+      <!-- LEFT: KEEPERHUB EXECUTION ("Can BULWARK execute?") -->
+      <div class="command-card bottom-card" id="keeperhubExecCard">
+        <div class="card-header-clean">
+          <div>
+            <span class="card-subtitle-tag">Can BULWARK execute?</span>
+            <h2 class="card-headline">KeeperHub Execution</h2>
+          </div>
+          <a href="/executions" class="nav-link" style="padding: 2px 8px; font-size: 11px;">Ledger &rarr;</a>
+        </div>
+        <div id="executionsList" class="exec-focal-card">
+          <div class="card"><span class="card-key">Loading executions...</span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: PoAA / PROOF ("Can anyone prove it?") -->
+      <div class="command-card bottom-card poaa-card" id="poaaProofCard">
+        <div class="card-header-clean">
+          <div>
+            <span class="card-subtitle-tag highlight">Can anyone prove it?</span>
+            <h2 class="card-headline">Proof of Authorized Agency</h2>
+          </div>
+          <span class="chip chip-policy">Independent Invariant</span>
+        </div>
+        <div class="poaa-hero-body">
+          <div class="poaa-hero-title">PROOF OF AUTHORIZED AGENCY</div>
+          <div class="poaa-hero-score">11 / 11</div>
+          <div class="poaa-hero-verdict">VERIFIED</div>
+          <p class="poaa-hero-desc">
+            Independent mathematical and cryptographic verification that autonomous actions remained strictly within owner-authorized boundaries.
+          </p>
+          <div class="poaa-hero-action">
+            <a href="/verify" class="btn-primary" style="text-decoration: none;">
+              <span>View Full Proof / Independent Verifier</span>
+              <span>&rarr;</span>
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Panel 3: Executions -->
-    <section class="panel">
-      <div class="panel-header">
-        <span class="panel-title">3. KeeperHub Executions</span>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <a href="/executions" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Ledger &rarr;</a>
-        </div>
-      </div>
-      <div class="panel-body" id="executionsList">
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Loading executions...</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel 4: Audit Trail -->
-    <section class="panel">
-      <div class="panel-header">
-        <span class="panel-title">4. Append-Only Audit</span>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <a href="/audit" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Full Trail &rarr;</a>
-        </div>
-      </div>
-      <div class="panel-body" id="auditList">
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Loading audit log...</span>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Hidden audit container for app.js state persistence -->
+    <div id="auditList" style="display: none;"></div>
   </main>
 
   <!-- Web3 Wallet Connection Modal -->

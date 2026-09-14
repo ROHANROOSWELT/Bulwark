@@ -16,158 +16,204 @@ async function fetchState() {
 function renderState(data) {
   // 1. Header Chips
   const keyChip = document.getElementById("keyChip");
-  if (data.hasKey) {
-    keyChip.className = "chip chip-keeperhub";
-    keyChip.textContent = "KEY ACTIVE";
-  } else {
-    keyChip.className = "chip chip-unavailable";
-    keyChip.textContent = "KEY NOT SET";
+  if (keyChip) {
+    if (data.hasKey) {
+      keyChip.className = "chip chip-keeperhub";
+      keyChip.textContent = "KEY ACTIVE";
+    } else {
+      keyChip.className = "chip chip-unavailable";
+      keyChip.textContent = "KEY NOT SET";
+    }
   }
 
   // 2. Desk KPIs
   if (data.capacity) {
-    document.getElementById("deskBalanceVal").textContent = `$${(data.capacity.deskBalanceUsd || 0).toFixed(2)}`;
-    document.getElementById("availableCapVal").textContent = `$${(data.capacity.availableUsd || 0).toFixed(2)}`;
-    document.getElementById("reservedCapVal").textContent = `$${(data.capacity.reservedUsd || 0).toFixed(2)}`;
+    const balEl = document.getElementById("deskBalanceVal");
+    const availEl = document.getElementById("availableCapVal");
+    const resEl = document.getElementById("reservedCapVal");
+    if (balEl) balEl.textContent = `$${(data.capacity.deskBalanceUsd || 0).toFixed(2)}`;
+    if (availEl) availEl.textContent = `$${(data.capacity.availableUsd || 0).toFixed(2)}`;
+    if (resEl) resEl.textContent = `$${(data.capacity.reservedUsd || 0).toFixed(2)}`;
   }
   if (data.reputation) {
-    document.getElementById("verifiedRescuesVal").textContent = data.reputation.totalExecutionsVerified || 0;
-    document.getElementById("capitalDeployedVal").textContent = `$${(data.reputation.totalCapitalDeployedUsd || 0).toFixed(2)}`;
+    const recEl = document.getElementById("verifiedRescuesVal");
+    const capEl = document.getElementById("capitalDeployedVal");
+    if (recEl) recEl.textContent = data.reputation.totalExecutionsVerified || 0;
+    if (capEl) capEl.textContent = `$${(data.reputation.totalCapitalDeployedUsd || 0).toFixed(2)}`;
   }
 
-  // 3. Panel 1: Monitored Positions
+  // 3. LEFT COLUMN: Monitored Position ("What is at risk?")
   const posContainer = document.getElementById("positionsList");
-  if (!data.watchlist || data.watchlist.length === 0) {
-    posContainer.innerHTML = `<div class="card"><span class="card-key">No positions on watchlist.</span></div>`;
-  } else {
-    posContainer.innerHTML = data.watchlist.map((p) => {
-      const hfClass = p.healthFactor < 1.2 ? "hf-critical" : p.healthFactor < 1.5 ? "hf-caution" : "hf-healthy";
-      return `
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Borrower:</span>
-            <span class="card-val">${p.userAddress.slice(0, 8)}...${p.userAddress.slice(-6)}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Health Factor:</span>
-            <span class="hf-badge ${hfClass}">${p.healthFactor.toFixed(3)}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Collateral Base:</span>
-            <span class="card-val">$${p.totalCollateralUsd.toFixed(2)}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Debt Base:</span>
-            <span class="card-val">$${p.totalDebtUsd.toFixed(2)}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Liquidation Threshold:</span>
-            <span class="card-val">${(p.currentLiquidationThresholdBps / 100).toFixed(1)}%</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Source:</span>
-            <span class="chip chip-chain">On-Chain</span>
-          </div>
+  const pos = (data.watchlist && data.watchlist.length > 0) ? data.watchlist[0] : null;
+
+  if (posContainer) {
+    if (!pos) {
+      posContainer.innerHTML = `<div class="card"><span class="card-key">No monitored positions on watchlist.</span></div>`;
+    } else {
+      const hf = pos.healthFactor;
+      const hfClass = hf < 1.05 ? "hf-critical" : hf < 1.2 ? "hf-critical" : hf < 1.5 ? "hf-caution" : "hf-healthy";
+      const hfRiskText = hf < 1.05 ? "Liquidation Hazard" : hf < 1.2 ? "Critical Risk &bull; Floor Breach" : hf < 1.5 ? "Moderate Caution &bull; Preemptive Zone" : "Healthy Buffer &bull; Safe";
+
+      posContainer.innerHTML = `
+        <div class="hf-focal-display">
+          <span class="hf-focal-label">Health Factor</span>
+          <span class="hf-focal-number ${hfClass}">${hf.toFixed(3)}</span>
+          <span class="hf-focal-status ${hfClass}">${hfRiskText}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-key">Borrower</span>
+          <span class="card-val">${pos.userAddress.slice(0, 8)}...${pos.userAddress.slice(-6)}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-key">Collateral Base</span>
+          <span class="card-val">$${pos.totalCollateralUsd.toFixed(2)}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-key">Debt Base</span>
+          <span class="card-val">$${pos.totalDebtUsd.toFixed(2)}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-key">Liquidation Threshold</span>
+          <span class="card-val">${(pos.currentLiquidationThresholdBps / 100).toFixed(1)}%</span>
+        </div>
+        <div class="card-row">
+          <span class="card-key">Market Source</span>
+          <span class="chip chip-chain">Sepolia Aave v3</span>
         </div>
       `;
-    }).join("");
+    }
   }
 
-  // 4. Panel 2: RescueGrants
+  // 4. CENTER COLUMN: Rescue Engine ("What does BULWARK decide?")
+  const engineHfEl = document.getElementById("engineCurrentHf");
+  const engineReqRescueEl = document.getElementById("engineRequiredRescue");
+  const engineHfSubEl = document.getElementById("engineCurrentHfSub");
+  const engineReqSubEl = document.getElementById("engineRequiredRescueSub");
+
+  if (pos && engineHfEl && engineReqRescueEl) {
+    const hf = pos.healthFactor;
+    const hfClass = hf < 1.2 ? "hf-critical" : hf < 1.5 ? "hf-caution" : "hf-healthy";
+    engineHfEl.textContent = hf.toFixed(3);
+    engineHfEl.className = `step-val ${hfClass}`;
+
+    if (engineHfSubEl) {
+      engineHfSubEl.textContent = hf < 1.5 ? "Preemptive Buffer Deficit" : "Position Healthy";
+    }
+
+    // Exact debt repayment math from packages/core/src/underwriter/plans.ts
+    const targetHf = 1.500;
+    const threshold = (pos.currentLiquidationThresholdBps || 8000) / 10000;
+    const targetDebt = (pos.totalCollateralUsd * threshold) / targetHf;
+    const reqRescue = pos.totalDebtUsd > targetDebt ? (pos.totalDebtUsd - targetDebt) : 0;
+
+    engineReqRescueEl.textContent = `$${reqRescue.toFixed(2)}`;
+    if (reqRescue > 0) {
+      engineReqRescueEl.style.color = "var(--accent-amber)";
+      if (engineReqSubEl) engineReqSubEl.textContent = "Exact Repayment Required";
+    } else {
+      engineReqRescueEl.style.color = "var(--accent-emerald)";
+      if (engineReqSubEl) engineReqSubEl.textContent = "No Capital Needed";
+    }
+  }
+
+  // 5. RIGHT COLUMN: RescueGrant / Authorization ("Is the rescue allowed?")
   const grantsContainer = document.getElementById("grantsList");
-  if (!data.grants || data.grants.length === 0) {
-    grantsContainer.innerHTML = `<div class="card"><span class="card-key">No active grants in store.</span></div>`;
-  } else {
-    grantsContainer.innerHTML = data.grants.map((g) => {
-      const statusClass = `status-${g.state.status.toLowerCase()}`;
-      const isProposed = g.state.status === "proposed";
-      const isArmed = g.state.status === "armed";
-      return `
-        <div class="card">
+  if (grantsContainer) {
+    if (!data.grants || data.grants.length === 0) {
+      grantsContainer.innerHTML = `<div class="card"><span class="card-key">No active grants in store.</span></div>`;
+    } else {
+      const grant = data.grants[0]; // Overview prioritizes active grant
+      const statusClass = `status-${grant.state.status.toLowerCase()}`;
+      const isProposed = grant.state.status === "proposed";
+      const isArmed = grant.state.status === "armed";
+
+      grantsContainer.innerHTML = `
+        <div class="grant-status-header">
+          <span class="card-key">Authorization State</span>
+          <span class="status-badge ${statusClass}">${grant.state.status}</span>
+        </div>
+        <div class="grant-limits-box">
           <div class="card-row">
-            <span class="card-key">Grant ID:</span>
-            <span class="card-val">${g.grantId}</span>
+            <span class="card-key">Grant ID</span>
+            <span class="card-val">${grant.grantId}</span>
           </div>
           <div class="card-row">
-            <span class="card-key">Status:</span>
-            <span class="status-badge ${statusClass}">${g.state.status}</span>
+            <span class="card-key">Capital Cap</span>
+            <span class="card-val">$${grant.authority.capitalCapUsd}</span>
           </div>
           <div class="card-row">
-            <span class="card-key">Capital Cap:</span>
-            <span class="card-val">$${g.authority.capitalCapUsd} (Per-Action: $${g.authority.perActionCapUsd})</span>
+            <span class="card-key">Per-Action Cap</span>
+            <span class="card-val">$${grant.authority.perActionCapUsd}</span>
           </div>
           <div class="card-row">
-            <span class="card-key">Grant Hash:</span>
-            <span class="card-val">${g.grantHash.slice(0, 12)}...</span>
-          </div>
-          <div class="card-row" style="margin-top: 6px; gap: 6px; justify-content: flex-end;">
-            ${isProposed ? `<button onclick="approveGrant('${g.grantId}')" class="btn-sm btn-approve">Approve</button>` : ""}
-            ${isArmed ? `<button onclick="dryRunGrant('${g.grantId}')" class="btn-sm btn-dry">Dry Run</button>` : ""}
-            ${isArmed ? `<button onclick="executeGrant('${g.grantId}')" class="btn-sm btn-execute">Execute</button>` : ""}
-            ${!["revoked", "invalidated", "settled"].includes(g.state.status) ? `<button onclick="revokeGrant('${g.grantId}')" class="btn-sm btn-revoke">Revoke</button>` : ""}
+            <span class="card-key">Authority Hash</span>
+            <span class="card-val" style="font-family: var(--font-mono);">${grant.grantHash.slice(0, 12)}...</span>
           </div>
         </div>
+        <div class="grant-actions-row">
+          ${isProposed ? `<button onclick="approveGrant('${grant.grantId}')" class="btn-sm btn-approve">Approve</button>` : ""}
+          ${isArmed ? `<button onclick="dryRunGrant('${grant.grantId}')" class="btn-sm btn-dry">Dry Run</button>` : ""}
+          ${isArmed ? `<button onclick="executeGrant('${grant.grantId}')" class="btn-sm btn-execute">Execute</button>` : ""}
+          ${!["revoked", "invalidated", "settled"].includes(grant.state.status) ? `<button onclick="revokeGrant('${grant.grantId}')" class="btn-sm btn-revoke">Revoke</button>` : ""}
+        </div>
       `;
-    }).join("");
+    }
   }
 
-  // 5. Panel 3: Executions
+  // 6. BOTTOM LEFT: KeeperHub Execution ("Can BULWARK execute?")
   const execsContainer = document.getElementById("executionsList");
-  if (!data.executions || data.executions.length === 0) {
-    execsContainer.innerHTML = `<div class="card"><span class="card-key">${data.hasKey ? "No executions recorded." : "[UNAVAILABLE] Key required for executions."}</span></div>`;
-  } else {
-    execsContainer.innerHTML = data.executions.map((e) => {
-      const explorerLink = e.txHash ? `https://sepolia.etherscan.io/tx/${e.txHash}` : null;
-      return `
-        <div class="card">
-          <div class="card-row">
-            <span class="card-key">Exec ID:</span>
-            <span class="card-val">${e.executionId}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Status:</span>
-            <span class="status-badge status-${e.status}">${e.status}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Amount:</span>
-            <span class="card-val">$${e.amountUsd.toFixed(2)} (${e.action})</span>
-          </div>
-          <div class="card-row">
-            <span class="card-key">Receipts:</span>
-            <span class="card-val">${e.receiptVerified ? "Dual Verified" : "Pending / Unavailable"}</span>
-          </div>
-          ${explorerLink ? `
-          <div class="card-row">
-            <span class="card-key">Transaction:</span>
-            <a href="${explorerLink}" target="_blank" rel="noopener" class="card-val" style="color: var(--accent-cyan); text-decoration: underline;">
-              ${e.txHash.slice(0, 10)}...${e.txHash.slice(-6)} &nearr;
-            </a>
-          </div>` : ""}
-          <div class="card-row">
-            <span class="card-key">HF Delta:</span>
-            <span class="card-val">${e.preHealthFactor ? e.preHealthFactor.toFixed(3) : "N/A"} &rarr; ${e.postHealthFactor ? e.postHealthFactor.toFixed(3) : "N/A"}</span>
-          </div>
+  if (execsContainer) {
+    const hasExecs = data.executions && data.executions.length > 0;
+    const latest = hasExecs ? data.executions[data.executions.length - 1] : null;
+    const explorerLink = latest?.txHash ? `https://sepolia.etherscan.io/tx/${latest.txHash}` : null;
+
+    execsContainer.innerHTML = `
+      <div class="exec-header-row">
+        <div class="exec-status-pill">
+          <span class="live-dot"><span class="live-dot-ping"></span><span class="live-dot-core"></span></span>
+          <span>${data.hasKey ? "KeeperHub Ready &bull; Zero Revert Dispatch" : "Key Required for Autonomous Dispatch"}</span>
         </div>
-      `;
-    }).join("");
+        <span class="chip chip-keeperhub">${data.hasKey ? "Active Node" : "Key Inactive"}</span>
+      </div>
+
+      <div class="exec-summary-grid">
+        <div class="exec-stat-cell">
+          <span class="card-key">Execution State</span>
+          <span class="card-val">${latest ? latest.status.toUpperCase() : "AWAITING TRIGGER"}</span>
+        </div>
+        <div class="exec-stat-cell">
+          <span class="card-key">Latest Action</span>
+          <span class="card-val">${latest ? `$${latest.amountUsd.toFixed(2)} (${latest.action})` : "Monitoring Pool"}</span>
+        </div>
+        <div class="exec-stat-cell">
+          <span class="card-key">Receipt Status</span>
+          <span class="card-val">${latest?.receiptVerified ? "Dual Verified" : "Autonomous Standby"}</span>
+        </div>
+        <div class="exec-stat-cell">
+          <span class="card-key">HF Recovery</span>
+          <span class="card-val">${latest?.preHealthFactor ? `${latest.preHealthFactor.toFixed(2)} &rarr; ${latest.postHealthFactor?.toFixed(2)}` : "Target 1.500"}</span>
+        </div>
+      </div>
+
+      ${explorerLink ? `
+      <div class="card-row" style="margin-top: 4px;">
+        <span class="card-key">On-Chain Transaction</span>
+        <a href="${explorerLink}" target="_blank" rel="noopener" class="card-val" style="color: var(--accent); text-decoration: underline;">
+          ${latest.txHash.slice(0, 10)}...${latest.txHash.slice(-6)} &nearr;
+        </a>
+      </div>` : ""}
+
+      <div class="exec-footer-meta">
+        <div class="meta-item"><span class="kpi-label">Verified Rescues:</span> <span class="kpi-value">${data.reputation?.totalExecutionsVerified || 0}</span></div>
+        <div class="meta-item"><span class="kpi-label">Capital Deployed:</span> <span class="kpi-value">$${(data.reputation?.totalCapitalDeployedUsd || 0).toFixed(2)}</span></div>
+      </div>
+    `;
   }
 
-  // 6. Panel 4: Audit Trail
+  // 7. Audit log persistence (hidden element)
   const auditContainer = document.getElementById("auditList");
-  if (!data.audit || data.audit.length === 0) {
-    auditContainer.innerHTML = `<div class="card"><span class="card-key">No audit records yet.</span></div>`;
-  } else {
-    auditContainer.innerHTML = data.audit.slice(-25).reverse().map((a) => {
-      return `
-        <div class="audit-entry">
-          <div class="audit-meta">
-            <span>${a.type}</span>
-            <span class="chip chip-compiler">${a.provenance || "FACT"}</span>
-          </div>
-          <div style="color: var(--text-secondary);">${new Date(a.timestamp).toLocaleTimeString()} &middot; ${a.grantId || a.id}</div>
-        </div>
-      `;
-    }).join("");
+  if (auditContainer && data.audit) {
+    auditContainer.innerHTML = data.audit.slice(-5).map(a => `<div data-id="${a.id}">${a.type}</div>`).join("");
   }
 }
 
