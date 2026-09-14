@@ -412,8 +412,31 @@ pnpm test
 pnpm web
 ```
 Open your browser:
+* **Live Vercel Production:** [https://bulwark-keeperhub.vercel.app](https://bulwark-keeperhub.vercel.app)
 * **Operator Console:** [http://localhost:4567](http://localhost:4567)
 * **Public Verifier:** [http://localhost:4567/verify](http://localhost:4567/verify)
+
+### 6. Connect AI Agents via Model Context Protocol (MCP)
+
+BULWARK natively supports KeeperHub's Streamable MCP endpoint (`https://app.keeperhub.com/mcp`). Point your AI agent (Claude Code, Cursor, Gemini CLI, Goose, Codex) to drive workflows and non-custodial transactions:
+
+**Gemini CLI (`~/.gemini/settings.json`)**:
+```json
+{
+  "mcpServers": {
+    "keeperhub": {
+      "httpUrl": "https://app.keeperhub.com/mcp"
+    }
+  }
+}
+```
+
+**Claude Code / Claude Desktop**:
+```bash
+/plugin marketplace add KeeperHub/claude-plugins
+/plugin install keeperhub@keeperhub-plugins
+/keeperhub:login
+```
 
 ---
 
