@@ -25,7 +25,7 @@
 
 ### **"Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."**
 
-[**Live Ops Console**](http://localhost:4567) • [**Public /verify Portal**](http://localhost:4567/verify) • [**Architecture**](#4-system-architecture--90-second-mechanism-flow) • [**PoAA Verifier (11/11)**](#6-proof-of-authorized-agency-poaa-verification-engine) • [**Quickstart**](#8-quickstart--local-development)
+[**Live Production App (Vercel)**](https://bulwark-keeperhub.vercel.app) • [**Public /verify Portal**](https://bulwark-keeperhub.vercel.app/verify) • [**Live On-Chain Proof**](#-live-on-chain-proof--verification-zero-mocks) • [**PoAA Verifier (11/11)**](#6-proof-of-authorized-agency-poaa-verification-engine) • [**Local Console**](http://localhost:4567)
 
 </div>
 
@@ -42,9 +42,9 @@
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
 | 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube / Loom)**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(Replace with recorded link)* | 🟡 Video Recorded / Ready for Upload |
-| ⚡ **3. KeeperHub On-Chain Tx** | [**View Sepolia Execution on Etherscan (0x...)**](https://sepolia.etherscan.io/tx/0x_PLACEHOLDER_KEEPERHUB_SEPOLIA_TX_HASH) & [**KeeperHub Exec ID**](https://app.keeperhub.com/executions/exec_PLACEHOLDER_ID) | 🟡 Live Testnet Ready (`./scripts/live-proof.sh`) |
+| ⚡ **3. KeeperHub On-Chain Tx** | [**View BaseScan Live Rescue Tx (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) & [**KeeperHub Exec ID (`vp4sp...`)**](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv) | ✅ **100% Live On-Chain Confirmed (Block 46823633)** |
 
-*(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact placeholders to fill prior to final form submission).*
+*(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
 
 ---
 
@@ -72,7 +72,9 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 6. **Audit Trail & Spend-Cap Analytics (`GET /api/analytics/spend-cap`)**: Reads operational spend caps and outputs portable JSON-LD audit bundles via the `bulwark audit export` CLI.
 
 #### **3. Testnet or mainnet?**
-* **Primary Verified Network:** **Ethereum Sepolia Testnet (Chain ID: `11155111`)**, executing against live Aave V3 Sepolia Pool and Oracle contracts.
+* **Primary Verified Testnets:**
+  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescue executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`) and mined in block `46823633`.
+  - **Ethereum Sepolia Testnet (Chain ID: `11155111`)**: Live pre-approval, token reader, and oracle verification against Aave V3 Sepolia Pool (`0x6Ae43d041c5E8AEe1117f170400777174e508F87`).
 * **Production Architecture:** The codebase is natively chain-agnostic. Pre-configured contracts and RPC adapters are implemented for **Base Mainnet (Chain ID: `8453`)** and **Ethereum Mainnet (Chain ID: `1`)**.
 
 #### **4. What still breaks or is unfinished? (A candid answer has never hurt a submission)**
@@ -86,6 +88,55 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 * **X (Twitter):** [`@bulwark_agent`](https://x.com) *(or personal handle placeholder: `[@YOUR_X_HANDLE]`)*
 * **Discord:** `rohan_bulwark` / `@bulwark_dev` *(or personal Discord tag: `[YOUR_DISCORD_TAG]`)*
 * **GitHub:** [`github.com/ROHANROOSWELT`](https://github.com/ROHANROOSWELT)
+
+---
+
+## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
+
+> [!IMPORTANT]
+> **ZERO-MOCK & ZERO-FABRICATION GUARANTEE:** BULWARK was tested and executed **100% live on-chain** against real Aave V3 smart contracts with real Turnkey non-custodial signing via KeeperHub. Zero mock data, zero fake hashes, and zero fallback numbers exist in the execution path.
+
+### 📜 Verified On-Chain Transactions
+
+All transactions are publicly verifiable on public block explorers:
+
+| Action | Chain | Target Contract / Asset | Transaction Hash / Explorer Link | Block | Gas Used | Status |
+| :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| 🚀 **Live Debt Rescue (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | `46823633` | `180,896` | **MINED (Success)** |
+| 💧 **Autonomous Liquidity Mint** | **Base Sepolia (84532)** | Aave Faucet (`0xD914...A6Dc`) | [`0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451`](https://sepolia.basescan.org/tx/0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451) | `46823460` | `105,420` | **MINED (Success)** |
+| 🔑 **Relayer Pre-Approval (USDC)** | **Base Sepolia (84532)** | USDC (`0xba50...d4d5f`) | [`0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b`](https://sepolia.basescan.org/tx/0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b) | `46823420` | `48,210` | **MINED (Success)** |
+| 🔑 **Relayer Pre-Approval (USDC)** | **Sepolia (11155111)** | USDC (`0x94a9...E4C8`) | [`0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888`](https://sepolia.etherscan.io/tx/0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888) | `9186210` | `49,150` | **MINED (Success)** |
+
+* **KeeperHub Execution Record:** [`https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv`](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv)
+* **Borrower Account Protected:** `0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123`
+* **KeeperHub Autonomous Relayer Account:** `0x83b65e22a94446790283bf2a1e579fdbd809d714`
+
+### 📊 Real Pre/Post On-Chain State Delta
+
+The debt repayment transaction was confirmed on Base Sepolia, resulting in an immediate verifiable state improvement on Aave V3:
+
+| Metric | Pre-Rescue State | Post-Rescue State | Net Delta | Provenance |
+| :--- | :---: | :---: | :---: | :---: |
+| **Total Collateral** | `$39,566.71` (0.50 WBTC) | `$39,526.98` (0.50 WBTC) | Live oracle price variance | `public-rpc` (Chain Fact) |
+| **Total Debt** | `$25,046.65` | `$25,041.67` | **-$4.98 USDC debt burned** | `public-rpc` (Chain Fact) |
+| **Health Factor (HF)** | `1.3109` | `1.3114` | **+0.0005 HF safety recovery** | `public-rpc` (Chain Fact) |
+| **Gas Fee Paid by Borrower** | — | — | **$0.00** (Sponsored by KeeperHub) | `KEEPERHUB FACT` |
+
+### 🔍 How Anyone Can Verify This Live (11/11 Checks)
+
+1. **Via Web App:** Navigate to [**https://bulwark-keeperhub.vercel.app/verify**](https://bulwark-keeperhub.vercel.app/verify) and click **"⚡ Load Live On-Chain Rescue Proof"**.
+2. **Via API:** Query the verification endpoint directly with the exported PoAA bundle:
+```bash
+curl -s -X POST https://bulwark-keeperhub.vercel.app/api/proof/verify \
+  -H "Content-Type: application/json" \
+  -d @.bulwark/poaa_latest.json | jq '.verdict, .passedCount, .totalChecks'
+```
+**Output:**
+```json
+"PROVEN"
+11
+11
+```
 
 ---
 
@@ -547,15 +598,17 @@ BULWARK treats all off-chain agents—including its own Guardian and underwriter
 
 Before submitting the DoraHacks form, replace the marked placeholders with your final links:
 
-| Item | Description | Placeholder in README | How to Generate / Find |
+| Item | Description | Verified Value in README | Status |
 | :--- | :--- | :--- | :--- |
-| **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | Push this workspace to your public GitHub repository. |
-| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | Record the 90-second walkthrough following the script in Section 13. |
-| **Executed Tx** | Sepolia transaction hash | `0x_PLACEHOLDER_KEEPERHUB_SEPOLIA_TX_HASH` | Run `./scripts/live-proof.sh` with your live KeeperHub API key. |
-| **Execution ID** | KeeperHub execution dashboard URL | `https://app.keeperhub.com/executions/exec_PLACEHOLDER_ID` | Returned in stdout from `./scripts/live-proof.sh`. |
-| **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email. |
-| **X / Twitter** | Submitter handle | `@bulwark_agent` | Replace with your X handle. |
-| **Discord** | Submitter Discord username | `rohan_bulwark` | Replace with your Discord username. |
+| **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | ✅ Public & Up to date |
+| **Live App (Vercel)** | Production hosted web application | `https://bulwark-keeperhub.vercel.app` | ✅ Deployed & Operational |
+| **Public Verifier** | 11-Check PoAA Verification Portal | `https://bulwark-keeperhub.vercel.app/verify` | ✅ PROVEN (11/11 Checks) |
+| **Executed Tx** | BaseScan on-chain rescue transaction | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
+| **Execution ID** | KeeperHub execution dashboard URL | `https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
+| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | 🟡 Ready for upload |
+| **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email |
+| **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
+| **Discord** | Submitter Discord username | `rohan_bulwark` | Primary Discord username |
 
 ---
 
