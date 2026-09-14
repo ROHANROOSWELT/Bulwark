@@ -2001,11 +2001,11 @@ body.landing-page {
 
 body.landing-page .app-header {
   position: sticky;
-  top: 16px;
+  top: 12px;
   z-index: 1000;
-  max-width: 1240px;
-  margin: 16px auto 0;
-  width: calc(100% - 32px);
+  max-width: none;
+  margin: 12px 24px 6px 24px;
+  width: auto;
 }
 
 main.landing-container,
@@ -2015,9 +2015,10 @@ main.dashboard-grid.landing-container {
   min-height: auto !important;
   grid-template-columns: none !important;
   gap: 0 !important;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 8px 24px 80px 24px !important;
   overflow: visible !important;
   position: relative;
   z-index: 10;
@@ -2029,14 +2030,14 @@ main.dashboard-grid.landing-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 50px 0 30px;
+  padding: 40px 0 30px;
   position: relative;
 }
 
 .hero-main-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 40px;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 36px;
   align-items: center;
   width: 100%;
 }
@@ -2219,11 +2220,11 @@ main.dashboard-grid.landing-container {
 .isometric-stage-card {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 620px;
   background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  padding: 20px 16px;
+  padding: 24px 20px;
   backdrop-filter: var(--glass-blur);
   box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
   transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -2400,7 +2401,7 @@ main.dashboard-grid.landing-container {
 
 .section-head {
   text-align: center;
-  max-width: 700px;
+  max-width: 860px;
   margin: 0 auto 50px;
 }
 
