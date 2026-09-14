@@ -31,7 +31,7 @@ export function getDefaultPolicyConfig(maxUsdPerAction = 25, hfCritical = 1.2, h
     maxUsdPerAction,
     hfCritical,
     hfTarget,
-    allowedChains: [11155111, 8453, 1],
+    allowedChains: [11155111, 84532, 8453, 1],
     allowedActions: ["repay", "add-collateral"],
     allowedDebtAssets,
   };

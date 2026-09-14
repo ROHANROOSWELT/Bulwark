@@ -80,6 +80,7 @@ export class BulwarkGuardian {
       perActionCapUsd?: number;
       adaptiveBands?: AdaptiveBand[];
       expiresInHours?: number;
+      hfTriggerBelow?: number;
     }
   ): Promise<RescueGrantV2> {
     await this.init();
@@ -123,7 +124,7 @@ export class BulwarkGuardian {
         hfFloor: 1.05,
       },
       conditions: {
-        hfTriggerBelow: this.config.policyHfCritical,
+        hfTriggerBelow: options?.hfTriggerBelow ?? this.config.policyHfCritical,
         recoveryHf: this.config.policyHfTarget,
         maxDebtChangePct: 0.2, // 20% max drift
         priceBandPct: 0.15, // 15% max price change

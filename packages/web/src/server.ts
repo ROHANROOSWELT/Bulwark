@@ -316,6 +316,7 @@ export async function handleRequest(
           capitalCapUsd?: number;
           perActionCapUsd?: number;
           expiresInHours?: number;
+          hfTriggerBelow?: number;
         }>();
         if (!body.owner || !body.owner.startsWith("0x")) {
           sendJson(400, { error: "Missing or invalid borrower/owner address" });
@@ -336,6 +337,7 @@ export async function handleRequest(
             capitalCapUsd: body.capitalCapUsd ? Number(body.capitalCapUsd) : undefined,
             perActionCapUsd: body.perActionCapUsd ? Number(body.perActionCapUsd) : undefined,
             expiresInHours: body.expiresInHours ? Number(body.expiresInHours) : undefined,
+            hfTriggerBelow: body.hfTriggerBelow ? Number(body.hfTriggerBelow) : 1.35,
           });
           sendJson(200, grant);
         } catch (propErr: any) {
