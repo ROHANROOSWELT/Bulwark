@@ -58,7 +58,9 @@ function renderPositionsTable(positions) {
       const hfClass = hf < 1.2 ? "hf-critical" : hf < 1.5 ? "hf-caution" : "hf-healthy";
       const riskLevel = hf < 1.2 ? "CRITICAL (Rescue Eligible)" : hf < 1.5 ? "ELEVATED RISK" : "NORMAL";
       const riskClass = hf < 1.2 ? "status-invalidated" : hf < 1.5 ? "status-proposed" : "status-verified";
-      const explorerUrl = `https://sepolia.etherscan.io/address/${p.userAddress}`;
+      const explorerUrl = p.chainId === 84532
+        ? `https://sepolia.basescan.org/address/${p.userAddress}`
+        : `https://sepolia.etherscan.io/address/${p.userAddress}`;
 
       return `
         <tr>

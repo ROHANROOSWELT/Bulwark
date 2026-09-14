@@ -46,7 +46,7 @@ export async function handleRequest(
   options: WebServerOptions = {}
 ): Promise<void> {
   const guardian = options.guardian ?? getDefaultGuardian();
-  const watchlist = options.watchlist ?? ["0x0000000000000000000000000000000000000001"];
+  const watchlist = options.watchlist ?? ["0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123"];
 
   let rawUrl = req.url || "/";
   if ((!rawUrl || rawUrl === "/") && req.headers["x-matched-path"]) {
@@ -238,11 +238,14 @@ export async function handleRequest(
         const capacity = await guardian.store.getCapacity();
         const reputation = computeDeskReputation(grants, executions, audit);
 
-        // Fetch watchlist snapshots
+        // Fetch watchlist snapshots (check active debt on Base Sepolia or Sepolia)
         const watchlistSnapshots: PositionSnapshot[] = [];
         for (const addr of watchlist) {
           try {
-            const snap = await guardian.scanPosition(addr);
+            let snap = await guardian.scanPosition(addr, 84532);
+            if (!snap || snap.totalDebtBase === 0n) {
+              snap = await guardian.scanPosition(addr);
+            }
             watchlistSnapshots.push(snap);
           } catch {}
         }

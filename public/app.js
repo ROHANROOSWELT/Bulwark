@@ -164,8 +164,12 @@ function renderState(data) {
   const execsContainer = document.getElementById("executionsList");
   if (execsContainer) {
     const hasExecs = data.executions && data.executions.length > 0;
-    const latest = hasExecs ? data.executions[data.executions.length - 1] : null;
-    const explorerLink = latest?.txHash ? `https://sepolia.etherscan.io/tx/${latest.txHash}` : null;
+    const isBase = latest?.txHash?.startsWith("0x43dbc") || data.grants?.some(g => g.grantId === latest?.grantId && g.position?.chainId === 84532);
+    const explorerBase = isBase ? "https://sepolia.basescan.org" : "https://sepolia.etherscan.io";
+    const explorerLink = latest?.txHash ? `${explorerBase}/tx/${latest.txHash}` : null;
+    const hfRecoveryText = (typeof latest?.preHealthFactor === "number" && typeof latest?.postHealthFactor === "number")
+      ? `${latest.preHealthFactor.toFixed(3)} &rarr; ${latest.postHealthFactor.toFixed(3)}`
+      : "Target 1.500";
 
     execsContainer.innerHTML = `
       <div class="exec-header-row">
@@ -191,7 +195,7 @@ function renderState(data) {
         </div>
         <div class="exec-stat-cell">
           <span class="card-key">HF Recovery</span>
-          <span class="card-val">${latest?.preHealthFactor ? `${latest.preHealthFactor.toFixed(2)} &rarr; ${latest.postHealthFactor?.toFixed(2)}` : "Target 1.500"}</span>
+          <span class="card-val">${hfRecoveryText}</span>
         </div>
       </div>
 

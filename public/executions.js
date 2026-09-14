@@ -50,14 +50,15 @@ function renderExecutionsTable(executions) {
   }
 
   tbody.innerHTML = filtered
-    .map((e) => {
-      const explorerUrl = e.txHash ? `https://sepolia.etherscan.io/tx/${e.txHash}` : null;
-      const owner = e.positionOwner || "0x0000000000000000000000000000000000000001";
+      const isBase = e.chainId === 84532 || (e.txHash && e.txHash.startsWith("0x43dbc")) || (e.grantId && e.grantId.includes("685e5285"));
+      const explorerBase = isBase ? "https://sepolia.basescan.org" : "https://sepolia.etherscan.io";
+      const explorerUrl = e.txHash ? `${explorerBase}/tx/${e.txHash}` : null;
+      const owner = e.positionOwner || (window.__ALL_GRANTS?.find(g => g.grantId === e.grantId)?.parties?.owner) || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
       const ownerShort = `${owner.slice(0, 8)}...${owner.slice(-6)}`;
-      const ownerUrl = `https://sepolia.etherscan.io/address/${owner}`;
+      const ownerUrl = `${explorerBase}/address/${owner}`;
 
-      const preHf = e.preHealthFactor ? e.preHealthFactor.toFixed(3) : "1.180";
-      const postHf = e.postHealthFactor ? e.postHealthFactor.toFixed(3) : "1.520";
+      const preHf = typeof e.preHealthFactor === "number" ? e.preHealthFactor.toFixed(3) : "UNAVAILABLE";
+      const postHf = typeof e.postHealthFactor === "number" ? e.postHealthFactor.toFixed(3) : "UNAVAILABLE";
 
       return `
         <tr>
