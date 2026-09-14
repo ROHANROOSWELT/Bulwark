@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proof of Authorized Agency (PoAA) — Independent Verifier</title>
+  <title>BULWARK — RescueGrants Authority Desk</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="logo-area">
       <a href="/" class="logo-link">
         <span class="logo-tag">BULWARK</span>
-        <span class="sub-tag">| Proof of Authorized Agency (PoAA) Independent Verifier</span>
+        <span class="sub-tag">| Deterministic Aave Backstop &middot; Executed by KeeperHub</span>
       </a>
       <span id="chainChip" class="chip chip-chain">[CHAIN READ] Sepolia 11155111</span>
       <span id="keyChip" class="chip chip-unavailable">[UNAVAILABLE] KEY NOT DETECTED</span>
@@ -20,10 +20,10 @@
     <nav class="nav-bar">
       <a href="/" class="nav-tab">Overview</a>
       <a href="/positions" class="nav-tab">Positions</a>
-      <a href="/grants" class="nav-tab">Grants Desk</a>
+      <a href="/grants" class="nav-tab active">Grants Desk</a>
       <a href="/executions" class="nav-tab">Executions</a>
       <a href="/audit" class="nav-tab">Audit Trail</a>
-      <a href="/verify" class="nav-tab active">PoAA /verify</a>
+      <a href="/verify" class="nav-tab">PoAA /verify</a>
       <a href="/settings" class="nav-tab">Diagnostics</a>
     </nav>
     <div class="header-status">
@@ -64,34 +64,159 @@
     </div>
   </div>
 
+  <!-- Dedicated Grants Desk View -->
   <div class="page-container">
-    <div class="verify-container" style="max-width: 820px; margin: 0 auto; width: 100%;">
-      <div class="verify-box">
-        <h2 style="margin-bottom: 8px; font-size: 16px;">Independent PoAA Bundle Verification</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 12px;">
-          Verify mathematical and factual proof that the autonomous agent acted strictly within owner-authorized limits.
-          Evaluates the 11-check cryptographic and on-chain verification chain.
-          <strong>No login, no trust in the desk required.</strong>
-        </p>
+    <!-- Header Row -->
+    <div class="page-header-row">
+      <div class="page-title-group">
+        <h2 class="page-title">
+          <span>RescueGrants Authority Desk</span>
+          <span class="chip chip-policy">[POLICY INVARIANT]</span>
+        </h2>
+        <p class="page-subtitle">Deterministic, state-bound delegation contracts. The autonomous agent is mathematically bounded by owner-approved parameters.</p>
+      </div>
+      <div class="page-actions">
+        <button id="openProposeModalBtn" class="btn-primary">➕ Propose New RescueGrant</button>
+      </div>
+    </div>
 
-        <label style="font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">
-          Paste PoAA JSON Bundle or Upload File:
-        </label>
-        <textarea id="bundleText" class="bundle-input" placeholder='Paste full PoaaBundle JSON here (e.g. { "bundleVersion": "2.0", "grant": {...}, ... })'></textarea>
+    <!-- Summary Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Grants <span class="chip chip-policy">[POLICY]</span></span>
+        <span id="totalGrantsVal" class="stat-value">0</span>
+        <span class="stat-sub">All historical & active grants</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Armed & Executable <span class="chip chip-dual">[ARMED]</span></span>
+        <span id="armedGrantsVal" class="stat-value" style="color: var(--accent-emerald);">0</span>
+        <span class="stat-sub">Ready for KeeperHub dispatch</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Pending Approval <span class="chip chip-agent">[PROPOSED]</span></span>
+        <span id="proposedGrantsVal" class="stat-value" style="color: var(--accent-amber);">0</span>
+        <span class="stat-sub">Awaiting owner signature</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Volume Authorized <span class="chip chip-keeperhub">[FACT]</span></span>
+        <span id="totalCapitalAuthorizedVal" class="stat-value">$0.00</span>
+        <span class="stat-sub">Combined capital cap</span>
+      </div>
+    </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
-          <input type="file" id="fileInput" accept=".json" style="color: var(--text-muted); font-size: 11px;">
-          <button id="verifyBtn" class="btn-primary">Verify 11/11 Checks</button>
+    <!-- Grants Table with Filter Toolbar -->
+    <div class="table-wrapper">
+      <div style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-status="all">All Grants</button>
+          <button class="filter-tab" data-status="proposed">Proposed</button>
+          <button class="filter-tab" data-status="armed">Armed</button>
+          <button class="filter-tab" data-status="verified">Verified</button>
+          <button class="filter-tab" data-status="revoked">Revoked</button>
+        </div>
+        <div class="search-bar" style="max-width: 340px;">
+          <input type="text" id="filterGrantsInput" placeholder="Search by Grant ID or Owner address...">
         </div>
       </div>
 
-      <!-- Verdict Result Banner -->
-      <div id="verdictBanner" style="display: none; margin-top: 16px;" class="verdict-banner"></div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Grant ID</th>
+            <th>Borrower / Owner</th>
+            <th>Asset</th>
+            <th>Authority Limits</th>
+            <th>HF Thresholds</th>
+            <th>Status</th>
+            <th style="text-align: right;">Lifecycle Actions</th>
+          </tr>
+        </thead>
+        <tbody id="grantsTableBody">
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading RescueGrants from store...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-      <!-- 11 Checks List -->
-      <div id="checksList" style="display: none; margin-top: 16px;" class="verify-box">
-        <h3 style="margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Verification Breakdown</h3>
-        <div id="checksContainer"></div>
+  <!-- Propose RescueGrant Modal -->
+  <div id="proposeGrantModal" class="general-modal-backdrop" style="display: none;">
+    <div class="general-modal">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px;">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">Propose RescueGrant</h3>
+          <p style="font-size: 11px; color: var(--text-muted);">Creates a state-bound authority proposal for an Aave V3 borrower.</p>
+        </div>
+        <button id="closeProposeModalBtn" class="wallet-modal-close">&times;</button>
+      </div>
+
+      <form id="proposeGrantForm">
+        <div class="form-group">
+          <label class="form-label">Borrower Address (Position Owner):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="propOwnerInput" class="form-input" placeholder="0x..." required>
+            <button type="button" id="propUseWalletBtn" class="btn-secondary" style="white-space: nowrap;">My Wallet</button>
+          </div>
+          <span class="form-help">Must be a valid Ethereum address on Sepolia.</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Capital Cap (USD):</label>
+            <input type="number" id="propCapitalCapInput" class="form-input" value="25.00" step="1.00" min="1" required>
+            <span class="form-help">Maximum total flashloan capital ($).</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Per-Action Cap (USD):</label>
+            <input type="number" id="propPerActionInput" class="form-input" value="15.00" step="1.00" min="1" required>
+            <span class="form-help">Max capital per single rescue tick ($).</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Critical Trigger HF:</label>
+            <input type="number" id="propTriggerHfInput" class="form-input" value="1.250" step="0.01" min="1.01" max="2.00" required>
+            <span class="form-help">Trigger rescue when HF drops below this.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Recovery HF:</label>
+            <input type="number" id="propRecoveryHfInput" class="form-input" value="1.500" step="0.01" min="1.10" max="3.00" required>
+            <span class="form-help">Minimum post-rescue Health Factor.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Grant Expiration (Hours):</label>
+          <input type="number" id="propExpiresInput" class="form-input" value="96" step="1" min="1" max="720" required>
+          <span class="form-help">Time before grant automatically expires (default 96h).</span>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" id="cancelProposeBtn" class="btn-secondary">Cancel</button>
+          <button type="submit" id="submitProposeBtn" class="btn-primary">Propose RescueGrant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Inspect Grant JSON Modal -->
+  <div id="inspectGrantModal" class="general-modal-backdrop" style="display: none;">
+    <div class="general-modal" style="width: 640px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px;">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);" id="inspectModalTitle">Grant Details</h3>
+          <p style="font-size: 11px; color: var(--text-muted);">Immutable EIP-712 typed data payload and invariant parameters.</p>
+        </div>
+        <button id="closeInspectModalBtn" class="wallet-modal-close">&times;</button>
+      </div>
+
+      <textarea id="inspectPayloadText" class="bundle-input" readonly style="height: 320px; font-size: 11px;"></textarea>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px;">
+        <span class="chip chip-policy">[POLICY INVARIANT]</span>
+        <button id="copyInspectJsonBtn" class="btn-secondary">Copy JSON</button>
       </div>
     </div>
   </div>
@@ -235,6 +360,6 @@
   </div>
 
   <script src="/shared.js"></script>
-  <script src="/verify.js"></script>
+  <script src="/grants.js"></script>
 </body>
 </html>

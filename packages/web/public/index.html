@@ -10,14 +10,24 @@
   <!-- Global App Header -->
   <header class="app-header">
     <div class="logo-area">
-      <span class="logo-tag">BULWARK</span>
-      <span class="sub-tag">| Deterministic Aave Backstop &middot; Executed by KeeperHub</span>
+      <a href="/" class="logo-link">
+        <span class="logo-tag">BULWARK</span>
+        <span class="sub-tag">| Deterministic Aave Backstop &middot; Executed by KeeperHub</span>
+      </a>
       <span id="chainChip" class="chip chip-chain">[CHAIN READ] Sepolia 11155111</span>
       <span id="keyChip" class="chip chip-unavailable">[UNAVAILABLE] KEY NOT DETECTED</span>
     </div>
+    <nav class="nav-bar">
+      <a href="/" class="nav-tab active">Overview</a>
+      <a href="/positions" class="nav-tab">Positions</a>
+      <a href="/grants" class="nav-tab">Grants Desk</a>
+      <a href="/executions" class="nav-tab">Executions</a>
+      <a href="/audit" class="nav-tab">Audit Trail</a>
+      <a href="/verify" class="nav-tab">PoAA /verify</a>
+      <a href="/settings" class="nav-tab">Diagnostics</a>
+    </nav>
     <div class="header-status">
       <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
-      <a href="/verify" class="nav-link" title="Verify Proof of Authorized Agency">PoAA /verify</a>
       <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
         <span class="wallet-btn-icon" id="walletBtnIcon">⚡</span>
         <span id="walletBtnLabel">Connect Wallet</span>
@@ -60,7 +70,10 @@
     <section class="panel">
       <div class="panel-header">
         <span class="panel-title">1. Monitored Positions</span>
-        <span class="chip chip-chain">[CHAIN READ]</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="chip chip-chain">[CHAIN READ]</span>
+          <a href="/positions" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Deep Dive &rarr;</a>
+        </div>
       </div>
       <div class="panel-body" id="positionsList">
         <div class="card">
@@ -75,7 +88,10 @@
     <section class="panel">
       <div class="panel-header">
         <span class="panel-title">2. RescueGrants</span>
-        <span class="chip chip-policy">[POLICY INVARIANT]</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="chip chip-policy">[POLICY INVARIANT]</span>
+          <a href="/grants" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Desk &rarr;</a>
+        </div>
       </div>
       <div class="panel-body" id="grantsList">
         <div class="card">
@@ -90,7 +106,10 @@
     <section class="panel">
       <div class="panel-header">
         <span class="panel-title">3. KeeperHub Executions</span>
-        <span class="chip chip-keeperhub">[KEEPERHUB FACT]</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="chip chip-keeperhub">[KEEPERHUB FACT]</span>
+          <a href="/executions" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Ledger &rarr;</a>
+        </div>
       </div>
       <div class="panel-body" id="executionsList">
         <div class="card">
@@ -105,7 +124,10 @@
     <section class="panel">
       <div class="panel-header">
         <span class="panel-title">4. Append-Only Audit</span>
-        <span class="chip chip-compiler">[COMPILER DERIVED]</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="chip chip-compiler">[COMPILER DERIVED]</span>
+          <a href="/audit" class="nav-link" style="padding: 2px 6px; font-size: 10px;">Full Trail &rarr;</a>
+        </div>
       </div>
       <div class="panel-body" id="auditList">
         <div class="card">
@@ -261,6 +283,7 @@
     </div>
   </div>
 
+  <script src="/shared.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
