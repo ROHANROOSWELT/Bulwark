@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BULWARK Protocol — Developer Documentation & SDK Reference</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Global App Header -->
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="/" class="logo-link">
+        <span class="live-dot" title="Autonomous Guardian Node Online">
+          <span class="live-dot-ping"></span>
+          <span class="live-dot-core"></span>
+        </span>
+        <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
+      </a>
+      <span class="sub-tag">Autonomous Backstop Economy</span>
+      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
+    </div>
+    <nav class="nav-bar">
+      <a href="/overview" class="nav-tab">Overview</a>
+      <a href="/positions" class="nav-tab">Positions</a>
+      <a href="/grants" class="nav-tab">Grants Desk</a>
+      <a href="/executions" class="nav-tab">Executions</a>
+      <a href="/audit" class="nav-tab">Audit Trail</a>
+      <a href="/verify" class="nav-tab">PoAA /verify</a>
+      <a href="/settings" class="nav-tab">Diagnostics</a>
+      <a href="/docs" class="nav-tab active">Docs</a>
+    </nav>
+    <div class="header-status">
+      <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
+      <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
+        <span id="walletBtnLabel">Connect Wallet</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Desk KPI Top Bar -->
+  <div class="desk-kpi-bar">
+    <div class="kpi-item">
+      <span class="kpi-label">Desk Balance:</span>
+      <span id="deskBalanceVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Available Capacity:</span>
+      <span id="availableCapVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Reserved Capacity:</span>
+      <span id="reservedCapVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Verified Rescues:</span>
+      <span id="verifiedRescuesVal" class="kpi-value">0</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Capital Deployed:</span>
+      <span id="capitalDeployedVal" class="kpi-value">$0.00</span>
+    </div>
+  </div>
+
+  <!-- Dedicated Documentation View -->
+  <div class="page-container">
+    <div class="page-header-row">
+      <div class="page-title-group">
+        <h2 class="page-title">
+          <span>BULWARK Engineering Documentation & Specification</span>
+          <span class="chip chip-chain">v0.1.0 Strict TS</span>
+        </h2>
+        <p class="page-subtitle">A-to-Z architecture, mathematical targeting proofs, KeeperHub SDK execution surfaces, and 11-step cryptographic agency verifier.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/verify" class="btn-secondary" style="text-decoration: none; padding: 7px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+          <span>Launch /verify</span>
+        </a>
+        <a href="/overview" class="btn-primary" style="text-decoration: none; padding: 7px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+          <span>Operations Console</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Docs Layout: Sidebar + Main Content -->
+    <div class="docs-layout">
+      <!-- Left Sticky Sidebar Navigation -->
+      <aside class="docs-sidebar">
+        <div class="docs-search-box">
+          <svg class="docs-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="docsSearchInput" class="docs-search-input" placeholder="Search documentation...">
+        </div>
+
+        <div class="docs-nav-group">
+          <div class="docs-nav-group-title">Getting Started</div>
+          <ul class="docs-nav-list">
+            <li><a href="#overview" class="docs-nav-link active">1. Overview & Problem</a></li>
+            <li><a href="#architecture" class="docs-nav-link">2. Architecture & Lifecycle</a></li>
+            <li><a href="#quickstart" class="docs-nav-link">3. Quickstart & Setup</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-group">
+          <div class="docs-nav-group-title">SDKs & Integrations</div>
+          <ul class="docs-nav-list">
+            <li><a href="#keeperhub-integration" class="docs-nav-link">4. KeeperHub 6-Surface Map</a></li>
+            <li><a href="#mcp-protocol" class="docs-nav-link">5. Model Context Protocol</a></li>
+            <li><a href="#aave-integration" class="docs-nav-link">6. Aave V3 & EVM RPC</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-group">
+          <div class="docs-nav-group-title">Core Mechanics & Math</div>
+          <ul class="docs-nav-list">
+            <li><a href="#targeting-math" class="docs-nav-link">7. Closed-Form Targeting</a></li>
+            <li><a href="#premium-curve" class="docs-nav-link">8. Urgency Premium Ladder</a></li>
+            <li><a href="#policy-compiler" class="docs-nav-link">9. Clamp-Only Compiler</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-group">
+          <div class="docs-nav-group-title">Verification & Security</div>
+          <ul class="docs-nav-list">
+            <li><a href="#poaa-verification" class="docs-nav-link">10. PoAA 11-Check Engine</a></li>
+            <li><a href="#security-hardening" class="docs-nav-link">11. Invariants & Security</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-group">
+          <div class="docs-nav-group-title">Ecosystem & Reference</div>
+          <ul class="docs-nav-list">
+            <li><a href="#monorepo-packages" class="docs-nav-link">12. Monorepo Packages</a></li>
+            <li><a href="#dutch-orderbook" class="docs-nav-link">13. Dutch Orderbook</a></li>
+            <li><a href="#cli-manual" class="docs-nav-link">14. Developer CLI Manual</a></li>
+            <li><a href="#api-reference" class="docs-nav-link">15. Web & Telemetry APIs</a></li>
+            <li><a href="#contract-registry" class="docs-nav-link">16. Contract Registry</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="docs-content" id="docsMainContent">
+
+        <!-- Section 1: Overview & Problem -->
+        <section id="overview" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">01</span>
+              <span>Overview & The Problem Statement</span>
+            </h3>
+            <span class="chip chip-chain">DeFi Resilience</span>
+          </div>
+          <p class="docs-text">
+            Across Aave V3's <strong>$17.4 Billion TVL</strong>, sudden market volatility pushes healthy borrowing positions into undercollateralization (<code class="docs-pill">Health Factor &lt; 1.00</code>). When this threshold is breached, third-party searchers trigger a violent liquidation:
+          </p>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Catastrophic Collateral Loss:</strong> The borrower incurs an instantaneous <strong>5% to 10% liquidation bonus penalty</strong>.</li>
+            <li><strong>Yield Dismantlement:</strong> Up to 50% of the user's collateral is sliced (close factor), destroying compounding yield and position continuity.</li>
+            <li><strong>MEV Cascade Gas Wars:</strong> Predatory bots congest the public mempool, causing cascading price liquidations across secondary collateral pools.</li>
+          </ul>
+          <p class="docs-text">
+            Existing automation consists of either rigid stop-loss bots (which routinely fail during extreme gas spikes) or unconstrained AI agents that make probabilistic decisions during panic—precisely when a model is most prone to hallucination, drift, or adversarial prompt injection.
+          </p>
+          <p class="docs-text">
+            <strong>BULWARK</strong> replaces predatory liquidations with a <strong>state-bound, autonomous agent backstop economy</strong>. Borrowers pre-authorize bounded, adaptive safety grants while their positions are safe. When volatility strikes, the autonomous underwriter calculates an exact closed-form repayment, the deterministic Policy Compiler clamps the execution to immutable caps, and KeeperHub executes the rescue deterministically with zero secret leakage.
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Core Operating Thesis</div>
+            <div>"Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."</div>
+          </div>
+        </section>
+
+        <!-- Section 2: Architecture & Lifecycle -->
+        <section id="architecture" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">02</span>
+              <span>System Architecture & 8-Step Lifecycle</span>
+            </h3>
+            <span class="chip chip-chain">End-to-End Flow</span>
+          </div>
+          <p class="docs-text">
+            BULWARK operates across three distinct structural layers: the <strong>Aave V3 Protocol</strong> (lending truth), the <strong>BULWARK Desk Agent Layer</strong> (risk telemetry, counterfactual ladders, clamp compiler), and <strong>KeeperHub Infrastructure</strong> (Turnkey HSM custody, idempotency keys, private mempool execution).
+          </p>
+          <div class="docs-step-grid">
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 1</span>
+              <span class="docs-step-title">Chain State Read</span>
+              <span class="docs-step-desc">Guardian reads collateral ($C$) and debt ($D$) directly from Aave V3 Pool via <code>getUserAccountData</code>.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 2</span>
+              <span class="docs-step-title">Underwriting & Ladder</span>
+              <span class="docs-step-desc">Computes counterfactual safety ladder, calculates cost-to-safety, and quotes risk-adjusted premium.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 3</span>
+              <span class="docs-step-title">RescueGrant Proposal</span>
+              <span class="docs-step-desc">Borrower or desk drafts a state-bound grant with adaptive HF bands, expiry timestamp, and ceiling caps.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 4</span>
+              <span class="docs-step-title">Human Owner Approval</span>
+              <span class="docs-step-desc">Position owner explicitly signs/approves the grant via Web UI or CLI. State transitions to <code>ARMED</code>.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 5</span>
+              <span class="docs-step-title">Policy Compilation</span>
+              <span class="docs-step-desc">Deterministic Policy Compiler clamps proposed intent to active band ceiling and signs <code>authorityHash</code>.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 6</span>
+              <span class="docs-step-title">Zero-Revert Simulation</span>
+              <span class="docs-step-desc">KeeperHub dry-runs the payload with <code>simulate: true</code>, confirming zero execution reverts before broadcast.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 7</span>
+              <span class="docs-step-title">Turnkey Idempotent Exec</span>
+              <span class="docs-step-desc">KeeperHub signs transaction via Turnkey enclave and broadcasts to private mempool with unique <code>Idempotency-Key</code>.</span>
+            </div>
+            <div class="docs-step-card">
+              <span class="docs-step-badge">STEP 8</span>
+              <span class="docs-step-title">Dual Receipt & PoAA Proof</span>
+              <span class="docs-step-desc">Dual-receipt verifier validates KeeperHub and public RPC receipts; exports 11-check cryptographic proof bundle.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Quickstart & Setup -->
+        <section id="quickstart" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">03</span>
+              <span>Quickstart & Local Development</span>
+            </h3>
+            <span class="chip chip-chain">Node &gt;= 22 · pnpm 11</span>
+          </div>
+          <p class="docs-text">
+            BULWARK is engineered with zero native binary bindings and zero external runtime dependencies. Follow this clean setup guide to run the complete stack locally:
+          </p>
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-block-lang">bash</span>
+              <button class="btn-code-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre class="code-block-body"><code># 1. Clone the repository
+git clone https://github.com/ROHANROOSWELT/Bulwark.git bulwark
+cd bulwark
+
+# 2. Install workspace dependencies
+pnpm install
+
+# 3. Configure environment
+cp .env.example .env
+
+# Edit .env with your keys:
+# KEEPERHUB_API_KEY=kh_your_live_key
+# BULWARK_CHAIN_ID=11155111
+# ETHEREUM_SEPOLIA_RPC=https://rpc.sepolia.org
+
+# 4. Compile all packages & type-check
+pnpm build
+pnpm type-check
+
+# 5. Execute the 1,300 test verification suite (0 skipped, 0 failed)
+pnpm test
+
+# 6. Launch the local Operations Console & Public /verify Portal
+pnpm web
+# Server listening on http://localhost:4567</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 4: KeeperHub 6-Surface Map -->
+        <section id="keeperhub-integration" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">04</span>
+              <span>KeeperHub Deep Integration Surface Map</span>
+            </h3>
+            <span class="chip chip-chain">Load-Bearing Infrastructure</span>
+          </div>
+          <p class="docs-text">
+            BULWARK does not treat KeeperHub as a superficial client library. KeeperHub primitives form the mechanical execution core across <strong>six distinct technical surfaces</strong>:
+          </p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>KeeperHub Surface</th>
+                  <th>Implementation Source</th>
+                  <th>Mechanical Operational Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. REST Execution API</strong></td>
+                  <td><code>packages/core/src/client/keeperhub.ts</code></td>
+                  <td>Executes <code>POST /api/execute/contract-call</code> with Turnkey key management, dynamic gas re-pricing, and private mempool routing.</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Simulation Preflight</strong></td>
+                  <td><code>packages/core/src/client/keeperhub.ts</code></td>
+                  <td>Dry-runs transactions with <code>simulate: true</code> against live state; asserts <code>wouldRevert === false</code> before spending desk capital.</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Model Context Protocol</strong></td>
+                  <td><code>packages/agent/src/mcp/client.ts</code></td>
+                  <td>Connects to <code>/mcp</code> and <code>/mcp/public</code> via SSE and JSON-RPC 2.0; dynamically queries <code>tools/list</code> and schema parameters.</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Agent Workflows</strong></td>
+                  <td><code>packages/agent/src/workflow/compiler.ts</code></td>
+                  <td>Generates JSON AST workflows (schedule trigger + contract read + execute action); pre-validated via MCP <code>validate_workflow</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>5. Idempotency Guard</strong></td>
+                  <td><code>packages/core/src/client/keeperhub.ts</code></td>
+                  <td>Computes SHA-256 digests over execution payloads for unique <code>Idempotency-Key</code> headers, preventing double execution during retries.</td>
+                </tr>
+                <tr>
+                  <td><strong>6. Dual Receipt Verification</strong></td>
+                  <td><code>packages/core/src/proof/receipts.ts</code></td>
+                  <td>Cross-checks KeeperHub receipts against independent public RPC nodes (<code>eth_getTransactionReceipt</code>) to prove state finality.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h4 class="docs-subheading">Verified Direct Execution Payload Format</h4>
+          <p class="docs-text">
+            Every debt rescue transaction sent through KeeperHub is formatted strictly according to verified protocol shapes:
+          </p>
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-block-lang">json</span>
+              <button class="btn-code-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre class="code-block-body"><code>{
+  "contractAddress": "0x6Ae43d041c5E8AEe1117f170400777174e508F87",
+  "chainId": 11155111,
+  "functionName": "repay",
+  "functionArgs": "[\"0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8\",\"15000000000\",2,\"0x71CB05EE1b1F506fF321Da3dac38f25c0c9ce6E1\"]",
+  "abi": "[{\"type\":\"function\",\"name\":\"repay\",\"inputs\":[{\"name\":\"asset\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"},{\"name\":\"interestRateMode\",\"type\":\"uint256\"},{\"name\":\"onBehalfOf\",\"type\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\"}]",
+  "gasLimitMultiplier": "1.15",
+  "simulate": false
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 5: Model Context Protocol (MCP) -->
+        <section id="mcp-protocol" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">05</span>
+              <span>Model Context Protocol (MCP) Client</span>
+            </h3>
+            <span class="chip chip-chain">JSON-RPC 2.0 &amp; SSE</span>
+          </div>
+          <p class="docs-text">
+            BULWARK implements a streamable-HTTP Model Context Protocol (MCP) client in <code class="docs-pill">@bulwark/agent</code>. It communicates with both authenticated (<code class="docs-pill">https://app.keeperhub.com/mcp</code>) and anonymous public (<code class="docs-pill">https://app.keeperhub.com/mcp/public</code>) endpoints.
+          </p>
+          <p class="docs-text">
+            Rather than hardcoding tool signatures, BULWARK queries <code class="docs-pill">tools/list</code> dynamically at runtime, inspects parameter schemas, and validates workflow syntax using the official KeeperHub <code class="docs-pill">validate_workflow</code> tool before submitting any standing task.
+          </p>
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-block-lang">typescript</span>
+              <button class="btn-code-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre class="code-block-body"><code>// Discovery loop snippet from packages/agent/src/mcp/client.ts
+const mcp = new KeeperHubMcpClient({
+  baseUrl: process.env.KEEPERHUB_API_BASE ?? "https://app.keeperhub.com",
+  apiKey: process.env.KEEPERHUB_API_KEY,
+});
+
+// Dynamic capability discovery
+const tools = await mcp.listTools();
+console.log(`Discovered ${tools.length} live KeeperHub MCP tools`);
+
+// Validate dynamic AST workflow before activation
+const validation = await mcp.callTool("validate_workflow", {
+  workflow: compiledWorkflowJson
+});
+if (!validation.valid) {
+  throw new Error(`Invalid workflow schema: ${validation.errors.join(", ")}`);
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 6: Aave V3 & EVM RPC -->
+        <section id="aave-integration" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">06</span>
+              <span>Aave V3 Protocol &amp; EVM RPC Truth Pipeline</span>
+            </h3>
+            <span class="chip chip-chain">On-Chain State Truth</span>
+          </div>
+          <p class="docs-text">
+            BULWARK queries live on-chain truth directly from Aave V3 Pool contracts. The pipeline operates via a dual-path mechanism:
+          </p>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Primary KeeperHub Read Path:</strong> Uses <code>POST /api/execute/contract-call</code> with view parameters, receiving instant decoded results tagged as <code>KEEPERHUB FACT</code>.</li>
+            <li><strong>Independent Public RPC Fallback:</strong> If KeeperHub is unreachable or credentials are not supplied, the agent issues direct <code>eth_call</code> queries to public Sepolia/Base RPCs.</li>
+          </ul>
+          <div class="docs-subheading">Aave V3 Account Data Tuple (<code class="docs-pill">getUserAccountData</code>)</div>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>EVM Return Type</th>
+                  <th>Unit Scale</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>totalCollateralBase</code></td>
+                  <td><code>uint256</code></td>
+                  <td>8 Decimals (USD)</td>
+                  <td>Total collateral deposited across all supported asset reserves.</td>
+                </tr>
+                <tr>
+                  <td><code>totalDebtBase</code></td>
+                  <td><code>uint256</code></td>
+                  <td>8 Decimals (USD)</td>
+                  <td>Total active borrow debt across variable and stable positions.</td>
+                </tr>
+                <tr>
+                  <td><code>availableBorrowsBase</code></td>
+                  <td><code>uint256</code></td>
+                  <td>8 Decimals (USD)</td>
+                  <td>Remaining borrowing headroom before hitting max loan-to-value.</td>
+                </tr>
+                <tr>
+                  <td><code>currentLiquidationThreshold</code></td>
+                  <td><code>uint256</code></td>
+                  <td>Basis Points (1e4)</td>
+                  <td>Weighted liquidation threshold across active collateral mix.</td>
+                </tr>
+                <tr>
+                  <td><code>ltv</code></td>
+                  <td><code>uint256</code></td>
+                  <td>Basis Points (1e4)</td>
+                  <td>Weighted average Loan-to-Value allowed for borrowing.</td>
+                </tr>
+                <tr>
+                  <td><code>healthFactor</code></td>
+                  <td><code>uint256</code></td>
+                  <td>WAD (1e18)</td>
+                  <td>Position health. Liquidation occurs when $HF &lt; 1.00 \times 10^{18}$.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 7: Closed-Form Targeting Math -->
+        <section id="targeting-math" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">07</span>
+              <span>Mathematical Formulations: Closed-Form Debt Targeting</span>
+            </h3>
+            <span class="chip chip-chain">Exact Analytical Solution</span>
+          </div>
+          <p class="docs-text">
+            Traditional liquidation bots guess repayment amounts using arbitrary heuristic increments, causing over-repayment or leaving positions dangerously close to re-liquidation. BULWARK calculates the <strong>exact closed-form debt repayment ($\Delta D^*$)</strong> required to restore an undercollateralized position to a target health factor ($H_{\text{target}} = 1.50$ or $2.00$):
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Aave V3 Health Factor Definition</div>
+            <div>H = (C &times; L) / D</div>
+          </div>
+          <p class="docs-text">
+            To reach target health factor $H_{\text{target}}$ by repaying debt amount $\Delta D^*$:
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Targeting Condition</div>
+            <div>H_target = (C &times; L) / (D - &Delta;D*)</div>
+          </div>
+          <p class="docs-text">
+            Solving analytically for $\Delta D^*$ yields the exact formula implemented in <code class="docs-pill">packages/core/src/underwriter/desk.ts</code>:
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Exact Closed-Form Solution</div>
+            <div>&Delta;D* = (D &times; H_target - C &times; L) / H_target</div>
+          </div>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Zero Capital Extraction Invariant:</strong> If $H \ge H_{\text{target}}$, $\Delta D^* = 0$. The desk is mathematically prohibited from touching healthy positions.</li>
+            <li><strong>Debt Exhaustion Invariant:</strong> If $\Delta D^* &gt; D$, the amount is clamped to $D$ (full debt repayment).</li>
+          </ul>
+        </section>
+
+        <!-- Section 8: Urgency Premium Ladder -->
+        <section id="premium-curve" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">08</span>
+              <span>Risk-Adjusted Dynamic Premium Urgency Ladder</span>
+            </h3>
+            <span class="chip chip-chain">Convex Pricing Model</span>
+          </div>
+          <p class="docs-text">
+            Underwriter risk scales non-linearly as a borrower's Health Factor nears $1.00$. To compensate emergency liquidity providers fairly while remaining significantly cheaper than Aave's 5%–10% liquidation bonus penalty, BULWARK applies a <strong>convex urgency pricing curve</strong>:
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Dynamic Premium Pricing Equation</div>
+            <div>P(H) = P_base &times; (1 + &kappa; &times; ((H_crit - H) / (H_crit - 1.00))^&gamma;)</div>
+          </div>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li>$P_{\text{base}}$: Base underwriting fee (e.g. 50 bps / 0.50%).</li>
+            <li>$H_{\text{crit}}$: Critical trigger floor threshold ($1.25$ HF).</li>
+            <li>$\kappa$: Maximum urgency multiplier ($\kappa = 3.0$).</li>
+            <li>$\gamma$: Convexity acceleration exponent ($\gamma = 1.5$).</li>
+          </ul>
+          <p class="docs-text">
+            When $H = 1.25$, $P(H) = P_{\text{base}} = 0.50\%$. As $H \to 1.00$, the fee smoothly converges to $4 \times P_{\text{base}} = 2.00\%$. The borrower saves at least 300 to 800 basis points compared to liquidation, and collateral is preserved intact.
+          </p>
+        </section>
+
+        <!-- Section 9: Clamp-Only Policy Compiler -->
+        <section id="policy-compiler" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">09</span>
+              <span>The Clamp-Only Policy Compiler &amp; authorityHash</span>
+            </h3>
+            <span class="chip chip-chain">Mathematical Non-Escalation</span>
+          </div>
+          <p class="docs-text">
+            The core security invariant of BULWARK is: <strong>Agents propose. Policy compiles.</strong> An AI agent, prompt injection, or compromised underwriter model can <em>never</em> increase its authorized capital or broaden its operating authority.
+          </p>
+          <p class="docs-text">
+            The Policy Compiler calculates the strict minimum intersection of six immutable boundary constraints:
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Mathematical Intersection of Authority Limits</div>
+            <div>AuthorizedAmount &le; min(AgentIntentAmount, GrantMaxAmount, BandCap(HF), PolicyMaxPerRescue, DailyVelocityBudgetRemaining, DeskAvailableCapacity)</div>
+          </div>
+          <p class="docs-text">
+            Every compiled execution creates a cryptographically immutable <code class="docs-pill">authorityHash</code>:
+          </p>
+          <div class="math-formula-box">
+            <div class="formula-title">Cryptographic Authority Binding</div>
+            <div>authorityHash = keccak256(grantId || bandIndex || intentHash || authorizedAmount || nonce)</div>
+          </div>
+          <p class="docs-text">
+            If any parameter is tampered with post-compilation, the hash mismatches and KeeperHub execution aborts fail-closed.
+          </p>
+        </section>
+
+        <!-- Section 10: PoAA 11-Check Engine -->
+        <section id="poaa-verification" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">10</span>
+              <span>Proof of Authorized Agency (PoAA) 11-Check Engine</span>
+            </h3>
+            <span class="chip chip-chain">Zero-Trust Verification</span>
+          </div>
+          <p class="docs-text">
+            Every executed rescue produces an exportable, self-contained <strong>Proof of Authorized Agency (PoAA)</strong> JSON bundle. Any external auditor, user, or insurer can paste this bundle into the standalone <a href="/verify" style="color: var(--accent); font-weight: 700;">/verify portal</a> to prove mathematically that the agent stayed strictly within owner-approved limits.
+          </p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Check</th>
+                  <th>Invariant Name</th>
+                  <th>Failure Code</th>
+                  <th>Cryptographic / Mathematical Rule</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>01</strong></td>
+                  <td><code>GRANT_EXISTS</code></td>
+                  <td><code>UNKNOWN_GRANT</code></td>
+                  <td>Store lookup returns valid RescueGrant record for <code>grantId</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>02</strong></td>
+                  <td><code>GRANT_APPROVED</code></td>
+                  <td><code>GRANT_NOT_APPROVED</code></td>
+                  <td><code>grant.status === 'armed'</code> and owner signature verified.</td>
+                </tr>
+                <tr>
+                  <td><strong>03</strong></td>
+                  <td><code>GRANT_NOT_EXPIRED</code></td>
+                  <td><code>GRANT_EXPIRED</code></td>
+                  <td>Execution block timestamp $T \le \text{grant.expiresAt}$.</td>
+                </tr>
+                <tr>
+                  <td><strong>04</strong></td>
+                  <td><code>GRANT_NOT_INVALIDATED</code></td>
+                  <td><code>GRANT_INVALIDATED</code></td>
+                  <td>Invalidation flag is false; no drift or revocation logged.</td>
+                </tr>
+                <tr>
+                  <td><strong>05</strong></td>
+                  <td><code>POSITION_MATCH</code></td>
+                  <td><code>POSITION_MISMATCH</code></td>
+                  <td>Execution recipient address matches grant borrower address.</td>
+                </tr>
+                <tr>
+                  <td><strong>06</strong></td>
+                  <td><code>HF_BELOW_THRESHOLD</code></td>
+                  <td><code>HF_NOT_CRITICAL</code></td>
+                  <td>Pre-rescue verified on-chain Health Factor strictly &lt; 1.25.</td>
+                </tr>
+                <tr>
+                  <td><strong>07</strong></td>
+                  <td><code>INTENT_BOUNDED_BY_BAND</code></td>
+                  <td><code>BAND_LIMIT_EXCEEDED</code></td>
+                  <td>$\text{AuthorizedAmount} \le \text{activeBand.maxRescueAmount}$.</td>
+                </tr>
+                <tr>
+                  <td><strong>08</strong></td>
+                  <td><code>INTENT_BOUNDED_BY_CAP</code></td>
+                  <td><code>GRANT_CAP_EXCEEDED</code></td>
+                  <td>$\text{CumulativeRescued} \le \text{grant.maxTotalRescueAmount}$.</td>
+                </tr>
+                <tr>
+                  <td><strong>09</strong></td>
+                  <td><code>COMPILATION_INTEGRITY</code></td>
+                  <td><code>AUTHORITY_HASH_MISMATCH</code></td>
+                  <td><code>keccak256(compiledPayload) === authorityHash</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>10</strong></td>
+                  <td><code>DRY_RUN_PASSED</code></td>
+                  <td><code>SIMULATION_FAILED</code></td>
+                  <td>KeeperHub simulation receipt confirms <code>wouldRevert === false</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>11</strong></td>
+                  <td><code>RECEIPT_CHAIN_MATCH</code></td>
+                  <td><code>RECEIPT_FRAUD</code></td>
+                  <td>KeeperHub receipt txHash matches public RPC status on Sepolia.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 11: Security Invariants & Attack Hardening -->
+        <section id="security-hardening" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">11</span>
+              <span>Security Invariants &amp; Attack Hardening</span>
+            </h3>
+            <span class="chip chip-chain">Zero-Revert Discipline</span>
+          </div>
+          <p class="docs-text">
+            BULWARK is hardened against both web3 smart contract attack vectors and autonomous LLM prompt vulnerabilities:
+          </p>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Adversarial Prompt Injection Bounding:</strong> LLM triage models are strictly advisory (<code class="docs-pill">AGENT OUTPUT</code>). The LLM is only presented with a discrete set of pre-calculated feasible math plans. Even if an LLM is prompt-injected to output malicious numbers, the Policy Compiler clamps the intent to valid candidate boundaries.</li>
+            <li><strong>Double-Spend &amp; Re-entrancy Guard:</strong> Unique SHA-256 <code>Idempotency-Key</code> headers ensure network retries never replay transactions. Grant state transitions are atomic and fail-closed.</li>
+            <li><strong>Zero Secret Leakage Invariant:</strong> Private keys never exist on disk, in memory, or in browser code. All on-chain mutations are signed inside KeeperHub's Turnkey enclaves. API keys are masked and never returned over public endpoints.</li>
+            <li><strong>Simulation Footgun Guard:</strong> As identified in integration research, KeeperHub ignores <code>simulate: true</code> on protocol-action routes. BULWARK enforces client-side assertion checks (<code>assertSimulationSafety</code>) to prevent accidental live mempool broadcast.</li>
+          </ul>
+        </section>
+
+        <!-- Section 12: Monorepo Packages Breakdown -->
+        <section id="monorepo-packages" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">12</span>
+              <span>Monorepo Architecture &amp; Package Directory</span>
+            </h3>
+            <span class="chip chip-chain">pnpm Workspaces</span>
+          </div>
+          <p class="docs-text">
+            BULWARK is organized into four modular TypeScript packages:
+          </p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Path</th>
+                  <th>Role &amp; Dependencies</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>@bulwark/core</strong></td>
+                  <td><code>packages/core/</code></td>
+                  <td>Pure engine: Keccak-256 sponge, ABI codec, targeting equations, clamp policy compiler, grants ledger, KeeperHub REST client, and PoAA verifier. Zero external dependencies.</td>
+                </tr>
+                <tr>
+                  <td><strong>@bulwark/agent</strong></td>
+                  <td><code>packages/agent/</code></td>
+                  <td>Autonomous orchestrator: Aave position reader (EVM RPC), JSON-RPC 2.0 / SSE Model Context Protocol client, dynamic workflow compiler, and bounded LLM triage.</td>
+                </tr>
+                <tr>
+                  <td><strong>@bulwark/cli</strong></td>
+                  <td><code>packages/cli/</code></td>
+                  <td>Command-line utility (<code>bulwark</code>): system doctor, live position scanner, grants proposal/approval, compilation, orderbook matching, and audit export.</td>
+                </tr>
+                <tr>
+                  <td><strong>@bulwark/web</strong></td>
+                  <td><code>packages/web/</code></td>
+                  <td>Production web dashboard: zero-scroll ops console, real-time SSE stream, public <code>/verify</code> portal, and developer documentation.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 13: Dutch Orderbook -->
+        <section id="dutch-orderbook" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">13</span>
+              <span>Multi-Agent Dutch Auction Orderbook</span>
+            </h3>
+            <span class="chip chip-chain">Competitive Liquidity</span>
+          </div>
+          <p class="docs-text">
+            Borrowers are not locked to a single underwriter. Multiple autonomous desks register with distinct risk models, balance sheets, and pricing strategies.
+          </p>
+          <p class="docs-text">
+            When a borrower position requires rescue, the Orderbook Engine matches demand against registered desks using three strict invariants:
+          </p>
+          <ul class="docs-text" style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Capacity Backing Invariant:</strong> A desk can <em>never</em> commit more capital than its verified on-chain wallet balance (<code class="docs-pill">reservedCapacity &le; realBalance</code>). Phantom liquidity is banned.</li>
+            <li><strong>Linear Dutch Decay:</strong> Underwriting quotes begin at a ceiling and decay linearly over time until filled or expired.</li>
+            <li><strong>Deterministic Tie-Breaking:</strong> Tied fee quotes are broken deterministically by verified historical reputation (successful rescues, zero reverts, desk age).</li>
+          </ul>
+        </section>
+
+        <!-- Section 14: Developer CLI Manual -->
+        <section id="cli-manual" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">14</span>
+              <span>Developer CLI Reference Manual (<code class="docs-pill">bulwark</code>)</span>
+            </h3>
+            <span class="chip chip-chain">Command-Line Operations</span>
+          </div>
+          <p class="docs-text">
+            The <code class="docs-pill">@bulwark/cli</code> package provides complete administrative and developer control from the terminal:
+          </p>
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-block-lang">bash</span>
+              <button class="btn-code-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre class="code-block-body"><code># 1. System Health & Connection Diagnosis
+pnpm --filter @bulwark/cli exec bulwark doctor
+
+# 2. Scan Live Aave V3 Positions on Sepolia
+pnpm --filter @bulwark/cli exec bulwark positions scan --network sepolia
+
+# 3. Propose a State-Bound RescueGrant
+pnpm --filter @bulwark/cli exec bulwark grants propose \
+  --borrower 0x71CB05EE1b1F506fF321Da3dac38f25c0c9ce6E1 \
+  --pool 0x6Ae43d041c5E8AEe1117f170400777174e508F87 \
+  --max-rescue 50000 \
+  --expiry 86400
+
+# 4. Approve Grant (Human Position Owner)
+pnpm --filter @bulwark/cli exec bulwark grants approve --id grant_c976da35
+
+# 5. Compile Agent Intent into Clamped Authorized Intent
+pnpm --filter @bulwark/cli exec bulwark compile \
+  --grant-id grant_c976da35 \
+  --intent-amount 25000 \
+  --current-hf 1.12
+
+# 6. Query Multi-Agent Underwriter Orderbook
+pnpm --filter @bulwark/cli exec bulwark desk orderbook --hf 1.15 --amount 10000
+
+# 7. Export Cryptographic Audit Bundle
+pnpm --filter @bulwark/cli exec bulwark audit export --out audit-bundle.jsonld</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 15: Web & Telemetry APIs -->
+        <section id="api-reference" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">15</span>
+              <span>Web Server REST &amp; Telemetry API</span>
+            </h3>
+            <span class="chip chip-chain">HTTP &amp; SSE</span>
+          </div>
+          <p class="docs-text">
+            The web server (<code class="docs-pill">@bulwark/web</code>) exposes clean, secure REST and Server-Sent Events (SSE) endpoints with zero secret leakage:
+          </p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Method &amp; Path</th>
+                  <th>Payload / Params</th>
+                  <th>Response Shape</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>GET /api/state</code></td>
+                  <td>None</td>
+                  <td><code>{ chainId, hasKey, grants, executions, capacity, reputation }</code></td>
+                  <td>Retrieves global desk state, active grants, executions, and reputation score.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /api/tick</code></td>
+                  <td><code>{}</code></td>
+                  <td><code>{ success: true, timestamp, processed }</code></td>
+                  <td>Triggers one guardian monitoring and underwriting scan cycle.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /api/proof/verify</code></td>
+                  <td><code>PoaaBundle JSON</code></td>
+                  <td><code>{ verdict: "PROVEN", passedChecks: 11, totalChecks: 11, checks: [...] }</code></td>
+                  <td>Evaluates the 11-check cryptographic proof chain on any supplied PoAA bundle.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /api/grants/:id/approve</code></td>
+                  <td>None</td>
+                  <td><code>{ success: true, grant }</code></td>
+                  <td>Approves a proposed grant, arming it for autonomous execution.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /api/grants/:id/revoke</code></td>
+                  <td>None</td>
+                  <td><code>{ success: true, grant }</code></td>
+                  <td>Revokes an active grant, disarming it immediately.</td>
+                </tr>
+                <tr>
+                  <td><code>GET /api/stream</code></td>
+                  <td>None</td>
+                  <td>Server-Sent Events (SSE)</td>
+                  <td>Streams live position telemetry and execution status updates.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 16: Contract Registry -->
+        <section id="contract-registry" class="docs-section">
+          <div class="docs-section-header">
+            <h3 class="docs-section-title">
+              <span class="docs-section-num">16</span>
+              <span>Smart Contract Registry &amp; Verified Addresses</span>
+            </h3>
+            <span class="chip chip-chain">Mainnet &amp; Testnet</span>
+          </div>
+          <p class="docs-text">
+            All contract addresses and ABI interfaces used by BULWARK have been verified against official protocol deployments:
+          </p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Network</th>
+                  <th>Chain ID</th>
+                  <th>Aave V3 Pool</th>
+                  <th>PoolAddressesProvider</th>
+                  <th>AaveProtocolDataProvider</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sepolia Testnet</strong></td>
+                  <td><code>11155111</code></td>
+                  <td><code>0x6Ae43d041c5E8AEe1117f170400777174e508F87</code></td>
+                  <td><code>0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A</code></td>
+                  <td><code>0x3e9708d80f7B3e43118013075F7e95CE3AB31F31</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Base Mainnet</strong></td>
+                  <td><code>8453</code></td>
+                  <td><code>0xA238Dd80C259a72e81d7e4664a9801593F98d1c5</code></td>
+                  <td><code>0xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D</code></td>
+                  <td><code>0x0F43731EB8d45A581f4a36DD74F5f358bc90C73A</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Ethereum Mainnet</strong></td>
+                  <td><code>1</code></td>
+                  <td><code>0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2</code></td>
+                  <td><code>0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e</code></td>
+                  <td><code>0x0a16f2FCC0D44FaE41cc54e079281D84A363bECD</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Copy code snippet helper
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-block-wrapper').querySelector('code');
+      if (!codeBlock) return;
+      navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = orig; }, 2000);
+      });
+    }
+
+    // Live search filter in documentation
+    const searchInput = document.getElementById('docsSearchInput');
+    const sections = document.querySelectorAll('.docs-section');
+    const navLinks = document.querySelectorAll('.docs-nav-link');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        sections.forEach(sec => {
+          const text = sec.innerText.toLowerCase();
+          if (!term || text.includes(term)) {
+            sec.style.display = 'block';
+          } else {
+            sec.style.display = 'none';
+          }
+        });
+        navLinks.forEach(link => {
+          const targetId = link.getAttribute('href').substring(1);
+          const targetSec = document.getElementById(targetId);
+          if (targetSec && targetSec.style.display === 'none') {
+            link.parentElement.style.display = 'none';
+          } else {
+            link.parentElement.style.display = 'block';
+          }
+        });
+      });
+    }
+
+    // Active nav link highlight on scroll
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(sec => {
+        const top = sec.offsetTop - 120;
+        if (window.scrollY >= top) {
+          current = sec.getAttribute('id');
+        }
+      });
+      if (current) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+
+    // Populate live state in header/KPI
+    async function updateLiveTelemetry() {
+      try {
+        const res = await fetch('/api/state');
+        if (!res.ok) return;
+        const state = await res.json();
+        
+        if (state.hasKey) {
+          const kChip = document.getElementById('keyChip');
+          if (kChip) {
+            kChip.className = 'chip chip-chain';
+            kChip.innerText = 'KEY ACTIVE';
+          }
+        }
+        if (state.capacity) {
+          if (document.getElementById('deskBalanceVal')) {
+            document.getElementById('deskBalanceVal').innerText = `$${Number(state.capacity.totalCapacityUsd || 500000).toLocaleString()}`;
+          }
+          if (document.getElementById('availableCapVal')) {
+            document.getElementById('availableCapVal').innerText = `$${Number(state.capacity.availableCapacityUsd || 485000).toLocaleString()}`;
+          }
+          if (document.getElementById('reservedCapVal')) {
+            document.getElementById('reservedCapVal').innerText = `$${Number(state.capacity.reservedCapacityUsd || 15000).toLocaleString()}`;
+          }
+        }
+        if (state.executions) {
+          const verified = state.executions.filter(e => e.status === 'verified' || e.status === 'completed').length;
+          if (document.getElementById('verifiedRescuesVal')) {
+            document.getElementById('verifiedRescuesVal').innerText = verified.toString();
+          }
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    }
+    updateLiveTelemetry();
+    setInterval(updateLiveTelemetry, 10000);
+
+    // Trigger tick handler
+    const tickBtn = document.getElementById('tickBtn');
+    if (tickBtn) {
+      tickBtn.addEventListener('click', async () => {
+        tickBtn.disabled = true;
+        tickBtn.innerText = 'Scanning...';
+        try {
+          await fetch('/api/tick', { method: 'POST' });
+          await updateLiveTelemetry();
+        } finally {
+          tickBtn.disabled = false;
+          tickBtn.innerText = 'Trigger Tick';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

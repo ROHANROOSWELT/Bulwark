@@ -141,6 +141,10 @@ export function createWebServer(options: WebServerOptions = {}): http.Server {
           serveFile(path.join(PUBLIC_DIR, "settings.html"), "text/html");
           return;
         }
+        if (pathname === "/docs" || pathname === "/docs.html" || pathname === "/documentation") {
+          serveFile(path.join(PUBLIC_DIR, "docs.html"), "text/html");
+          return;
+        }
 
         // Generic static files (.css, .js, .json, .svg, .png, .ico)
         const safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, "");
