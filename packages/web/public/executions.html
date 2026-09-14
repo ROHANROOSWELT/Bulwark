@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BULWARK — KeeperHub Execution Desk & Settlement Ledger</title>
+  <title>🛡️ BULWARK — KeeperHub Execution Desk &amp; Settlement Ledger</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="alternate icon" type="image/png" href="/logo.png">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <!-- Global App Header -->
   <header class="app-header">
     <div class="logo-area">
-      <a href="/" class="logo-link">
+      <a href="/" class="logo-link" title="BULWARK Autonomous Backstop Economy">
+        <img src="/logo.svg" alt="BULWARK Logo" class="app-logo-icon" width="28" height="28">
         <span class="live-dot" title="Autonomous Guardian Node Online">
           <span class="live-dot-ping"></span>
           <span class="live-dot-core"></span>
         </span>
         <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
       </a>
-      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
-      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
+      <span class="sub-tag">Autonomous Backstop Economy</span>
     </div>
+
     <nav class="nav-bar">
       <a href="/overview" class="nav-tab">Overview</a>
       <a href="/positions" class="nav-tab">Positions</a>
@@ -30,10 +33,12 @@
       <a href="/settings" class="nav-tab">Diagnostics</a>
       <a href="/docs" class="nav-tab">Docs</a>
     </nav>
+
     <div class="header-status">
+      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">KEY NOT SET</span>
       <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
       <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
-        
         <span id="walletBtnLabel">Connect Wallet</span>
       </button>
     </div>
