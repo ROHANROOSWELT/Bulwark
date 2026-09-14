@@ -17,8 +17,8 @@
         </span>
         <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
       </a>
-      <span id="chainChip" class="chip chip-chain">[CHAIN READ] Sepolia 11155111</span>
-      <span id="keyChip" class="chip chip-unavailable">[UNAVAILABLE] KEY NOT DETECTED</span>
+      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
     </div>
     <nav class="nav-bar">
       <a href="/landing" class="nav-tab">Landing</a>
@@ -44,27 +44,22 @@
     <div class="kpi-item">
       <span class="kpi-label">Desk Balance:</span>
       <span id="deskBalanceVal" class="kpi-value">$0.00</span>
-      <span class="chip chip-chain">[CHAIN READ]</span>
     </div>
     <div class="kpi-item">
       <span class="kpi-label">Available Capacity:</span>
       <span id="availableCapVal" class="kpi-value">$0.00</span>
-      <span class="chip chip-policy">[POLICY INVARIANT]</span>
     </div>
     <div class="kpi-item">
       <span class="kpi-label">Reserved Capacity:</span>
       <span id="reservedCapVal" class="kpi-value">$0.00</span>
-      <span class="chip chip-policy">[POLICY INVARIANT]</span>
     </div>
     <div class="kpi-item">
       <span class="kpi-label">Verified Rescues:</span>
       <span id="verifiedRescuesVal" class="kpi-value">0</span>
-      <span class="chip chip-dual">[DUAL VERIFIED]</span>
     </div>
     <div class="kpi-item">
       <span class="kpi-label">Capital Deployed:</span>
       <span id="capitalDeployedVal" class="kpi-value">$0.00</span>
-      <span class="chip chip-keeperhub">[KEEPERHUB FACT]</span>
     </div>
   </div>
 
@@ -75,7 +70,6 @@
       <div class="page-title-group">
         <h2 class="page-title">
           <span>Aave V3 Monitored Positions & Underwriting Scanner</span>
-          <span class="chip chip-chain">[CHAIN READ]</span>
         </h2>
         <p class="page-subtitle">Continuous on-chain evaluation of borrower Health Factors, collateral ratios, and liquidation proximity on Ethereum Sepolia.</p>
       </div>
@@ -87,22 +81,22 @@
     <!-- Summary Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card">
-        <span class="stat-label">Total Collateral Monitored <span class="chip chip-chain">[CHAIN READ]</span></span>
+        <span class="stat-label">Total Collateral Monitored</span>
         <span id="totalCollateralVal" class="stat-value">$0.00</span>
         <span class="stat-sub">Across all watchlist borrowers</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">Total Debt Outstanding <span class="chip chip-chain">[CHAIN READ]</span></span>
+        <span class="stat-label">Total Debt Outstanding</span>
         <span id="totalDebtVal" class="stat-value">$0.00</span>
         <span class="stat-sub">USDC active borrows</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">Average Health Factor <span class="chip chip-policy">[POLICY INVARIANT]</span></span>
+        <span class="stat-label">Average Health Factor</span>
         <span id="avgHfVal" class="stat-value">--</span>
         <span class="stat-sub">Floor threshold: 1.050</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">At-Risk Positions <span class="chip chip-policy">[CRITICAL &lt; 1.25]</span></span>
+        <span class="stat-label">At-Risk Positions</span>
         <span id="atRiskCountVal" class="stat-value" style="color: var(--accent-rose);">0</span>
         <span class="stat-sub">Eligible for RescueGrants</span>
       </div>
@@ -118,7 +112,6 @@
           </svg>
           Live Aave V3 Borrower Risk Scanner
         </span>
-        <span class="chip chip-compiler">[COMPILER DERIVED]</span>
       </div>
       <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 14px;">
         Query any Ethereum address on Sepolia to inspect on-chain collateral base, debt, liquidation threshold, and calculate automated RescueGrant terms.
@@ -135,7 +128,6 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 8px;">
           <div>
             <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);" id="scannedBorrowerTitle">Borrower 0x000...</span>
-            <span class="chip chip-chain" style="margin-left: 8px;">[CHAIN READ]</span>
           </div>
           <div id="scannedHfBadge" class="hf-badge hf-healthy">HF 1.500</div>
         </div>

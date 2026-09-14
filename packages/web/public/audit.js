@@ -81,18 +81,18 @@ function renderAuditTimeline(logs) {
       const ts = log.timestamp ? new Date(log.timestamp).toISOString() : new Date().toISOString();
 
       let chipClass = "chip-compiler";
-      let chipLabel = "[COMPILER DERIVED]";
+      let chipLabel = "Compiler";
 
       const actUpper = action.toUpperCase();
       if (actUpper.includes("SCAN") || actUpper.includes("CHAIN")) {
         chipClass = "chip-chain";
-        chipLabel = "[CHAIN READ]";
+        chipLabel = "On-Chain";
       } else if (actUpper.includes("GRANT") || actUpper.includes("POLICY") || actUpper.includes("APPROVE")) {
         chipClass = "chip-policy";
-        chipLabel = "[POLICY INVARIANT]";
+        chipLabel = "Policy";
       } else if (actUpper.includes("EXECUTE") || actUpper.includes("KEEPERHUB") || actUpper.includes("DISPATCH")) {
         chipClass = "chip-keeperhub";
-        chipLabel = "[KEEPERHUB FACT]";
+        chipLabel = "KeeperHub";
       }
 
       const entity = log.grantId || log.userAddress || log.executionId || "System Core";

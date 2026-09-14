@@ -82,7 +82,7 @@ function renderReport(report) {
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="chip ${provClass}">[${c.provenance}]</span>
+          <span class="chip ${provClass}">${c.provenance}</span>
           <span class="${c.passed ? "check-pass" : "check-fail"}" style="font-size: 14px;">
             ${c.passed ? "✓ PASS" : "✗ FAIL"}
           </span>

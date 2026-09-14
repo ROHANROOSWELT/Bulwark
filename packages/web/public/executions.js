@@ -90,7 +90,7 @@ function renderExecutionsTable(executions) {
             <span style="color: var(--accent-rose);">${preHf}</span> &rarr; <span style="color: var(--accent-emerald); font-weight: 700;">${postHf}</span>
           </td>
           <td>
-            <span class="chip chip-dual">[DUAL VERIFIED]</span>
+            <span class="chip chip-dual">Dual Verified</span>
           </td>
           <td style="text-align: right;">
             <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">

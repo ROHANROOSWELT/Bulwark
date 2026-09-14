@@ -18,10 +18,10 @@ function renderState(data) {
   const keyChip = document.getElementById("keyChip");
   if (data.hasKey) {
     keyChip.className = "chip chip-keeperhub";
-    keyChip.textContent = "[KEEPERHUB FACT] KEY ACTIVE";
+    keyChip.textContent = "KEY ACTIVE";
   } else {
     keyChip.className = "chip chip-unavailable";
-    keyChip.textContent = "[UNAVAILABLE] KEY NOT SET";
+    keyChip.textContent = "KEY NOT SET";
   }
 
   // 2. Desk KPIs
@@ -66,7 +66,7 @@ function renderState(data) {
           </div>
           <div class="card-row">
             <span class="card-key">Source:</span>
-            <span class="chip chip-chain">[CHAIN READ]</span>
+            <span class="chip chip-chain">On-Chain</span>
           </div>
         </div>
       `;
