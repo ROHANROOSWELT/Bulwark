@@ -63,6 +63,23 @@ export class BulwarkStore {
     if (this.isInitialized) return;
     await fs.mkdir(this.baseDir, { recursive: true });
 
+    // In serverless /tmp environment on Vercel, seed from repo's .bulwark if available
+    if (process.env.VERCEL && this.baseDir === "/tmp/.bulwark") {
+      const seedFiles = ["grants.json", "executions.json", "capacity.json", "audit.jsonl"];
+      for (const file of seedFiles) {
+        const dest = join(this.baseDir, file);
+        const src = join(process.cwd(), ".bulwark", file);
+        try {
+          await fs.access(dest);
+        } catch {
+          try {
+            const content = await fs.readFile(src, "utf8");
+            await fs.writeFile(dest, content, "utf8");
+          } catch {}
+        }
+      }
+    }
+
     // Ensure default files exist if not present
     const grantsPath = join(this.baseDir, "grants.json");
     try {

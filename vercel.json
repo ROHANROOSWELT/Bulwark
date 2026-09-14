@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/overview", "destination": "/overview.html" },
+    { "source": "/dashboard", "destination": "/overview.html" },
+    { "source": "/console", "destination": "/overview.html" },
+    { "source": "/diagnostics", "destination": "/settings.html" },
+    { "source": "/documentation", "destination": "/docs.html" }
+  ]
+}

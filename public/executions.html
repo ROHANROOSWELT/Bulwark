@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BULWARK — KeeperHub Execution Desk & Settlement Ledger</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Global App Header -->
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="/" class="logo-link">
+        <span class="live-dot" title="Autonomous Guardian Node Online">
+          <span class="live-dot-ping"></span>
+          <span class="live-dot-core"></span>
+        </span>
+        <span class="logo-tag text-gradient">BULWARK<span class="logo-dot">.</span></span>
+      </a>
+      <span id="chainChip" class="chip chip-chain">Sepolia 11155111</span>
+      <span id="keyChip" class="chip chip-unavailable">KEY NOT DETECTED</span>
+    </div>
+    <nav class="nav-bar">
+      <a href="/overview" class="nav-tab">Overview</a>
+      <a href="/positions" class="nav-tab">Positions</a>
+      <a href="/grants" class="nav-tab">Grants Desk</a>
+      <a href="/executions" class="nav-tab active">Executions</a>
+      <a href="/audit" class="nav-tab">Audit Trail</a>
+      <a href="/verify" class="nav-tab">PoAA /verify</a>
+      <a href="/settings" class="nav-tab">Diagnostics</a>
+      <a href="/docs" class="nav-tab">Docs</a>
+    </nav>
+    <div class="header-status">
+      <button id="tickBtn" class="btn-primary" title="Trigger guardian scan and underwrite tick">Trigger Tick</button>
+      <button id="connectWalletBtn" class="btn-wallet" title="Connect Web3 Wallet">
+        
+        <span id="walletBtnLabel">Connect Wallet</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Desk KPI Top Bar -->
+  <div class="desk-kpi-bar">
+    <div class="kpi-item">
+      <span class="kpi-label">Desk Balance:</span>
+      <span id="deskBalanceVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Available Capacity:</span>
+      <span id="availableCapVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Reserved Capacity:</span>
+      <span id="reservedCapVal" class="kpi-value">$0.00</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Verified Rescues:</span>
+      <span id="verifiedRescuesVal" class="kpi-value">0</span>
+    </div>
+    <div class="kpi-item">
+      <span class="kpi-label">Capital Deployed:</span>
+      <span id="capitalDeployedVal" class="kpi-value">$0.00</span>
+    </div>
+  </div>
+
+  <!-- Dedicated Executions View -->
+  <div class="page-container">
+    <!-- Header Row -->
+    <div class="page-header-row">
+      <div class="page-title-group">
+        <h2 class="page-title">
+          <span>KeeperHub Execution Desk & Settlement Ledger</span>
+        </h2>
+        <p class="page-subtitle">Historical settlement ledger of on-chain flashloan debt repays executed through KeeperHub and verified against Ethereum Sepolia receipts.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/verify" class="btn-primary" style="text-decoration: none;">Verify PoAA Bundle &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Summary Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Capital Rescued</span>
+        <span id="totalRescuedCapitalVal" class="stat-value">$0.00</span>
+        <span class="stat-sub">Cumulative debt repaid</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Executions Dispatched</span>
+        <span id="totalExecsCountVal" class="stat-value">0</span>
+        <span class="stat-sub">Across all authorized grants</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Dual Verification Rate</span>
+        <span class="stat-value" style="color: var(--accent-emerald);">100%</span>
+        <span class="stat-sub">On-chain receipt + PoAA matching</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Average Gas Efficiency</span>
+        <span id="avgGasVal" class="stat-value">~180k</span>
+        <span class="stat-sub">Flashloan + repay gas units</span>
+      </div>
+    </div>
+
+    <!-- Executions Table -->
+    <div class="table-wrapper">
+      <div style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">Settled KeeperHub Transactions</span>
+        <div class="search-bar" style="max-width: 360px;">
+          <input type="text" id="filterExecsInput" placeholder="Filter by Exec ID, TxHash, or Borrower...">
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Execution ID</th>
+            <th>Grant ID</th>
+            <th>Borrower Address</th>
+            <th>Amount Repaid</th>
+            <th>Transaction Hash</th>
+            <th>Health Factor Delta</th>
+            <th>Verification</th>
+            <th style="text-align: right;">Receipt & PoAA</th>
+          </tr>
+        </thead>
+        <tbody id="execsTableBody">
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading executions ledger...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div id="receiptModal" class="general-modal-backdrop" style="display: none;">
+    <div class="general-modal" style="width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px;">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);" id="receiptModalTitle">KeeperHub Execution Receipt</h3>
+          <p style="font-size: 11px; color: var(--text-muted);">Verified on-chain execution receipt from Ethereum Sepolia.</p>
+        </div>
+        <button id="closeReceiptModalBtn" class="wallet-modal-close">&times;</button>
+      </div>
+
+      <textarea id="receiptText" class="bundle-input" readonly style="height: 280px; font-size: 11px;"></textarea>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px;">
+        <span class="chip chip-keeperhub">KeeperHub Execution</span>
+        <button id="copyReceiptBtn" class="btn-secondary">Copy Receipt JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web3 Wallet Modal -->
+  <div id="walletModal" class="wallet-modal-backdrop" style="display: none;">
+    <div class="wallet-modal">
+      <div class="wallet-modal-header">
+        <div class="wallet-modal-title">
+          <h3>Connect Web3 Wallet</h3>
+          <p>Select your preferred wallet to manage Aave positions and authorize RescueGrants.</p>
+        </div>
+        <button id="closeWalletModal" class="wallet-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div id="walletConnectedSection" class="wallet-connected-section" style="display: none;">
+        <div class="wallet-active-card">
+          <div class="wallet-avatar" id="walletAvatar">MM</div>
+          <div class="wallet-details">
+            <div class="wallet-name-row">
+              <span id="connectedWalletName" class="connected-wallet-name">MetaMask</span>
+              <span id="connectedChainTag" class="chip chip-chain">Sepolia 11155111</span>
+            </div>
+            <span id="connectedAddressFull" class="connected-address-full">0x0000...0000</span>
+          </div>
+        </div>
+        <div class="wallet-actions-row">
+          <button id="switchNetworkBtn" class="btn-primary" style="display: none;">Switch to Sepolia</button>
+          <button id="scanConnectedPosBtn" class="btn-secondary">Scan My Position</button>
+          <button id="disconnectWalletBtn" class="btn-danger">Disconnect</button>
+        </div>
+      </div>
+
+      <div id="walletListSection" class="wallet-list">
+        <button class="wallet-option" data-wallet="metamask" id="opt-metamask">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <path d="M29.07 4L18.43 11.89L20.35 7.16L29.07 4Z" fill="#E2761B"/>
+                <path d="M2.93 4L11.57 7.21L13.57 11.89L2.93 4Z" fill="#E4761B"/>
+                <path d="M24.89 22.38L22.18 26.54L28.39 28.24L30.17 22.48L24.89 22.38Z" fill="#E4761B"/>
+                <path d="M1.83 22.48L3.61 28.24L9.82 26.54L7.11 22.38L1.83 22.48Z" fill="#E4761B"/>
+                <path d="M9.54 13.98L7.86 16.51L13.43 16.82L13.25 10.74L9.54 13.98Z" fill="#E4761B"/>
+                <path d="M22.46 13.98L18.72 10.72L18.57 16.82L24.14 16.51L22.46 13.98Z" fill="#E4761B"/>
+                <path d="M9.82 26.54L13.19 24.91L10.36 21.65L9.82 26.54Z" fill="#D7C1B3"/>
+                <path d="M18.81 24.91L22.18 26.54L21.64 21.65L18.81 24.91Z" fill="#D7C1B3"/>
+                <path d="M13.42 16.82L9.57 16.61L10.36 21.65L13.42 16.82Z" fill="#233447"/>
+                <path d="M18.58 16.82L21.64 21.65L22.43 16.61L18.58 16.82Z" fill="#233447"/>
+                <path d="M18.81 24.91L13.19 24.91L13.78 28.52L18.22 28.52L18.81 24.91Z" fill="#CD6116"/>
+                <path d="M18.57 16.82L18.22 28.52L18.81 24.91L21.64 21.65L18.57 16.82Z" fill="#E4751F"/>
+                <path d="M10.36 21.65L13.19 24.91L13.78 28.52L13.43 16.82L10.36 21.65Z" fill="#E4751F"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">MetaMask</span>
+              <span class="wallet-option-desc">Connect via desktop extension or mobile app</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-metamask">Available</span>
+        </button>
+
+        <button class="wallet-option" data-wallet="okx" id="opt-okx">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#000000"/>
+                <rect x="7" y="7" width="6" height="6" fill="#ffffff"/>
+                <rect x="19" y="7" width="6" height="6" fill="#ffffff"/>
+                <rect x="13" y="13" width="6" height="6" fill="#ffffff"/>
+                <rect x="7" y="19" width="6" height="6" fill="#ffffff"/>
+                <rect x="19" y="19" width="6" height="6" fill="#ffffff"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">OKX Wallet</span>
+              <span class="wallet-option-desc">Connect via OKX Web3 browser extension</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-okx">Available</span>
+        </button>
+
+        <button class="wallet-option" data-wallet="coinbase" id="opt-coinbase">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#0052FF"/>
+                <circle cx="16" cy="16" r="9" fill="#ffffff"/>
+                <rect x="13" y="13" width="6" height="6" rx="1.5" fill="#0052FF"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Coinbase Wallet</span>
+              <span class="wallet-option-desc">Connect via Coinbase Wallet extension</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-coinbase">Available</span>
+        </button>
+
+        <button class="wallet-option" data-wallet="rabby" id="opt-rabby">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#7082FF"/>
+                <path d="M9 22C9 18 13 14 16 14C19 14 23 18 23 22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="13" cy="11" r="2" fill="#ffffff"/>
+                <circle cx="19" cy="11" r="2" fill="#ffffff"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Rabby Wallet</span>
+              <span class="wallet-option-desc">Connect via DeBank Rabby game-ready extension</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-rabby">Available</span>
+        </button>
+
+        <button class="wallet-option" data-wallet="injected" id="opt-injected">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#1e293b"/>
+                <path d="M16 8L24 12.5V21.5L16 26L8 21.5V12.5L16 8Z" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M16 17V26M16 17L8 12.5M16 17L24 12.5" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Browser Injected</span>
+              <span class="wallet-option-desc">Connect any standard EIP-1193 provider</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-injected">Available</span>
+        </button>
+      </div>
+
+      <div id="walletErrorMsg" class="wallet-error-msg" style="display: none;"></div>
+
+      <div class="wallet-modal-footer">
+        <span class="wallet-footer-tip">Non-custodial &middot; Signatures stay strictly within your wallet</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared.js"></script>
+  <script src="/executions.js"></script>
+</body>
+</html>

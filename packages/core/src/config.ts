@@ -66,7 +66,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
     llmBaseUrl: env.BULWARK_LLM_BASE_URL,
     llmApiKey: env.BULWARK_LLM_API_KEY,
     llmModel: env.BULWARK_LLM_MODEL ?? "gpt-4o-mini",
-    storeDir: env.BULWARK_STORE_DIR ?? ".bulwark",
+    storeDir: env.BULWARK_STORE_DIR ?? (process.env.VERCEL ? "/tmp/.bulwark" : ".bulwark"),
     webPort,
     autoApprove: env.BULWARK_AUTO_APPROVE === "1" || env.BULWARK_AUTO_APPROVE === "true",
     rpcUrls: {

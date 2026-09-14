@@ -32,56 +32,86 @@ export interface WebServerOptions {
   watchlist?: string[];
 }
 
-export function createWebServer(options: WebServerOptions = {}): http.Server {
-  const guardian = options.guardian ?? new BulwarkGuardian();
+let defaultGuardian: BulwarkGuardian | null = null;
+export function getDefaultGuardian(): BulwarkGuardian {
+  if (!defaultGuardian) {
+    defaultGuardian = new BulwarkGuardian();
+  }
+  return defaultGuardian;
+}
+
+export async function handleRequest(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  options: WebServerOptions = {}
+): Promise<void> {
+  const guardian = options.guardian ?? getDefaultGuardian();
   const watchlist = options.watchlist ?? ["0x0000000000000000000000000000000000000001"];
 
-  const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
-    const pathname = url.pathname;
-    const method = req.method || "GET";
+  const rawUrl = (req.headers["x-matched-path"] as string) || (req.headers["x-vercel-matched-path"] as string) || req.url || "/";
+  const url = new URL(rawUrl, `http://${req.headers.host || "localhost"}`);
+  const pathname = url.pathname;
+  const method = req.method || "GET";
 
-    // Helper to send JSON responses (BigInt-safe)
-    const sendJson = (status: number, data: unknown) => {
-      if (res.headersSent) return;
-      let body: string;
-      try {
-        body = JSON.stringify(data, (_, v) => (typeof v === "bigint" ? v.toString() : v));
-      } catch (err: any) {
-        body = JSON.stringify({ error: `Serialization error: ${err.message}` });
-        status = 500;
-      }
-      res.writeHead(status, {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store",
-        "Access-Control-Allow-Origin": "*",
+  // Helper to send JSON responses (BigInt-safe)
+  const sendJson = (status: number, data: unknown) => {
+    if (res.headersSent) return;
+    let body: string;
+    try {
+      body = JSON.stringify(data, (_, v) => (typeof v === "bigint" ? v.toString() : v));
+    } catch (err: any) {
+      body = JSON.stringify({ error: `Serialization error: ${err.message}` });
+      status = 500;
+    }
+    res.writeHead(status, {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    });
+    res.end(body);
+  };
+
+  // CORS preflight
+  if (method === "OPTIONS") {
+    res.writeHead(204, {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    });
+    res.end();
+    return;
+  }
+
+  // Helper to parse JSON body
+  const readBody = async <T>(): Promise<T> => {
+    if ((req as any).body) {
+      return typeof (req as any).body === "string"
+        ? JSON.parse((req as any).body)
+        : ((req as any).body as T);
+    }
+    return new Promise<T>((resolve, reject) => {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk;
+        if (body.length > 2 * 1024 * 1024) {
+          reject(new Error("Request body exceeds 2MB limit"));
+        }
       });
-      res.end(body);
-    };
-
-    // Helper to parse JSON body
-    const readBody = async <T>(): Promise<T> => {
-      return new Promise<T>((resolve, reject) => {
-        let body = "";
-        req.on("data", (chunk) => {
-          body += chunk;
-          if (body.length > 2 * 1024 * 1024) {
-            reject(new Error("Request body exceeds 2MB limit"));
-          }
-        });
-        req.on("end", () => {
-          try {
-            resolve(body ? (JSON.parse(body) as T) : ({} as T));
-          } catch (e: any) {
-            reject(new Error(`Invalid JSON: ${e.message}`));
-          }
-        });
-        req.on("error", reject);
+      req.on("end", () => {
+        try {
+          resolve(body ? (JSON.parse(body) as T) : ({} as T));
+        } catch (e: any) {
+          reject(new Error(`Invalid JSON: ${e.message}`));
+        }
       });
-    };
+      req.on("error", reject);
+    });
+  };
 
-    // Helper to serve static files
-    const serveFile = (filePath: string, contentType: string) => {
+  // Helper to serve static files
+  const serveFile = (filePath: string, contentType: string) => {
       try {
         if (!fs.existsSync(filePath)) {
           res.writeHead(404, { "Content-Type": "text/plain" });
@@ -362,9 +392,12 @@ export function createWebServer(options: WebServerOptions = {}): http.Server {
     } catch (err: any) {
       sendJson(500, { error: err.message || "Internal server error" });
     }
-  });
+}
 
-  return server;
+export function createWebServer(options: WebServerOptions = {}): http.Server {
+  return http.createServer(async (req, res) => {
+    await handleRequest(req, res, options);
+  });
 }
 
 export function startWebServer(port?: number, host = "0.0.0.0"): Promise<{ server: http.Server; port: number }> {

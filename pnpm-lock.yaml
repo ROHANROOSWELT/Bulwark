@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@bulwark/core':
+        specifier: workspace:*
+        version: link:packages/core
+      '@bulwark/web':
+        specifier: workspace:*
+        version: link:packages/web
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

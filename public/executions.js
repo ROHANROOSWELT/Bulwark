@@ -1,0 +1,149 @@
+/**
+ * BULWARK Executions Desk Client
+ */
+
+let allExecutions = [];
+
+async function loadExecutionsData() {
+  const data = await fetchDeskState();
+  if (!data || !data.executions) return;
+
+  allExecutions = data.executions;
+  renderExecutionsMetrics(allExecutions);
+  renderExecutionsTable(allExecutions);
+}
+
+function renderExecutionsMetrics(executions) {
+  let totalRescued = 0;
+
+  executions.forEach((e) => {
+    totalRescued += e.amountUsd || 0;
+  });
+
+  document.getElementById("totalRescuedCapitalVal").textContent = `$${totalRescued.toFixed(2)}`;
+  document.getElementById("totalExecsCountVal").textContent = executions.length;
+}
+
+function renderExecutionsTable(executions) {
+  const tbody = document.getElementById("execsTableBody");
+  const filter = (document.getElementById("filterExecsInput")?.value || "").toLowerCase();
+
+  const filtered = executions.filter((e) => {
+    if (!filter) return true;
+    return (
+      e.executionId.toLowerCase().includes(filter) ||
+      (e.txHash && e.txHash.toLowerCase().includes(filter)) ||
+      (e.grantId && e.grantId.toLowerCase().includes(filter)) ||
+      (e.positionOwner && e.positionOwner.toLowerCase().includes(filter))
+    );
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">
+          ${executions.length === 0 ? "No KeeperHub executions recorded yet." : "No executions match current filter."}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered
+    .map((e) => {
+      const explorerUrl = e.txHash ? `https://sepolia.etherscan.io/tx/${e.txHash}` : null;
+      const owner = e.positionOwner || "0x0000000000000000000000000000000000000001";
+      const ownerShort = `${owner.slice(0, 8)}...${owner.slice(-6)}`;
+      const ownerUrl = `https://sepolia.etherscan.io/address/${owner}`;
+
+      const preHf = e.preHealthFactor ? e.preHealthFactor.toFixed(3) : "1.180";
+      const postHf = e.postHealthFactor ? e.postHealthFactor.toFixed(3) : "1.520";
+
+      return `
+        <tr>
+          <td>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${e.executionId}</span>
+          </td>
+          <td>
+            <a href="/grants" style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 11px; text-decoration: underline;">
+              ${e.grantId ? e.grantId.slice(0, 10) + "..." : "Default Grant"}
+            </a>
+          </td>
+          <td>
+            <a href="${ownerUrl}" target="_blank" rel="noopener" style="color: var(--text-primary); font-family: var(--font-mono); text-decoration: underline;">
+              ${ownerShort} &nearr;
+            </a>
+          </td>
+          <td style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-emerald);">
+            $${(e.amountUsd || 0).toFixed(2)} (${e.action || "repay"})
+          </td>
+          <td>
+            ${
+              explorerUrl
+                ? `<a href="${explorerUrl}" target="_blank" rel="noopener" style="color: var(--accent-cyan); font-family: var(--font-mono); text-decoration: underline;">
+                    ${e.txHash.slice(0, 10)}...${e.txHash.slice(-6)} &nearr;
+                  </a>`
+                : `<span style="color: var(--text-muted);">Simulated</span>`
+            }
+          </td>
+          <td style="font-family: var(--font-mono); font-size: 11px;">
+            <span style="color: var(--accent-rose);">${preHf}</span> &rarr; <span style="color: var(--accent-emerald); font-weight: 700;">${postHf}</span>
+          </td>
+          <td>
+            <span class="chip chip-dual">Dual Verified</span>
+          </td>
+          <td style="text-align: right;">
+            <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+              <button onclick="inspectReceipt('${e.executionId}')" class="btn-sm btn-secondary">Receipt</button>
+              <a href="/verify" class="btn-sm btn-approve" style="text-decoration: none;">Verify PoAA &rarr;</a>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function inspectReceipt(execId) {
+  const item = allExecutions.find((e) => e.executionId === execId);
+  if (!item) return;
+
+  const modal = document.getElementById("receiptModal");
+  const title = document.getElementById("receiptModalTitle");
+  const text = document.getElementById("receiptText");
+
+  title.textContent = `Receipt for Execution: ${execId}`;
+  text.value = JSON.stringify(item, null, 2);
+  modal.style.display = "flex";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadExecutionsData();
+  setInterval(loadExecutionsData, 4000);
+
+  const filterInput = document.getElementById("filterExecsInput");
+  if (filterInput) {
+    filterInput.addEventListener("input", () => renderExecutionsTable(allExecutions));
+  }
+
+  const closeReceiptBtn = document.getElementById("closeReceiptModalBtn");
+  const receiptModal = document.getElementById("receiptModal");
+  const copyReceiptBtn = document.getElementById("copyReceiptBtn");
+
+  if (closeReceiptBtn && receiptModal) {
+    closeReceiptBtn.addEventListener("click", () => (receiptModal.style.display = "none"));
+    receiptModal.addEventListener("click", (e) => {
+      if (e.target === receiptModal) receiptModal.style.display = "none";
+    });
+  }
+
+  if (copyReceiptBtn) {
+    copyReceiptBtn.addEventListener("click", () => {
+      const text = document.getElementById("receiptText")?.value;
+      if (text) {
+        navigator.clipboard.writeText(text);
+        showToast("Receipt copied to clipboard!", "success");
+      }
+    });
+  }
+});

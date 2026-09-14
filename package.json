@@ -1,6 +1,7 @@
 {
   "name": "bulwark",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "description": "BULWARK — the agent backstop economy for live Aave positions, executed deterministically by KeeperHub.",
   "license": "MIT",
@@ -19,6 +20,10 @@
     "cli": "node packages/cli/dist/index.js",
     "agent": "node packages/agent/dist/index.js",
     "web": "node packages/web/dist/server.js"
+  },
+  "dependencies": {
+    "@bulwark/core": "workspace:*",
+    "@bulwark/web": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
