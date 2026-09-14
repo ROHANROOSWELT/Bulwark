@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="landing-page-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,48 +56,152 @@
 
     <!-- ── Hero Section ─────────────────────────────────────────────────────── -->
     <section class="landing-hero">
-      <div class="hero-badge">
-        <span class="live-dot" style="margin: 0;">
-          <span class="live-dot-ping"></span>
-          <span class="live-dot-core"></span>
-        </span>
-        <span>Autonomous Risk Backstop &middot; Aave Liquidity Guardian</span>
-      </div>
+      <div class="hero-main-grid">
+        <div class="hero-content-col">
+          <div class="hero-badge">
+            <span class="live-dot" style="margin: 0;">
+              <span class="live-dot-ping"></span>
+              <span class="live-dot-core"></span>
+            </span>
+            <span>Autonomous Risk Backstop &middot; Aave Liquidity Guardian</span>
+          </div>
 
-      <h1 class="hero-title">
-        Deterministic<br>
-        <span class="text-gradient">Risk Backstop.</span>
-      </h1>
+          <h1 class="hero-title">
+            Deterministic<br>
+            <span class="text-gradient">Risk Backstop.</span>
+          </h1>
 
-      <p class="hero-subtitle">
-        Autonomous liquidity protection with mathematically proven agency. Preemptive debt repayment, invariant risk clamping, and cryptographic Proof of Authorized Agency executed by KeeperHub.
-      </p>
+          <p class="hero-subtitle">
+            Autonomous liquidity protection with mathematically proven agency. Preemptive debt repayment, invariant risk clamping, and cryptographic Proof of Authorized Agency executed by KeeperHub.
+          </p>
 
-      <div class="hero-actions">
-        <a href="/overview" class="btn-hero-primary">
-          <span>Launch Operations Console</span>
-          <span>&rarr;</span>
-        </a>
-        <a href="/verify" class="btn-hero-secondary">
-          <span>Verify PoAA Proof</span>
-        </a>
-        <a href="/positions" class="btn-hero-secondary">
-          <span>Explore Positions</span>
-        </a>
-      </div>
+          <div class="hero-actions">
+            <a href="/overview" class="btn-hero-primary">
+              <span>Launch Operations Console</span>
+              <span>&rarr;</span>
+            </a>
+            <a href="/verify" class="btn-hero-secondary">
+              <span>Verify PoAA Proof</span>
+            </a>
+            <a href="/positions" class="btn-hero-secondary">
+              <span>Explore Positions</span>
+            </a>
+          </div>
 
-      <div class="hero-floats">
-        <div class="float-chip">
-          <span>Aave Health Factor Floor 1.05 &bull; Target 1.50</span>
+          <div class="hero-floats">
+            <div class="float-chip">
+              <span class="chip-dot"></span>
+              <span>Aave HF Floor 1.05 &bull; Target 1.50</span>
+            </div>
+            <div class="float-chip">
+              <span class="chip-dot"></span>
+              <span>KeeperHub Zero-Revert Simulation</span>
+            </div>
+            <div class="float-chip">
+              <span class="chip-dot"></span>
+              <span>11-Step Cryptographic PoAA Validation</span>
+            </div>
+            <div class="float-chip">
+              <span class="chip-dot"></span>
+              <span>Zero Secret Leakage Invariant</span>
+            </div>
+          </div>
         </div>
-        <div class="float-chip">
-          <span>KeeperHub Calldata Simulation &bull; Zero Revert</span>
-        </div>
-        <div class="float-chip">
-          <span>11-Step Cryptographic PoAA Validation</span>
-        </div>
-        <div class="float-chip">
-          <span>Zero Secret Leakage Policy Invariant</span>
+
+        <div class="hero-isometric-col">
+          <div class="isometric-stage-card">
+            <!-- Floating stat chip top-left -->
+            <div class="stage-floating-chip stage-chip-top">
+              <span class="stage-chip-lbl">GUARDIAN SENTINEL</span>
+              <span class="stage-chip-val text-gradient">1.25 HF Floor</span>
+              <span class="stage-chip-sub">Autonomous Math Solver</span>
+            </div>
+
+            <!-- Floating stat chip bottom-right -->
+            <div class="stage-floating-chip stage-chip-bottom">
+              <span class="stage-chip-lbl">KEEPERHUB RELAY</span>
+              <span class="stage-chip-val" style="color: #059669;">Zero Revert &bull; 0 Revert</span>
+              <span class="stage-chip-sub">11/11 PoAA Cryptographic Checks</span>
+            </div>
+
+            <!-- Isometric 3D SVG Architecture -->
+            <svg class="isometric-svg" viewBox="0 0 520 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="topCoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4ecdc4"/>
+                  <stop offset="100%" stop-color="#0f766e"/>
+                </linearGradient>
+                <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.08"/>
+                </filter>
+              </defs>
+
+              <!-- Subtle Isometric Background Grid -->
+              <g stroke="rgba(78, 89, 120, 0.10)" stroke-width="0.8" stroke-dasharray="2 3">
+                <line x1="60" y1="190" x2="260" y2="90"/>
+                <line x1="260" y1="90" x2="460" y2="190"/>
+                <line x1="460" y1="190" x2="260" y2="290"/>
+                <line x1="260" y1="290" x2="60" y2="190"/>
+                <line x1="160" y1="140" x2="360" y2="240"/>
+                <line x1="360" y1="140" x2="160" y2="240"/>
+              </g>
+
+              <!-- Animated Connecting Pipelines -->
+              <path class="iso-pipeline-bg" d="M 120 167 L 180 130 L 208 80" stroke="rgba(78, 205, 196, 0.2)" stroke-width="4" stroke-linecap="round"/>
+              <path class="iso-pipeline" d="M 120 167 L 180 130 L 208 80" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+
+              <path class="iso-pipeline-bg" d="M 312 80 L 340 120 L 400 155" stroke="rgba(78, 205, 196, 0.2)" stroke-width="4" stroke-linecap="round"/>
+              <path class="iso-pipeline" d="M 312 80 L 340 120 L 400 155" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+
+              <path class="iso-pipeline-bg" d="M 400 200 L 350 235 L 308 260" stroke="rgba(5, 150, 105, 0.2)" stroke-width="4" stroke-linecap="round"/>
+              <path class="iso-pipeline" d="M 400 200 L 350 235 L 308 260" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+
+              <path class="iso-pipeline-bg" d="M 212 260 L 165 235 L 120 195" stroke="rgba(78, 205, 196, 0.2)" stroke-width="4" stroke-linecap="round"/>
+              <path class="iso-pipeline" d="M 212 260 L 165 235 L 120 195" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+
+              <!-- NODE 1: Aave V3 Lending Pool (Left) -->
+              <g class="iso-node" filter="url(#shadowFilter)">
+                <ellipse cx="120" cy="215" rx="42" ry="14" fill="rgba(15, 23, 42, 0.08)"/>
+                <path d="M 76 145 L 120 167 L 120 210 L 76 188 Z" fill="#e2e8f0" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 120 167 L 164 145 L 164 188 L 120 210 Z" fill="#cbd5e1" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 120 123 L 164 145 L 120 167 L 76 145 Z" fill="#ffffff" stroke="rgba(15, 23, 42, 0.15)" stroke-width="1"/>
+                <text x="120" y="148" font-family="var(--font-mono)" font-size="10" font-weight="800" fill="#0f172a" text-anchor="middle">AAVE V3</text>
+                <text x="120" y="161" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="#be123c" text-anchor="middle">HF 1.18</text>
+              </g>
+
+              <!-- NODE 2: BULWARK Sentinel Core (Elevated Top Center) -->
+              <g class="iso-node" filter="url(#shadowFilter)">
+                <ellipse cx="260" cy="138" rx="52" ry="17" fill="rgba(78, 205, 196, 0.2)"/>
+                <path d="M 208 55 L 260 81 L 260 132 L 208 106 Z" fill="#0f766e" stroke="rgba(78, 205, 196, 0.4)" stroke-width="1.2"/>
+                <path d="M 260 81 L 312 55 L 312 106 L 260 132 Z" fill="#115e59" stroke="rgba(78, 205, 196, 0.4)" stroke-width="1.2"/>
+                <path d="M 260 29 L 312 55 L 260 81 L 208 55 Z" fill="url(#topCoreGrad)" stroke="#5eead4" stroke-width="1.5"/>
+                <circle cx="260" cy="55" r="9" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <circle cx="260" cy="55" r="4" fill="#ffffff"/>
+                <text x="260" y="20" font-family="var(--font-mono)" font-size="10.5" font-weight="900" fill="#0f766e" text-anchor="middle">BULWARK CORE</text>
+                <text x="260" y="112" font-family="var(--font-mono)" font-size="9.5" font-weight="800" fill="#ffffff" text-anchor="middle">RESTORE 1.50 HF</text>
+              </g>
+
+              <!-- NODE 3: KeeperHub Relayer Node (Right) -->
+              <g class="iso-node" filter="url(#shadowFilter)">
+                <ellipse cx="400" cy="215" rx="42" ry="14" fill="rgba(15, 23, 42, 0.08)"/>
+                <path d="M 356 145 L 400 167 L 400 210 L 356 188 Z" fill="#e2e8f0" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 400 167 L 444 145 L 444 188 L 400 210 Z" fill="#cbd5e1" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 400 123 L 444 145 L 400 167 L 356 145 Z" fill="#ffffff" stroke="rgba(15, 23, 42, 0.15)" stroke-width="1"/>
+                <text x="400" y="148" font-family="var(--font-mono)" font-size="10" font-weight="800" fill="#0f172a" text-anchor="middle">KEEPERHUB</text>
+                <text x="400" y="161" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="#059669" text-anchor="middle">0 REVERT</text>
+              </g>
+
+              <!-- NODE 4: PoAA Cryptographic Proof Vault (Bottom Center) -->
+              <g class="iso-node" filter="url(#shadowFilter)">
+                <ellipse cx="260" cy="314" rx="48" ry="15" fill="rgba(15, 23, 42, 0.08)"/>
+                <path d="M 212 235 L 260 259 L 260 306 L 212 282 Z" fill="#e2e8f0" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 260 259 L 308 235 L 308 282 L 260 306 Z" fill="#cbd5e1" stroke="rgba(15, 23, 42, 0.12)" stroke-width="1"/>
+                <path d="M 260 211 L 308 235 L 260 259 L 212 235 Z" fill="#ffffff" stroke="rgba(15, 23, 42, 0.15)" stroke-width="1"/>
+                <text x="260" y="239" font-family="var(--font-mono)" font-size="10" font-weight="800" fill="#0f172a" text-anchor="middle">PoAA REGISTRY</text>
+                <text x="260" y="252" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="#0d9488" text-anchor="middle">11/11 PROVEN</text>
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -142,7 +246,11 @@
       <div class="features-grid">
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--accent);">SH</div>
+            <div class="feature-icon-box" style="color: var(--accent);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
             <h3 class="feature-name">Deterministic Debt Repayment</h3>
             <p class="feature-text">
               Real-time monitoring of Aave lending positions across every new block. When health factors breach safety bounds, the backstop autonomously calculates the exact debt repayment required to restore health to 1.50 HF.
@@ -157,7 +265,12 @@
 
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: #059669;">AU</div>
+            <div class="feature-icon-box" style="color: #059669;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
             <h3 class="feature-name">Proof of Authorized Agency (PoAA)</h3>
             <p class="feature-text">
               Every single executed backstop produces an unforgeable, self-contained JSON proof bundle. Anyone can independently verify 11 cryptographic checks—including policy hash, intent hash, and on-chain transaction receipts.
@@ -172,7 +285,19 @@
 
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--accent);">PL</div>
+            <div class="feature-icon-box" style="color: var(--accent);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"/>
+                <line x1="4" y1="10" x2="4" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12" y2="3"/>
+                <line x1="20" y1="21" x2="20" y2="16"/>
+                <line x1="20" y1="12" x2="20" y2="3"/>
+                <line x1="1" y1="14" x2="7" y2="14"/>
+                <line x1="9" y1="8" x2="15" y2="8"/>
+                <line x1="17" y1="16" x2="23" y2="16"/>
+              </svg>
+            </div>
             <h3 class="feature-name">Bounded Policy & Triage Clamping</h3>
             <p class="feature-text">
               Authority is strictly bounded by deterministic parameters: max debt change, daily capital caps, price bands, and expiration timestamps. Any AI or LLM triage advice is mathematically clamped to valid candidate plans.
@@ -187,7 +312,11 @@
 
         <div class="feature-card">
           <div>
-            <div class="feature-icon-box" style="color: var(--text-primary);">EX</div>
+            <div class="feature-icon-box" style="color: var(--text-primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
             <h3 class="feature-name">Zero-Trust KeeperHub Execution</h3>
             <p class="feature-text">
               Pre-flight simulation verifies transactions would succeed before broadcasting. Calldata is dispatched through KeeperHub with zero secret key leakage to client browsers and verified on-chain via dual RPC consensus.
@@ -270,6 +399,16 @@
             <a href="/verify" class="btn-secondary" style="text-decoration: none; padding: 10px 18px; font-size: 13px; display: inline-flex; align-items: center;">
               Open Full Verifier &rarr;
             </a>
+          </div>
+        </div>
+
+        <div class="sim-progress-wrap">
+          <div class="sim-progress-meta">
+            <span style="font-weight: 700; color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Cryptographic Invariant Pipeline</span>
+            <span id="simProgressPct" style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent);">0 / 11 Checks</span>
+          </div>
+          <div class="sim-progress-track">
+            <div id="simProgressBar" class="sim-progress-bar"></div>
           </div>
         </div>
 
@@ -609,6 +748,8 @@
       const runBtn = document.getElementById("simRunBtn");
       const checks = document.querySelectorAll(".sim-check-item");
       const verdict = document.getElementById("simVerdict");
+      const progressBar = document.getElementById("simProgressBar");
+      const progressPct = document.getElementById("simProgressPct");
       let running = false;
 
       if (!runBtn) return;
@@ -619,6 +760,8 @@
         runBtn.disabled = true;
         runBtn.textContent = "Verifying Cryptographic Invariants...";
         verdict.style.display = "none";
+        if (progressBar) progressBar.style.width = "0%";
+        if (progressPct) progressPct.textContent = "0 / 11 Checks";
 
         // Reset checks
         checks.forEach(item => {
@@ -638,6 +781,12 @@
             if (icon) {
               icon.textContent = "SATISFIED";
               icon.style.color = "#059669";
+            }
+            if (progressBar) {
+              progressBar.style.width = Math.round(((index + 1) / checks.length) * 100) + "%";
+            }
+            if (progressPct) {
+              progressPct.textContent = `${index + 1} / ${checks.length} Checks Proven`;
             }
 
             if (index === checks.length - 1) {

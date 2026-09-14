@@ -438,9 +438,14 @@ function renderDeskKpis(data) {
     const balanceEl = document.getElementById("deskBalanceVal");
     const availEl = document.getElementById("availableCapVal");
     const resEl = document.getElementById("reservedCapVal");
+    const landingCap = document.getElementById("landingDeskCap");
     if (balanceEl) balanceEl.textContent = `$${(data.capacity.deskBalanceUsd || 0).toFixed(2)}`;
     if (availEl) availEl.textContent = `$${(data.capacity.availableUsd || 0).toFixed(2)}`;
     if (resEl) resEl.textContent = `$${(data.capacity.reservedUsd || 0).toFixed(2)}`;
+    if (landingCap) {
+      const cap = data.capacity.availableUsd || data.capacity.deskBalanceUsd || 500000;
+      landingCap.textContent = `$${cap.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
   }
   if (data.reputation) {
     const rescuesEl = document.getElementById("verifiedRescuesVal");
