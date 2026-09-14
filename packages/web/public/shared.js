@@ -419,8 +419,22 @@ async function triggerTick() {
   }
 }
 
+// ── Inject Liquid Background Blobs ─────────────────────────────────────────
+function injectLiquidCanvas() {
+  if (document.querySelector(".liquid-canvas")) return;
+  const canvas = document.createElement("div");
+  canvas.className = "liquid-canvas";
+  canvas.innerHTML = `
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  `;
+  document.body.prepend(canvas);
+}
+
 // ── Setup Shared Handlers on Page Load ──────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+  injectLiquidCanvas();
   highlightActiveNav();
 
   // Tick Button
