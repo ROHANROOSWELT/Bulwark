@@ -287,11 +287,18 @@ export async function handleRequest(
       // GET /api/proof/bundle/latest
       if (method === "GET" && pathname === "/api/proof/bundle/latest") {
         try {
-          const poaaPath = path.join(process.cwd(), ".bulwark", "poaa_latest.json");
-          if (fs.existsSync(poaaPath)) {
-            const content = JSON.parse(fs.readFileSync(poaaPath, "utf-8"));
-            sendJson(200, content);
-            return;
+          const possiblePaths = [
+            path.join(process.cwd(), ".bulwark", "poaa_latest.json"),
+            path.join(process.cwd(), "fixtures", "poaa_latest.json"),
+            path.join(PUBLIC_DIR, "poaa_latest.json"),
+            path.join(process.cwd(), "public", "poaa_latest.json"),
+          ];
+          for (const p of possiblePaths) {
+            if (fs.existsSync(p)) {
+              const content = JSON.parse(fs.readFileSync(p, "utf-8"));
+              sendJson(200, content);
+              return;
+            }
           }
           sendJson(404, { error: "No latest PoAA bundle found" });
         } catch (e: any) {

@@ -3,7 +3,7 @@
     "version": 2,
     "policyId": "bulwark_default_v2",
     "policyHash": "0x384ab67c6d57694474997ad784f5604d3abc50b08f5308d0b8a9376b75d02cd3",
-    "createdAt": "2026-09-14T12:00:00.000Z",
+    "createdAt": "2026-09-14T07:50:01.322Z",
     "createdBy": "underwriter_agent",
     "parties": {
       "owner": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29",
@@ -46,7 +46,157 @@
       "recoveryHf": 2,
       "maxDebtChangePct": 0.2,
       "priceBandPct": 0.15,
-      "expiresAt": "2026-09-28T12:00:00.000Z"
+      "expiresAt": "2026-09-18T07:50:01.321Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "revoked",
+      "creationSnapshot": {
+        "hf": 999,
+        "debtUsd": 0,
+        "priceUsd": 1,
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T07:50:01.321Z"
+      },
+      "capacityReservedUsd": 0,
+      "dailySpentUsd": 0,
+      "totalSpentUsd": 0,
+      "executionCount": 0,
+      "statusReason": "Revoked by owner"
+    },
+    "grantHash": "0xb2ed65bc41c47a7f9a0b885916548ce5d99adba81669f77966dacf120706369d",
+    "grantId": "bg_b2ed65bc41c47a7f",
+    "approvedAt": "2026-09-14T08:14:34.825Z",
+    "approvedBy": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29"
+  },
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0xa8be105e821d36baff3433f7bf4632c3365b74af3cfce93e6e095828de33493f",
+    "createdAt": "2026-09-14T19:37:52.997Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 84532,
+      "positionOwner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "debtAsset": "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.2,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T19:37:52.997Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "insufficient_capacity",
+      "creationSnapshot": {
+        "hf": 1.3096250415848747,
+        "debtUsd": 25046.65339959,
+        "priceUsd": 1,
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T19:37:52.996Z"
+      },
+      "capacityReservedUsd": 0,
+      "dailySpentUsd": 0,
+      "totalSpentUsd": 0,
+      "executionCount": 0,
+      "statusReason": "Insufficient desk capacity: requested $15.00, total reserved would be $15.00 exceeding on-chain balance $0.00"
+    },
+    "grantHash": "0xe2bb7038301a7994735f6dac0caf2c10d930e1cf672ad33d7ed6e6d1536533be",
+    "grantId": "bg_e2bb7038301a7994",
+    "approvedAt": "2026-09-14T19:38:03.279Z",
+    "approvedBy": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123"
+  },
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0xa8be105e821d36baff3433f7bf4632c3365b74af3cfce93e6e095828de33493f",
+    "createdAt": "2026-09-14T19:40:41.207Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 84532,
+      "positionOwner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "debtAsset": "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.2,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T19:40:41.207Z"
     },
     "premium": {
       "curveId": "bulwark-curve-v1",
@@ -57,11 +207,11 @@
     "state": {
       "status": "armed",
       "creationSnapshot": {
-        "hf": 1.18,
-        "debtUsd": 500,
+        "hf": 1.3096248537935646,
+        "debtUsd": 25046.65699111,
         "priceUsd": 1,
-        "debtTokenBalance": "500000000",
-        "timestamp": "2026-09-14T12:00:00.000Z"
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T19:40:41.206Z"
       },
       "capacityReservedUsd": 15,
       "dailySpentUsd": 0,
@@ -69,9 +219,237 @@
       "executionCount": 0,
       "statusReason": "Capacity reserved; ready for execution"
     },
-    "grantHash": "0x384ab67c6d57694474997ad784f5604d3abc50b08f5308d0b8a9376b75d02cd3",
-    "grantId": "bg_384ab67c6d576944",
-    "approvedAt": "2026-09-14T12:05:00.000Z",
-    "approvedBy": "0x71C83604eD6652c7E4Ea2468307cE177A1950B29"
+    "grantHash": "0xe352e3728af7314772d2d35c8a951f7c24fff8054b9879405c74a422d12c2d06",
+    "grantId": "bg_e352e3728af73147",
+    "approvedAt": "2026-09-14T19:40:41.230Z",
+    "approvedBy": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123"
+  },
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0x1f57d38fa3729507cd0e2a67ebda79be79198bbafd89980e3eb47d573180142b",
+    "createdAt": "2026-09-14T19:44:05.658Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 84532,
+      "positionOwner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "debtAsset": "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.35,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T19:44:05.658Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "armed",
+      "creationSnapshot": {
+        "hf": 1.3096246234984084,
+        "debtUsd": 25046.66139552,
+        "priceUsd": 1,
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T19:44:05.657Z"
+      },
+      "capacityReservedUsd": 15,
+      "dailySpentUsd": 0,
+      "totalSpentUsd": 0,
+      "executionCount": 0,
+      "statusReason": "Capacity reserved; ready for execution"
+    },
+    "grantHash": "0xe2183c43684187561d65d556695241c0fa8ba3254064c7a6e31dd3f54b74800e",
+    "grantId": "bg_e2183c4368418756",
+    "approvedAt": "2026-09-14T19:44:05.670Z",
+    "approvedBy": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+    "authorityHash": "0xb9dbf90fd3dd792c0487ee5345e51e215b35c8f1a295a836a903f54d3519122d"
+  },
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0x1f57d38fa3729507cd0e2a67ebda79be79198bbafd89980e3eb47d573180142b",
+    "createdAt": "2026-09-14T19:49:29.899Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 84532,
+      "positionOwner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "debtAsset": "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.35,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T19:49:29.898Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "dry_run",
+      "creationSnapshot": {
+        "hf": 1.311167057112372,
+        "debtUsd": 25046.66832259,
+        "priceUsd": 1,
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T19:49:29.898Z"
+      },
+      "capacityReservedUsd": 15,
+      "dailySpentUsd": 0,
+      "totalSpentUsd": 0,
+      "executionCount": 0,
+      "statusReason": "Capacity reserved; ready for execution"
+    },
+    "grantHash": "0x44153d65644f3d2e7b4550e3f5ea33e8dc8da996dfe18953cb52a2a67d2218c6",
+    "grantId": "bg_44153d65644f3d2e",
+    "approvedAt": "2026-09-14T19:49:29.909Z",
+    "approvedBy": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+    "authorityHash": "0xe252c912dbbdd110389f95589c08fa4b1511d23844f36afe7abe64b0649e96d8"
+  },
+  {
+    "version": 2,
+    "policyId": "bulwark_default_v2",
+    "policyHash": "0x1f57d38fa3729507cd0e2a67ebda79be79198bbafd89980e3eb47d573180142b",
+    "createdAt": "2026-09-14T19:50:50.110Z",
+    "createdBy": "underwriter_agent",
+    "parties": {
+      "owner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "rescuer": "desk_keeperhub_primary",
+      "executor": "0x0000000000000000000000000000000000000000"
+    },
+    "position": {
+      "chainId": 84532,
+      "positionOwner": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+      "debtAsset": "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f"
+    },
+    "authority": {
+      "allowedActions": [
+        "repay"
+      ],
+      "capitalCapUsd": 25,
+      "perActionCapUsd": 15,
+      "dailyCapUsd": 25,
+      "adaptiveBands": [
+        {
+          "hfMin": 1.25,
+          "hfExcl": 1.35,
+          "maxCapitalUsd": 5
+        },
+        {
+          "hfMin": 1.15,
+          "hfExcl": 1.25,
+          "maxCapitalUsd": 15
+        },
+        {
+          "hfMin": 1.05,
+          "hfExcl": 1.15,
+          "maxCapitalUsd": 25
+        }
+      ],
+      "hfFloor": 1.05
+    },
+    "conditions": {
+      "hfTriggerBelow": 1.35,
+      "recoveryHf": 2,
+      "maxDebtChangePct": 0.2,
+      "priceBandPct": 0.15,
+      "expiresAt": "2026-09-18T19:50:50.109Z"
+    },
+    "premium": {
+      "curveId": "bulwark-curve-v1",
+      "baseUsd": 0.5,
+      "rateBps": 200,
+      "settlement": "BOOKKEEPING"
+    },
+    "state": {
+      "status": "verified",
+      "creationSnapshot": {
+        "hf": 1.3111669698058281,
+        "debtUsd": 25046.66999037,
+        "priceUsd": 1,
+        "debtTokenBalance": "0",
+        "timestamp": "2026-09-14T19:50:50.109Z"
+      },
+      "capacityReservedUsd": 15,
+      "dailySpentUsd": 5,
+      "totalSpentUsd": 5,
+      "executionCount": 1,
+      "statusReason": "Rescue executed and verified on-chain"
+    },
+    "grantHash": "0x685e5285e4881718fa3d9278f7f00e9079d4a317dc8d54440d0b31b62c62ff73",
+    "grantId": "bg_685e5285e4881718",
+    "approvedAt": "2026-09-14T19:50:50.120Z",
+    "approvedBy": "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123",
+    "authorityHash": "0x762a78a06cdeef7d07f309ceeef19749dcd7802321a796fbc3bcdd00d4efd39f"
   }
 ]

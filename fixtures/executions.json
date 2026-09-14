@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "executionId": "exec_vp4sp6951ipz00q2b65bv",
+    "grantId": "bg_685e5285e4881718",
+    "authorityHash": "0x762a78a06cdeef7d07f309ceeef19749dcd7802321a796fbc3bcdd00d4efd39f",
+    "action": "repay",
+    "amountUsd": 5,
+    "amountWei": "5000000",
+    "status": "verified",
+    "simulatedAt": "2026-09-14T19:50:52.938Z",
+    "submittedAt": "2026-09-14T19:52:25.000Z",
+    "verifiedAt": "2026-09-14T19:53:00.000Z",
+    "txHash": "0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16",
+    "blockNumber": 46823633,
+    "gasUsed": 180896,
+    "preHealthFactor": 1.3109,
+    "postHealthFactor": 1.3114,
+    "receiptVerified": true,
+    "independentReceiptVerified": true
+  }
+]
