@@ -34,9 +34,48 @@ export const CHAINS: Record<number, ChainConfig> = {
         address: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
         decimals: 6,
       },
+      USDC_NATIVE: {
+        symbol: "USDC",
+        address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        decimals: 6,
+      },
       WETH: {
         symbol: "WETH",
         address: "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+        decimals: 18,
+      },
+    },
+  },
+  // 84532 Base Sepolia (Aave V3 Testnet)
+  84532: {
+    chainId: 84532,
+    name: "Base Sepolia",
+    isTestnet: true,
+    pool: "0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27",
+    poolAddressesProvider: "0xE4C23309117Aa30342BFaae6c95c6478e0A4Ad00",
+    protocolDataProvider: "0xBc9f5b7E248451CdD7cA54e717a2BFe1F32b566b",
+    oracle: "0x943b0dE18d4abf4eF02A85912F8fc07684C141dF",
+    defaultRpcUrl: "https://sepolia.base.org",
+    blockExplorerUrl: "https://sepolia.basescan.org",
+    knownTokens: {
+      USDC: {
+        symbol: "USDC",
+        address: "0xba50cd2a20f6da35d788639e581bca8d0b5d4d5f",
+        decimals: 6,
+      },
+      USDT: {
+        symbol: "USDT",
+        address: "0x0a215d8ba66387dca84b284d18c3b4ec3de6e54a",
+        decimals: 6,
+      },
+      WBTC: {
+        symbol: "WBTC",
+        address: "0x54114591963cf60ef3aa63befd6ec263d98145a4",
+        decimals: 8,
+      },
+      WETH: {
+        symbol: "WETH",
+        address: "0x4200000000000000000000000000000000000006",
         decimals: 18,
       },
     },
