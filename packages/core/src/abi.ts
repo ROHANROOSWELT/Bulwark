@@ -35,11 +35,11 @@ export function decodeUint256(word32Hex: string): bigint {
 // Verified Function Signatures
 export const SELECTORS = {
   getUserAccountData: "0xbf92857c", // getUserAccountData(address)
-  getReserveTokensAddresses: "0x3e18525b", // getReserveTokensAddresses(address)
+  getReserveTokensAddresses: "0xd2493b6c", // getReserveTokensAddresses(address)
   balanceOf: "0x70a08231", // balanceOf(address)
   decimals: "0x313ce567", // decimals()
-  getPriceOracle: "0x0952d7dd", // getPriceOracle()
-  getAssetPrice: "0xb3ab73ab", // getAssetPrice(address)
+  getPriceOracle: "0xfca513a8", // getPriceOracle()
+  getAssetPrice: "0xb3596f07", // getAssetPrice(address)
   repay: "0x573ade81", // repay(address,uint256,uint256,address)
   withdraw: "0x69328dec", // withdraw(address,uint256,address)
   supply: "0x617ba037", // supply(address,uint256,address,uint16)

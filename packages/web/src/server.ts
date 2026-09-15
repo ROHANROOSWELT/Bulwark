@@ -30,6 +30,7 @@ export interface WebServerOptions {
   port?: number;
   host?: string;
   watchlist?: string[];
+  operatorKey?: string;
 }
 
 let defaultGuardian: BulwarkGuardian | null = null;
@@ -47,6 +48,25 @@ export async function handleRequest(
 ): Promise<void> {
   const guardian = options.guardian ?? getDefaultGuardian();
   const watchlist = options.watchlist ?? ["0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123"];
+
+  const checkOperatorAuth = (): boolean => {
+    const configuredKey = options.operatorKey ?? process.env.BULWARK_OPERATOR_KEY;
+    if (configuredKey) {
+      const authHeader = req.headers.authorization;
+      const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : undefined;
+      const headerKey =
+        (req.headers["x-bulwark-operator-key"] as string | undefined) ||
+        (req.headers["x-operator-key"] as string | undefined) ||
+        bearerToken;
+      return headerKey === configuredKey;
+    }
+    // On public cloud / production without an operator key configured, refuse mutating calls
+    if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+      return false;
+    }
+    // In local development / test mode without BULWARK_OPERATOR_KEY, allow execution
+    return true;
+  };
 
   let rawUrl = req.url || "/";
   if ((!rawUrl || rawUrl === "/") && req.headers["x-matched-path"]) {
@@ -72,9 +92,9 @@ export async function handleRequest(
     res.writeHead(status, {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": req.headers.origin || "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, x-bulwark-operator-key, x-operator-key",
     });
     res.end(body);
   };
@@ -82,9 +102,9 @@ export async function handleRequest(
   // CORS preflight
   if (method === "OPTIONS") {
     res.writeHead(204, {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": req.headers.origin || "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, x-bulwark-operator-key, x-operator-key",
     });
     res.end();
     return;
@@ -266,6 +286,10 @@ export async function handleRequest(
 
       // 2. POST /api/tick
       if (method === "POST" && pathname === "/api/tick") {
+        if (!checkOperatorAuth()) {
+          sendJson(401, { error: "Unauthorized: Operator authorization required for mutating operations" });
+          return;
+        }
         const result = await guardian.tick(watchlist);
         sendJson(200, result);
         return;
@@ -336,6 +360,10 @@ export async function handleRequest(
 
       // 5. POST /api/grants/propose
       if (method === "POST" && pathname === "/api/grants/propose") {
+        if (!checkOperatorAuth()) {
+          sendJson(401, { error: "Unauthorized: Operator authorization required for mutating operations" });
+          return;
+        }
         const body = await readBody<{
           owner?: string;
           chainId?: number;
@@ -438,12 +466,17 @@ export async function handleRequest(
       // 8. POST /api/grants/:id/(approve|revoke|dry|execute)
       const grantActionMatch = pathname.match(/^\/api\/grants\/([a-zA-Z0-9_-]+)\/(approve|revoke|dry|execute)$/);
       if (method === "POST" && grantActionMatch) {
+        if (!checkOperatorAuth()) {
+          sendJson(401, { error: "Unauthorized: Operator authorization required for mutating operations" });
+          return;
+        }
         const grantId = grantActionMatch[1]!;
         const action = grantActionMatch[2]!;
 
         switch (action) {
           case "approve": {
-            const approved = await guardian.approveGrant(grantId);
+            const body = await readBody<{ approvedBy?: string; signature?: string; nonce?: number }>().catch(() => ({}));
+            const approved = await guardian.approveGrant(grantId, body);
             sendJson(200, approved);
             return;
           }

@@ -31,17 +31,24 @@ export function computeDeskReputation(
   executions: ExecutionRecord[],
   auditLogs: AuditRecord[]
 ): ExecutionReputation {
+  const ARMED_LIFECYCLE_STATUSES = new Set([
+    "armed",
+    "dry_run",
+    "submitted",
+    "mined",
+    "verified",
+    "settled",
+  ]);
+
   let totalGrantsProposed = 0;
   let totalGrantsApproved = 0;
   let totalGrantsArmed = 0;
 
   for (const g of grants) {
-    if (g.state.status === "proposed") totalGrantsProposed++;
-    else if (g.state.status === "approved") {
-      totalGrantsProposed++;
+    totalGrantsProposed++;
+    if (g.state.status === "approved") {
       totalGrantsApproved++;
-    } else {
-      totalGrantsProposed++;
+    } else if (ARMED_LIFECYCLE_STATUSES.has(g.state.status)) {
       totalGrantsApproved++;
       totalGrantsArmed++;
     }
@@ -53,7 +60,7 @@ export function computeDeskReputation(
   const improvements: number[] = [];
 
   for (const exec of executions) {
-    if (exec.status === "verified" || exec.receiptVerified) {
+    if (exec.status === "verified" && exec.receiptVerified) {
       totalExecutionsVerified++;
       totalCapitalDeployedUsd += exec.amountUsd;
 

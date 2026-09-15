@@ -207,6 +207,10 @@ export class McpClient {
       },
       !isPublic
     );
+    if (res && res.isError) {
+      const errorText = res.content?.map((c) => c.text).filter(Boolean).join("; ") || `Tool '${toolName}' execution returned error`;
+      throw new Error(`MCP tool error (${toolName}): ${errorText}`);
+    }
     return res as T;
   }
 }
@@ -317,7 +321,8 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
 
         log(`[POLICY INVARIANT] Validating workflow '${workflow.name || filePath}'...`);
         try {
-          const res = await mcpClient.callTool("validate_workflow", { workflow });
+          const workflowId = workflow.workflowId || workflow.id || path.basename(filePath, ".json");
+          const res = await mcpClient.callTool("validate_workflow", { workflowId, deepCheck: true, workflow });
           log(`[KEEPERHUB FACT] Validation result: ${JSON.stringify(res)}`);
           return 0;
         } catch (err: any) {

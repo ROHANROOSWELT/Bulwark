@@ -77,12 +77,13 @@ export async function verifyExecutionReceipts(
   let gasUsed = khReceipt?.gasUsed;
 
   const txHash = statusResponse.transactionHash ?? khReceipt?.hash;
+  let rpcUrl = rpcUrlOverride;
   if (txHash && txHash.startsWith("0x") && txHash.length === 66) {
     const chainId = typeof statusResponse.network === "number"
       ? statusResponse.network
       : parseInt(String(statusResponse.network ?? "11155111"), 10);
 
-    const rpcUrl = rpcUrlOverride ?? (getChainConfig(chainId)?.defaultRpcUrl || "");
+    rpcUrl = rpcUrlOverride ?? (getChainConfig(chainId)?.defaultRpcUrl || "");
 
     if (rpcUrl) {
       try {

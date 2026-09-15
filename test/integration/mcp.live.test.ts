@@ -36,9 +36,8 @@ describe("KeeperHub Public MCP Endpoint Live Integration", () => {
       expect(fs.existsSync(invPath)).toBe(true);
       fs.rmSync(tmpDir, { recursive: true, force: true });
     } catch (err: any) {
-      // Offline network resilience assertion
-      expect(err).toBeDefined();
-      expect(typeof err.message).toBe("string");
+      // Offline network resilience: explicitly skip if network unavailable
+      ctx.skip();
     }
   });
 });

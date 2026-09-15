@@ -421,4 +421,60 @@ describe("BULWARK Web Dashboard & Public /verify (P11)", () => {
     expect(report.passedCount).toBe(11);
     expect(report.totalChecks).toBe(11);
   });
+
+  it("enforces operator authentication on mutating endpoints when operatorKey is configured", async () => {
+    const authServer = createWebServer({
+      guardian,
+      operatorKey: "secret-op-key-123",
+      watchlist: ["0x0000000000000000000000000000000000000001"],
+    });
+
+    let authPort: number = 0;
+    await new Promise<void>((resolve) => {
+      authServer.listen(0, "127.0.0.1", () => {
+        const addr = authServer.address();
+        authPort = typeof addr === "object" && addr ? addr.port : 0;
+        resolve();
+      });
+    });
+
+    const authUrl = `http://127.0.0.1:${authPort}`;
+
+    try {
+      // 1. Unauthenticated mutating request to /api/tick -> 401
+      const unauthTick = await fetch(`${authUrl}/api/tick`, { method: "POST" });
+      expect(unauthTick.status).toBe(401);
+      const unauthTickData = await unauthTick.json();
+      expect(unauthTickData.error).toContain("Operator authorization required");
+
+      // 2. Unauthenticated mutating request to /api/grants/propose -> 401
+      const unauthPropose = await fetch(`${authUrl}/api/grants/propose`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ owner: "0x0000000000000000000000000000000000000001" }),
+      });
+      expect(unauthPropose.status).toBe(401);
+
+      // 3. Unauthenticated mutating request to nonexistent grant execute -> 401 before looking up grant!
+      const unauthExec = await fetch(`${authUrl}/api/grants/does_not_exist/execute`, { method: "POST" });
+      expect(unauthExec.status).toBe(401);
+
+      // 4. Authenticated request with x-operator-key -> 200
+      const authTick = await fetch(`${authUrl}/api/tick`, {
+        method: "POST",
+        headers: { "x-operator-key": "secret-op-key-123" },
+      });
+      expect(authTick.status).toBe(200);
+
+      // 5. Authenticated request with Bearer Authorization -> 200
+      const authTickBearer = await fetch(`${authUrl}/api/tick`, {
+        method: "POST",
+        headers: { authorization: "Bearer secret-op-key-123" },
+      });
+      expect(authTickBearer.status).toBe(200);
+    } finally {
+      authServer.closeAllConnections?.();
+      await new Promise<void>((resolve) => authServer.close(() => resolve()));
+    }
+  });
 });

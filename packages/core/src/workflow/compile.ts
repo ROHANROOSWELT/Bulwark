@@ -47,16 +47,30 @@ export function compileExecutionPayloads(
     grant.position.positionOwner,
   ];
 
+  // supply(address asset, uint256 amount, address onBehalfOf=owner, uint16 referralCode=0)
+  const supplyArgs = [
+    authorizedIntent.asset,
+    authorizedIntent.amountWei,
+    grant.position.positionOwner,
+    0,
+  ];
+
+  const isSupply = authorizedIntent.action === "add-collateral";
+  const actionArgs = isSupply ? supplyArgs : repayArgs;
+  const functionName = isSupply ? "supply" : "repay";
+  const actionAbi = isSupply ? AAVE_V3_SUPPLY_ABI : AAVE_V3_REPAY_ABI;
+  const actionLabel = isSupply ? "Aave V3 Supply Collateral" : "Aave V3 Repay Debt";
+
   const directCall: ContractCallRequest = {
     contractAddress: poolAddress,
     chainId: grant.position.chainId,
-    functionName: authorizedIntent.action === "add-collateral" ? "supply" : "repay",
-    functionArgs: JSON.stringify(repayArgs),
-    abi: JSON.stringify(authorizedIntent.action === "add-collateral" ? AAVE_V3_SUPPLY_ABI : AAVE_V3_REPAY_ABI),
+    functionName,
+    functionArgs: JSON.stringify(actionArgs),
+    abi: JSON.stringify(actionAbi),
     gasLimitMultiplier: 1.1,
   };
 
-  // 1b. Native Check-and-Execute Payload (Scalar Guard + Atomic Repay)
+  // 1b. Native Check-and-Execute Payload (Scalar Guard + Atomic Repay/Supply)
   const triggerHfWad = (
     BigInt(Math.floor(grant.conditions.hfTriggerBelow * 10000)) * 100000000000000n
   ).toString();
@@ -72,9 +86,9 @@ export function compileExecutionPayloads(
     },
     action: {
       contractAddress: poolAddress,
-      functionName: authorizedIntent.action === "add-collateral" ? "supply" : "repay",
-      functionArgs: JSON.stringify(repayArgs),
-      abi: JSON.stringify(authorizedIntent.action === "add-collateral" ? AAVE_V3_SUPPLY_ABI : AAVE_V3_REPAY_ABI),
+      functionName,
+      functionArgs: JSON.stringify(actionArgs),
+      abi: JSON.stringify(actionAbi),
       gasLimitMultiplier: 1.1,
     },
     simulate: false,
@@ -82,7 +96,7 @@ export function compileExecutionPayloads(
 
   // 2. Standing Workflow (Marketplace-ready standing rescue order)
   const triggerNodeId = "trigger_manual_0";
-  const actionNodeId = "action_repay_0";
+  const actionNodeId = isSupply ? "action_supply_0" : "action_repay_0";
 
   const triggerNode: WorkflowNode = {
     id: triggerNodeId,
@@ -100,15 +114,15 @@ export function compileExecutionPayloads(
     id: actionNodeId,
     type: "action",
     data: {
-      label: "Aave V3 Repay Debt",
+      label: actionLabel,
       type: "web3/write-contract",
       config: {
         actionType: "web3/write-contract",
         network: String(grant.position.chainId), // string chain ID
         contractAddress: poolAddress,
-        functionName: "repay",
-        functionArgs: JSON.stringify(repayArgs),
-        abi: JSON.stringify(AAVE_V3_REPAY_ABI),
+        functionName,
+        functionArgs: JSON.stringify(actionArgs),
+        abi: JSON.stringify(actionAbi),
         gasLimitMultiplier: "1.1",
         web3Connection: "default",
       },

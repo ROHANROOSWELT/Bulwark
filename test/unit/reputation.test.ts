@@ -94,4 +94,47 @@ describe("Execution Reputation", () => {
     expect(rep.hfImprovements.average).toBe(0.85);
     expect(rep.totalSimulationFailures).toBe(0);
   });
+
+  it("does not count revoked, expired, or insufficient_capacity grants as armed", () => {
+    const makeGrant = (status: any): RescueGrantV2 => ({
+      ...computeGrantHash({
+        version: 2,
+        policyId: "p1",
+        policyHash: "0x1",
+        createdAt: "2026-09-14T00:00:00Z",
+        createdBy: "agent",
+        parties: { owner: "0x1", rescuer: "d1", executor: "0x2" },
+        position: { chainId: 11155111, positionOwner: "0x1", debtAsset: "0xusdc" },
+        authority: { allowedActions: ["repay"], capitalCapUsd: 25, perActionCapUsd: 15, dailyCapUsd: 25, adaptiveBands: [], hfFloor: 1.05 },
+        conditions: { hfTriggerBelow: 1.2, recoveryHf: 1.5, maxDebtChangePct: 0.2, priceBandPct: 0.1, expiresAt: "2026-09-18T00:00:00Z" },
+        premium: { curveId: "bulwark-curve-v1", baseUsd: 0.5, rateBps: 200, settlement: "BOOKKEEPING" },
+        state: { status, capacityReservedUsd: 0, dailySpentUsd: 0, totalSpentUsd: 0, executionCount: 0 },
+      }),
+      version: 2,
+      policyId: "p1",
+      policyHash: "0x1",
+      createdAt: "2026-09-14T00:00:00Z",
+      createdBy: "agent",
+      parties: { owner: "0x1", rescuer: "d1", executor: "0x2" },
+      position: { chainId: 11155111, positionOwner: "0x1", debtAsset: "0xusdc" },
+      authority: { allowedActions: ["repay"], capitalCapUsd: 25, perActionCapUsd: 15, dailyCapUsd: 25, adaptiveBands: [], hfFloor: 1.05 },
+      conditions: { hfTriggerBelow: 1.2, recoveryHf: 1.5, maxDebtChangePct: 0.2, priceBandPct: 0.1, expiresAt: "2026-09-18T00:00:00Z" },
+      premium: { curveId: "bulwark-curve-v1", baseUsd: 0.5, rateBps: 200, settlement: "BOOKKEEPING" },
+      state: { status, capacityReservedUsd: 0, dailySpentUsd: 0, totalSpentUsd: 0, executionCount: 0 },
+    });
+
+    const grants = [
+      makeGrant("proposed"),
+      makeGrant("approved"),
+      makeGrant("armed"),
+      makeGrant("revoked"),
+      makeGrant("insufficient_capacity"),
+      makeGrant("expired"),
+    ];
+
+    const rep = computeDeskReputation(grants, [], []);
+    expect(rep.totalGrantsProposed).toBe(6);
+    expect(rep.totalGrantsApproved).toBe(2); // approved + armed
+    expect(rep.totalGrantsArmed).toBe(1); // only armed
+  });
 });

@@ -191,7 +191,7 @@ $$H = \frac{C \cdot L}{D}$$
 To achieve a target health factor $H_{\text{target}}$ by repaying debt $\Delta D^*$:
 $$H_{\text{target}} = \frac{C \cdot L}{D - \Delta D^*}$$
 
-Solving for $\Delta D^*$ yields the exact closed-form equation implemented in [`packages/core/src/underwriter/desk.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/underwriter/desk.ts#L67):
+Solving for $\Delta D^*$ yields the exact closed-form equation implemented in [`packages/core/src/underwriter/plans.ts`](packages/core/src/underwriter/plans.ts):
 $$\Delta D^* = \frac{D \cdot H_{\text{target}} - C \cdot L}{H_{\text{target}}}$$
 
 * **Safety Invariant:** If $H \ge H_{\text{target}}$, $\Delta D^* = 0$. The desk never extracts capital from a healthy borrower.
@@ -314,14 +314,14 @@ BULWARK is not a superficial client; it is built ground-up on KeeperHub's techni
 
 | KeeperHub Surface | BULWARK Implementation & File Link | Mechanical Purpose |
 | :--- | :--- | :--- |
-| **REST Execution API** | [`packages/core/src/client/keeperhub.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/client/keeperhub.ts#L48) | Executes `POST /api/execute/contract-call` with Turnkey key management, dynamic gas escalation, and retry policies. |
-| **Simulation Sandbox** | [`packages/core/src/client/keeperhub.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/client/keeperhub.ts#L92) | Runs pre-flight dry-runs (`simulate: true`) before spending real capital; blocks execution if `wouldRevert === true`. |
-| **Model Context Protocol (MCP)** | [`packages/agent/src/mcp/client.ts`](file:///home/rohan/Desktop/Keeperhub/packages/agent/src/mcp/client.ts#L32) | Connects to `/mcp` and `/mcp/public` via SSE/JSON-RPC, querying `tools/list` to discover network capabilities dynamically. |
-| **Agent Workflows** | [`packages/agent/src/workflow/compiler.ts`](file:///home/rohan/Desktop/Keeperhub/packages/agent/src/workflow/compiler.ts#L18) | Generates JSON AST workflows (`trigger: schedule` + `condition: read_contract` + `action: execute`) validated via MCP schemas. |
-| **Idempotency Guard** | [`packages/core/src/client/keeperhub.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/client/keeperhub.ts#L125) | Computes SHA-256 digests over execution payloads to guarantee zero duplicate executions during network retries. |
-| **Dual Receipt Verification**| [`packages/core/src/proof/receipts.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/proof/receipts.ts#L24) | Cross-checks KeeperHub receipts against independent public RPC nodes (`eth_getTransactionReceipt`) to prove state finality. |
-| **Spend-Cap Analytics** | [`packages/core/src/client/keeperhub.ts`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/client/keeperhub.ts#L210) | Queries `GET /api/analytics/spend-cap` to enforce underwriter operational budget constraints. |
-| **Audit Trail Export** | [`packages/cli/src/commands/audit.ts`](file:///home/rohan/Desktop/Keeperhub/packages/cli/src/commands/audit.ts#L12) | Serializes verifiable audit bundles with cryptographic signatures for external compliance. |
+| **REST Execution API** | [`packages/core/src/keeperhub/client.ts`](packages/core/src/keeperhub/client.ts) | Executes `POST /api/execute/contract-call` with Turnkey key management, dynamic gas escalation, and retry policies. |
+| **Simulation Sandbox** | [`packages/core/src/keeperhub/client.ts`](packages/core/src/keeperhub/client.ts) | Runs pre-flight dry-runs (`simulate: true`) before spending real capital; blocks execution if `wouldRevert === true`. |
+| **Model Context Protocol (MCP)** | [`packages/agent/src/index.ts`](packages/agent/src/index.ts) | Connects to `/mcp` and `/mcp/public` via SSE/JSON-RPC, querying `tools/list` to discover network capabilities dynamically. |
+| **Agent Workflows** | [`packages/core/src/workflow/compile.ts`](packages/core/src/workflow/compile.ts) | Generates JSON AST workflows (`trigger: schedule` + `condition: read_contract` + `action: execute`) validated via MCP schemas. |
+| **Idempotency Guard** | [`packages/core/src/guardian.ts`](packages/core/src/guardian.ts) | Computes SHA-256 digests over execution payloads to guarantee zero duplicate executions during network retries. |
+| **Dual Receipt Verification**| [`packages/core/src/receipts/verify.ts`](packages/core/src/receipts/verify.ts) | Cross-checks KeeperHub receipts against independent public RPC nodes (`eth_getTransactionReceipt`) to prove state finality. |
+| **Spend-Cap Analytics** | [`packages/core/src/keeperhub/client.ts`](packages/core/src/keeperhub/client.ts) | Queries `GET /api/analytics/spend-cap` to enforce underwriter operational budget constraints. |
+| **Audit Trail Export** | [`packages/cli/src/index.ts`](packages/cli/src/index.ts) | Serializes verifiable audit bundles with cryptographic hash chaining for external compliance. |
 
 ---
 
@@ -546,19 +546,19 @@ BULWARK features **1,300 actual, non-mocked, passing tests** across 35 test file
 
 | Test Suite File | Type | Tests | Core Real Implementation Validated |
 | :--- | :---: | :---: | :--- |
-| [`keccak.vectors.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/crypto/keccak.vectors.test.ts) | Crypto | **256** | Keccak-256 sponge permutation absorbing byte buffers of length $0 \dots 255$. |
-| [`abi.properties.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/abi/abi.properties.test.ts) | ABI | **200** | 100 BigInt $\text{uint256}$ boundary vectors ($0 \dots 2^{256}-1$) & 100 EVM address pad checks. |
-| [`hf.invariants.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/math/hf.invariants.test.ts) | Math | **200** | 100 closed-form exact rescue targeting tests & 100 dynamic premium urgency proofs. |
-| [`compiler.clamp.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/policy/compiler.clamp.test.ts) | Policy | **150** | Formal boundary proof: $\text{Authorized} \le \min(\text{Intent}, \text{Cap}, \text{Policy}, \text{Band}, \text{Capacity})$. |
-| [`poaa.fuzz.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/proof/poaa.fuzz.test.ts) | Proof | **150** | Cross-chain state fuzzing across Sepolia (11155111), Base (8453), and Mainnet (1). |
-| [`orderbook.auction.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/desk/orderbook.auction.test.ts) | Desk | **100** | Dutch auction decay rates, fully-funded desk routing priority, & tie-breaking. |
-| [`poaa.matrix.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/unit/proof/poaa.matrix.test.ts) | Proof | **100** | Systematic 11-point mutation matrix proving all checks fail closed upon tampering. |
-| [`security.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/security/security.test.ts) | Security | **8** | LLM prompt injection immunity, re-entrancy, underwriter frontrunning, & replay guards. |
-| [`guardian.e2e.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/e2e/guardian.e2e.test.ts) | E2E | **3** | Full lifecycle: Propose $\to$ Approve $\to$ Arm $\to$ Dry Run $\to$ Execute $\to$ PoAA Proven. |
-| [`keeperhub.live.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/integration/keeperhub.live.test.ts) | Live | **4** | Real network chain query (Chain ID: 11155111) & unauthenticated barrier contract. |
-| [`guardian.live.e2e.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/e2e/guardian.live.e2e.test.ts) | Live | **1** | Real RPC reading against Aave v3 Sepolia contract (`0x6Ae43d04...`) (0 skips). |
-| [`mcp.live.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/integration/mcp.live.test.ts) | Live | **1** | Online/offline streamable MCP discovery without conditional skipping. |
-| [`cli.e2e.test.ts`](file:///home/rohan/Desktop/Keeperhub/test/e2e/cli.e2e.test.ts) | E2E | **4** | Real CLI subprocess spawning and stderr/stdout exit code verification. |
+| [`keccak.vectors.test.ts`](test/unit/crypto/keccak.vectors.test.ts) | Crypto | **256** | Keccak-256 sponge permutation absorbing byte buffers of length $0 \dots 255$. |
+| [`abi.properties.test.ts`](test/unit/abi/abi.properties.test.ts) | ABI | **200** | 100 BigInt $\text{uint256}$ boundary vectors ($0 \dots 2^{256}-1$) & 100 EVM address pad checks. |
+| [`hf.invariants.test.ts`](test/unit/math/hf.invariants.test.ts) | Math | **200** | 100 closed-form exact rescue targeting tests & 100 dynamic premium urgency proofs. |
+| [`compiler.clamp.test.ts`](test/unit/policy/compiler.clamp.test.ts) | Policy | **150** | Formal boundary proof: $\text{Authorized} \le \min(\text{Intent}, \text{Cap}, \text{Policy}, \text{Band}, \text{Capacity})$. |
+| [`poaa.fuzz.test.ts`](test/unit/proof/poaa.fuzz.test.ts) | Proof | **150** | Cross-chain state fuzzing across Sepolia (11155111), Base (8453), and Mainnet (1). |
+| [`orderbook.auction.test.ts`](test/unit/desk/orderbook.auction.test.ts) | Desk | **100** | Dutch auction decay rates, fully-funded desk routing priority, & tie-breaking. |
+| [`poaa.matrix.test.ts`](test/unit/proof/poaa.matrix.test.ts) | Proof | **100** | Systematic 11-point mutation matrix proving all checks fail closed upon tampering. |
+| [`security.test.ts`](test/security/security.test.ts) | Security | **8** | LLM prompt injection immunity, re-entrancy, underwriter frontrunning, & replay guards. |
+| [`guardian.e2e.test.ts`](test/e2e/guardian.e2e.test.ts) | E2E | **3** | Full lifecycle: Propose $\to$ Approve $\to$ Arm $\to$ Dry Run $\to$ Execute $\to$ PoAA Proven. |
+| [`keeperhub.live.test.ts`](test/integration/keeperhub.live.test.ts) | Live | **4** | Real network chain query (Chain ID: 11155111) & unauthenticated barrier contract. |
+| [`guardian.live.e2e.test.ts`](test/e2e/guardian.live.e2e.test.ts) | Live | **1** | Real RPC reading against Aave v3 Sepolia contract (`0x6Ae43d04...`) (0 skips). |
+| [`mcp.live.test.ts`](test/integration/mcp.live.test.ts) | Live | **1** | Online/offline streamable MCP discovery without conditional skipping. |
+| [`cli.e2e.test.ts`](test/e2e/cli.e2e.test.ts) | E2E | **4** | Real CLI subprocess spawning and stderr/stdout exit code verification. |
 | **All Other Unit Suites** | Unit | **123** | Config, reader, oracle, receipts, capacity, reputation, store, and web server. |
 | **Total Test Suite** | Monorepo | **1,300** | **100% Passed · 0 Failed · 0 Skipped** |
 

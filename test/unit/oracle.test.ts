@@ -13,7 +13,7 @@ describe("Aave V3 Oracle Truth Reader", () => {
 
   it("encodes getAssetPrice selector and padded asset address", () => {
     const encoded = encodeGetAssetPrice(mockAsset);
-    expect(encoded.startsWith("0xb3ab73ab")).toBe(true);
+    expect(encoded.startsWith("0xb3596f07")).toBe(true);
     expect(encoded.length).toBe(10 + 64); // 0x + 8 selector chars + 64 hex chars
     expect(encoded.toLowerCase()).toContain(mockAsset.toLowerCase().replace("0x", ""));
   });

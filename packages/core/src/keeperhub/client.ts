@@ -4,6 +4,7 @@
  * Zero external dependencies.
  */
 
+import { createHash } from "node:crypto";
 import {
   ChainInfo,
   SpendCapInfo,
@@ -71,14 +72,23 @@ export class KeeperHubClient {
       headers["Authorization"] = `Bearer ${this.apiKey}`;
     }
 
-    if (options.idempotencyKey) {
-      headers["Idempotency-Key"] = options.idempotencyKey;
-    }
-
     let requestBody: string | undefined = undefined;
     if (options.body !== undefined) {
       headers["Content-Type"] = "application/json";
       requestBody = JSON.stringify(options.body);
+    }
+
+    let idempotencyKey = options.idempotencyKey;
+    if (!idempotencyKey && method !== "GET") {
+      const digest = createHash("sha256")
+        .update(requestBody ? requestBody : `${method}:${path}`)
+        .digest("hex")
+        .slice(0, 32);
+      idempotencyKey = `kh_${digest}`;
+    }
+
+    if (idempotencyKey) {
+      headers["Idempotency-Key"] = idempotencyKey;
     }
 
     const url = `${this.apiBase}${path.startsWith("/") ? path : `/${path}`}`;
@@ -116,6 +126,12 @@ export class KeeperHubClient {
         if (retryHeader) {
           const parsed = parseInt(retryHeader, 10);
           if (!isNaN(parsed)) retryAfter = parsed;
+        }
+
+        const retriesLeft = (options as any).retries ?? 0;
+        if (status === 429 && retryAfter !== undefined && retryAfter <= 2 && retriesLeft > 0) {
+          await new Promise((r) => setTimeout(r, retryAfter * 1000));
+          return this.request(path, { ...options, retries: retriesLeft - 1 } as any);
         }
 
         const envelope = (json && typeof json === "object" ? json : { error: res.statusText }) as KeeperHubErrorEnvelope;
@@ -286,14 +302,23 @@ export class KeeperHubClient {
     timeoutMs = 60000
   ): Promise<DirectExecutionStatusResponse> {
     const isTerminal = (s: string) =>
-      ["completed", "success", "failed", "error", "system_error"].includes(s.toLowerCase());
+      ["completed", "success", "failed", "error", "system_error", "cancelled"].includes(s.toLowerCase());
+
+    const startTime = Date.now();
+    const deadline = startTime + timeoutMs;
 
     // 1. Try SSE endpoint first (/api/execute/{id}/events)
+    let sseReader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => {
+      controller.abort();
+      if (sseReader) {
+        try { sseReader.cancel(); } catch {}
+      }
+    }, Math.max(10, timeoutMs));
+
     try {
       const url = `${this.apiBase}/api/execute/${encodeURIComponent(executionId)}/events`;
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), Math.min(timeoutMs, 10000));
-
       const res = await (this.fetchFn ?? fetch)(url, {
         method: "GET",
         headers: {
@@ -303,15 +328,13 @@ export class KeeperHubClient {
         signal: controller.signal,
       });
 
-      clearTimeout(timer);
-
       if (res.ok && res.body) {
-        const reader = res.body.getReader();
+        sseReader = res.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
 
-        while (true) {
-          const { done, value } = await reader.read();
+        while (Date.now() < deadline) {
+          const { done, value } = await sseReader.read();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
           const blocks = buffer.split("\n\n");
@@ -325,7 +348,8 @@ export class KeeperHubClient {
                 const parsed = JSON.parse(dataStr) as DirectExecutionStatusResponse;
                 if (onUpdate) onUpdate(parsed);
                 if (isTerminal(parsed.status)) {
-                  reader.cancel();
+                  try { await sseReader.cancel(); } catch {}
+                  clearTimeout(abortTimer);
                   return parsed;
                 }
               } catch {
@@ -336,18 +360,25 @@ export class KeeperHubClient {
         }
       }
     } catch {
-      // SSE not supported or network error -> proceed to polling fallback
+      // SSE not supported, aborted, or network error -> proceed to polling fallback
+    } finally {
+      clearTimeout(abortTimer);
+      if (sseReader) {
+        try { await sseReader.cancel(); } catch {}
+      }
     }
 
     // 2. Resilient Polling Fallback
-    const startTime = Date.now();
-    while (Date.now() - startTime < timeoutMs) {
+    while (Date.now() < deadline) {
       const poll = await this.getExecutionStatus(executionId);
       if (onUpdate) onUpdate(poll.data);
       if (isTerminal(poll.data.status)) {
         return poll.data;
       }
-      const waitTime = Math.max(1, poll.pollIntervalHintSeconds ?? 2) * 1000;
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) break;
+      const requestedWait = Math.max(1, poll.pollIntervalHintSeconds ?? 2) * 1000;
+      const waitTime = Math.min(requestedWait, remaining);
       await new Promise((r) => setTimeout(r, waitTime));
     }
 
@@ -412,11 +443,13 @@ export class KeeperHubClient {
    */
   public async updateWorkflow(
     id: string,
-    req: WorkflowUpdateRequest
+    req: WorkflowUpdateRequest,
+    idempotencyKey?: string
   ): Promise<WorkflowObject> {
     const res = await this.request<WorkflowObject>(`/api/workflows/${encodeURIComponent(id)}`, {
       method: "PATCH",
       body: req,
+      idempotencyKey,
       requiresAuth: true,
     });
     return res.data;
@@ -427,12 +460,14 @@ export class KeeperHubClient {
    */
   public async deleteWorkflow(
     id: string,
-    force = false
+    force = false,
+    idempotencyKey?: string
   ): Promise<{ success: boolean }> {
     const res = await this.request<{ success: boolean }>(
       `/api/workflows/${encodeURIComponent(id)}${force ? "?force=true" : ""}`,
       {
         method: "DELETE",
+        idempotencyKey,
         requiresAuth: true,
       }
     );
@@ -522,11 +557,15 @@ export class KeeperHubClient {
   /**
    * POST /api/executions/{id}/cancel
    */
-  public async cancelExecution(executionId: string): Promise<{ success: boolean }> {
+  public async cancelExecution(
+    executionId: string,
+    idempotencyKey?: string
+  ): Promise<{ success: boolean }> {
     const res = await this.request<{ success: boolean }>(
       `/api/executions/${encodeURIComponent(executionId)}/cancel`,
       {
         method: "POST",
+        idempotencyKey,
         requiresAuth: true,
       }
     );

@@ -50,6 +50,7 @@ function renderExecutionsTable(executions) {
   }
 
   tbody.innerHTML = filtered
+    .map((e) => {
       const isBase = e.chainId === 84532 || (e.txHash && e.txHash.startsWith("0x43dbc")) || (e.grantId && e.grantId.includes("685e5285"));
       const explorerBase = isBase ? "https://sepolia.basescan.org" : "https://sepolia.etherscan.io";
       const explorerUrl = e.txHash ? `${explorerBase}/tx/${e.txHash}` : null;

@@ -480,6 +480,10 @@ async function triggerTick() {
   }
   try {
     const res = await fetch("/api/tick", { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Tick failed");
+    }
     const details = [
       `${data.scanned ?? 0} scanned`,
       `${data.proposed ?? 0} proposed`,

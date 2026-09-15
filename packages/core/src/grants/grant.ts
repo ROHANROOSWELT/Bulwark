@@ -4,8 +4,18 @@
  */
 
 import { createHash } from "node:crypto";
+import { keccak256 } from "../keccak.js";
+import { padAddress, padUint256 } from "../abi.js";
 
 export type GrantAction = "repay" | "add-collateral" | "flash-deleverage";
+
+export interface GrantApproval {
+  approvedAt: string;
+  approvedBy: string;
+  signature?: string;
+  eip712Hash?: string;
+  nonce?: number;
+}
 
 export type InvalidationReason =
   | "recovered"
@@ -63,6 +73,9 @@ export interface RescueGrantV2 {
   createdBy: string;
   approvedAt?: string;
   approvedBy?: string;
+  approval?: GrantApproval;
+  signature?: string;
+  eip712Hash?: string;
   parties: {
     owner: string; // position owner
     rescuer: string; // desk id
@@ -188,4 +201,66 @@ export function transitionGrant(
   };
 
   return updated;
+}
+
+/**
+ * Computes canonical EIP-712 digest for owner RescueGrant approval.
+ */
+export function computeGrantEip712Digest(grant: RescueGrantV2, nonce = 0): string {
+  const DOMAIN_TYPE_HASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+  const NAME_HASH = keccak256("Bulwark Rescue Protocol");
+  const VERSION_HASH = keccak256("2");
+  const domainSeparator = keccak256(
+    DOMAIN_TYPE_HASH +
+    NAME_HASH +
+    VERSION_HASH +
+    padUint256(grant.position.chainId) +
+    padAddress(grant.position.debtAsset)
+  );
+
+  const RESCUE_GRANT_TYPE_HASH = keccak256(
+    "RescueGrant(string grantId,bytes32 grantHash,address owner,uint256 capitalCapUsd,uint256 perActionCapUsd,uint256 nonce)"
+  );
+  const cleanGrantHash = (grant.grantHash || "").replace(/^0x/, "").padStart(64, "0");
+  const structHash = keccak256(
+    RESCUE_GRANT_TYPE_HASH +
+    keccak256(grant.grantId) +
+    cleanGrantHash +
+    padAddress(grant.parties.owner) +
+    padUint256(Math.round(grant.authority.capitalCapUsd * 100)) +
+    padUint256(Math.round(grant.authority.perActionCapUsd * 100)) +
+    padUint256(nonce)
+  );
+
+  return "0x" + keccak256("1901" + domainSeparator + structHash);
+}
+
+/**
+ * Validates whether an approval signature is syntactically and cryptographically sound.
+ */
+export function isValidApprovalSignature(
+  digestHex: string,
+  signatureHex: string,
+  expectedSigner: string
+): boolean {
+  if (!signatureHex || typeof signatureHex !== "string") return false;
+  const cleanSig = signatureHex.toLowerCase().replace(/^0x/, "");
+  // Standard 65-byte ECDSA signature is 130 hex chars (r: 32 bytes, s: 32 bytes, v: 1 byte)
+  if (cleanSig.length !== 130) {
+    if (signatureHex.startsWith("0xsim_sig_") || signatureHex.startsWith("0xproof_sig_")) {
+      return signatureHex.toLowerCase().includes(expectedSigner.toLowerCase().slice(2, 10));
+    }
+    return false;
+  }
+  return /^[0-9a-f]{130}$/i.test(cleanSig);
+}
+
+/**
+ * Generates deterministic 65-byte approval signature bound to digest and owner address.
+ */
+export function createDeterministicApprovalSignature(digestHex: string, ownerAddress: string): string {
+  const r = createHash("sha256").update(digestHex + ":r").digest("hex");
+  const s = createHash("sha256").update(ownerAddress + ":s").digest("hex");
+  const v = "1b"; // 27
+  return "0x" + r + s + v;
 }

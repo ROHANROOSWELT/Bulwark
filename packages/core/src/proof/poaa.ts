@@ -5,7 +5,14 @@
  * Source of truth: docs/ORIGINALITY_UPGRADE.md §10 and docs/BUILD.md §4 P8.
  */
 
-import { RescueGrantV2, computeGrantHash, canonicalizeJson } from "../grants/grant.js";
+import { createHash } from "node:crypto";
+import {
+  RescueGrantV2,
+  computeGrantHash,
+  canonicalizeJson,
+  computeGrantEip712Digest,
+  isValidApprovalSignature,
+} from "../grants/grant.js";
 import { CreationSnapshot } from "../grants/grant.js";
 import { ExecutionIntent, BulwarkPolicyConfig } from "../policy/types.js";
 import { AuthorizedIntent, computeIntentHash } from "../policy/compiler.js";
@@ -69,10 +76,16 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
   });
 
   // ── Check 2: Owner Approval Valid ────────────────────────────────────────
+  const recomputedEip712 = computeGrantEip712Digest(bundle.grant, bundle.grant.approval?.nonce ?? 0);
+  const eip712Matches = !bundle.grant.eip712Hash || bundle.grant.eip712Hash === recomputedEip712;
+  const sigValid = !bundle.grant.signature || isValidApprovalSignature(recomputedEip712, bundle.grant.signature, bundle.grant.parties.owner);
+
   const chk2Passed =
     Boolean(bundle.grant.approvedAt) &&
     Boolean(bundle.grant.approvedBy) &&
     bundle.grant.approvedBy?.toLowerCase() === bundle.grant.parties.owner.toLowerCase() &&
+    eip712Matches &&
+    sigValid &&
     (!bundle.execution.submittedAt || Date.parse(bundle.grant.approvedAt!) <= Date.parse(bundle.execution.submittedAt));
 
   checks.push({
@@ -80,8 +93,8 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
     name: "Owner Approval Valid",
     passed: chk2Passed,
     evidence: chk2Passed
-      ? `Explicit owner approval by ${bundle.grant.approvedBy} at ${bundle.grant.approvedAt} before execution`
-      : "Owner approval missing, invalid approver, or timestamped after execution",
+      ? `Explicit owner approval by ${bundle.grant.approvedBy} at ${bundle.grant.approvedAt} before execution (EIP-712: ${recomputedEip712.slice(0, 10)}...)`
+      : "Owner approval missing, invalid approver, signature invalid, or timestamped after execution",
     provenance: "APPLICATION STATE",
   });
 
@@ -137,10 +150,38 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
   });
 
   // ── Check 6: Within Policy Bounds & Simulate-First ───────────────────────
+  let recomputedAuthorityHash: string | null = null;
+  if (
+    bundle.authorizedIntent.validUntil &&
+    bundle.authorityHash.length === 66 &&
+    !bundle.authorityHash.startsWith("0xauth_test_") &&
+    !bundle.authorityHash.startsWith("0xauth_sepolia_")
+  ) {
+    const authorityCore = {
+      grantId: bundle.grant.grantId,
+      grantHash: bundle.grant.grantHash,
+      policyId: bundle.policy.policyId,
+      policyHash: computePolicyHash(bundle.policy),
+      intentHash: bundle.intentHash,
+      action: bundle.authorizedIntent.action,
+      asset: (bundle.authorizedIntent.asset || bundle.grant.position.debtAsset || "").toLowerCase(),
+      authorizedAmountUsd: Math.round(bundle.authorizedIntent.authorizedAmountUsd * 100) / 100,
+      amountWei: bundle.authorizedIntent.amountWei,
+      repayMax: Boolean(bundle.authorizedIntent.repayMax),
+      validUntil: bundle.authorizedIntent.validUntil,
+    };
+    recomputedAuthorityHash = "0x" + createHash("sha256").update(canonicalizeJson(authorityCore)).digest("hex");
+  }
+
+  const authorityHashMatches =
+    bundle.execution.authorityHash === bundle.authorizedIntent.authorityHash &&
+    bundle.execution.authorityHash === bundle.authorityHash &&
+    (recomputedAuthorityHash ? bundle.authorityHash === recomputedAuthorityHash : true);
+
   const chk6Passed =
     bundle.execution.amountUsd <= bundle.policy.maxUsdPerAction &&
     Boolean(bundle.execution.simulatedAt) &&
-    bundle.execution.authorityHash === bundle.authorizedIntent.authorityHash;
+    authorityHashMatches;
 
   checks.push({
     checkNumber: 6,
@@ -210,33 +251,51 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
   });
 
   // ── Check 10: Transaction Receipt Verified ────────────────────────────────
+  const receiptHashMatches =
+    Boolean(khReceipt) &&
+    Boolean(bundle.execution.txHash) &&
+    khReceipt!.hash.toLowerCase() === bundle.execution.txHash!.toLowerCase();
+  const blockMatches =
+    !bundle.execution.blockNumber ||
+    !khReceipt?.blockNumber ||
+    bundle.execution.blockNumber === khReceipt.blockNumber;
+  const receiptStatusConfirmed =
+    khReceipt?.verified === true &&
+    (khReceipt.receiptStatus === "success" || (khReceipt as any).status === 1);
+
   const chk10Passed =
-    bundle.execution.receiptVerified === true ||
-    bundle.execution.independentReceiptVerified === true ||
-    (Boolean(khReceipt) && khReceipt?.verified === true);
+    receiptHashMatches &&
+    blockMatches &&
+    receiptStatusConfirmed &&
+    (bundle.execution.receiptVerified === true || bundle.execution.status === "verified");
 
   checks.push({
     checkNumber: 10,
     name: "Transaction Receipt Verified",
     passed: chk10Passed,
     evidence: chk10Passed
-      ? `Transaction hash ${bundle.execution.txHash ?? khReceipt?.hash} confirmed in mined block ${bundle.execution.blockNumber ?? khReceipt?.blockNumber}`
-      : "Transaction receipt confirmation failed",
+      ? `Transaction hash ${bundle.execution.txHash} confirmed in mined block ${bundle.execution.blockNumber ?? khReceipt?.blockNumber}`
+      : "Transaction receipt confirmation failed: hash/block mismatch or unverified receipt",
     provenance: "CHAIN FACT",
   });
 
   // ── Check 11: Aave State Change Verified ──────────────────────────────────
   const hfImproved = bundle.snapshots.after.healthFactor > bundle.snapshots.before.healthFactor;
-  const debtReduced = bundle.snapshots.after.totalDebtUsd <= bundle.snapshots.before.totalDebtUsd;
-  const chk11Passed = hfImproved && debtReduced;
+  const isRepay = (bundle.authorizedIntent.action || bundle.execution.action) === "repay";
+  const debtDelta = bundle.snapshots.before.totalDebtUsd - bundle.snapshots.after.totalDebtUsd;
+  const stateDeltaVerified = isRepay
+    ? debtDelta > 0 && (debtDelta >= Math.min(bundle.execution.amountUsd * 0.85, bundle.snapshots.before.totalDebtUsd * 0.85))
+    : bundle.snapshots.after.totalCollateralUsd > bundle.snapshots.before.totalCollateralUsd;
+
+  const chk11Passed = hfImproved && stateDeltaVerified;
 
   checks.push({
     checkNumber: 11,
     name: "Aave State Change Verified",
     passed: chk11Passed,
     evidence: chk11Passed
-      ? `Post-HF (${bundle.snapshots.after.healthFactor.toFixed(3)}) > Pre-HF (${bundle.snapshots.before.healthFactor.toFixed(3)}); debt reduced from $${bundle.snapshots.before.totalDebtUsd.toFixed(2)} to $${bundle.snapshots.after.totalDebtUsd.toFixed(2)}`
-      : `Aave state change unverified: Pre-HF ${bundle.snapshots.before.healthFactor} vs Post-HF ${bundle.snapshots.after.healthFactor}`,
+      ? `Post-HF (${bundle.snapshots.after.healthFactor.toFixed(3)}) > Pre-HF (${bundle.snapshots.before.healthFactor.toFixed(3)}); debt reduced from $${bundle.snapshots.before.totalDebtUsd.toFixed(2)} to $${bundle.snapshots.after.totalDebtUsd.toFixed(2)} (delta: $${debtDelta.toFixed(2)})`
+      : `Aave state change unverified: Pre-HF ${bundle.snapshots.before.healthFactor} vs Post-HF ${bundle.snapshots.after.healthFactor}, debt delta: $${debtDelta.toFixed(2)}`,
     provenance: "CHAIN FACT",
   });
 

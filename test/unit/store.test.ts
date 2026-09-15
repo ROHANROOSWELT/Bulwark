@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { BulwarkStore } from "../../packages/core/src/grants/store.js";
+import { BulwarkStore, verifyAuditChain } from "../../packages/core/src/grants/store.js";
 import { RescueGrantV2, computeGrantHash } from "../../packages/core/src/grants/grant.js";
 import { promises as fs } from "node:fs";
 
@@ -11,6 +11,7 @@ describe("BulwarkStore (Persistence & Audit Trail)", () => {
     try {
       await fs.rm(testDir, { recursive: true, force: true });
     } catch {}
+    BulwarkStore.resetMemoryCache(testDir);
     store = new BulwarkStore(testDir);
     await store.init();
   });
@@ -83,5 +84,38 @@ describe("BulwarkStore (Persistence & Audit Trail)", () => {
     expect(logs).toHaveLength(2);
     expect(logs[0]?.id).toBe("aud_01");
     expect(logs[1]?.type).toBe("GRANT_APPROVED");
+  });
+
+  it("chains audit records with SHA-256 hashes and detects tampering", async () => {
+    const r1 = await store.appendAudit({
+      id: "aud_01",
+      timestamp: "2026-09-14T10:00:00Z",
+      type: "GRANT_PROPOSED",
+      grantId: "bg_123",
+      details: { owner: "0x1" },
+      provenance: "AGENT OUTPUT",
+    });
+
+    const r2 = await store.appendAudit({
+      id: "aud_02",
+      timestamp: "2026-09-14T10:01:00Z",
+      type: "GRANT_APPROVED",
+      grantId: "bg_123",
+      details: { approver: "owner" },
+      provenance: "APPLICATION STATE",
+    });
+
+    expect(r1.recordHash).toBeDefined();
+    expect(r2.prevHash).toBe(r1.recordHash);
+
+    const logs = await store.getAuditLogs(10);
+    const validCheck = verifyAuditChain(logs);
+    expect(validCheck.isValid).toBe(true);
+
+    // Tamper with record
+    const tampered = JSON.parse(JSON.stringify(logs)) as typeof logs;
+    tampered[0]!.details = { owner: "0xattacker" };
+    const tamperedCheck = verifyAuditChain(tampered);
+    expect(tamperedCheck.isValid).toBe(false);
   });
 });

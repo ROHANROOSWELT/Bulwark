@@ -13,6 +13,7 @@ export interface RescuePlan {
   amountUsd: number;
   projectedHf: number;
   isFeasible: boolean;
+  isPartialMitigation?: boolean;
   infeasibilityReason?: string;
   premiumUsd: number;
   flashLoanParams?: {
@@ -185,7 +186,8 @@ export function calculateExactRescueDebt(
 export function underwritePosition(
   snapshot: PositionSnapshot,
   maxAllowedCapUsd: number,
-  targetHf = 2.0
+  targetHf = 2.0,
+  allowedActions?: ("repay" | "add-collateral" | "flash-deleverage")[]
 ): UnderwriterQuote {
   const ltFraction = snapshot.currentLiquidationThresholdBps / 10000;
   const C = snapshot.totalCollateralUsd;
@@ -201,7 +203,10 @@ export function underwritePosition(
   // 2. Build Repay Plan (Capital Injection)
   const repayAmountClamped = Math.min(costToSafetyUsd, maxAllowedCapUsd);
   const repayProjectedHf = calculateProjectedHf(C, ltFraction, D, repayAmountClamped);
-  const repayFeasible = repayAmountClamped > 0 && repayAmountClamped <= maxAllowedCapUsd;
+  const repayReachesTarget = repayProjectedHf >= targetHf - 0.01;
+  const repayWithinCap = costToSafetyUsd <= maxAllowedCapUsd;
+  const repayFeasible = costToSafetyUsd > 0 && repayWithinCap && repayReachesTarget;
+  const repayPartial = !repayFeasible && repayAmountClamped > 0 && repayProjectedHf > snapshot.healthFactor;
 
   const repayPlan: RescuePlan = {
     planId: "plan_repay_optimal",
@@ -210,9 +215,12 @@ export function underwritePosition(
     amountUsd: Math.round(repayAmountClamped * 100) / 100,
     projectedHf: Math.round(repayProjectedHf * 100) / 100,
     isFeasible: repayFeasible,
+    isPartialMitigation: repayPartial,
     infeasibilityReason: repayFeasible
       ? undefined
-      : `Required repay $${costToSafetyUsd.toFixed(2)} exceeds cap $${maxAllowedCapUsd.toFixed(2)}`,
+      : costToSafetyUsd > maxAllowedCapUsd
+      ? `Required repay $${costToSafetyUsd.toFixed(2)} exceeds cap $${maxAllowedCapUsd.toFixed(2)} (partial projected HF ${repayProjectedHf.toFixed(2)} < target ${targetHf})`
+      : `Projected HF ${repayProjectedHf.toFixed(2)} cannot reach target HF ${targetHf}`,
     premiumUsd: calculateBulwarkPremium(snapshot.healthFactor, repayAmountClamped),
     provenance: {
       math: "DETERMINISTIC",
@@ -225,20 +233,27 @@ export function underwritePosition(
   if (ltFraction > 0) {
     topUpAmount = Math.max(0, (D * targetHf) / ltFraction - C);
   }
-  const topUpFeasible = topUpAmount > 0 && topUpAmount <= maxAllowedCapUsd;
-  const topUpProjectedHf = D > 0 ? ((C + Math.min(topUpAmount, maxAllowedCapUsd)) * ltFraction) / D : 999.0;
+  const topUpClamped = Math.min(topUpAmount, maxAllowedCapUsd);
+  const topUpProjectedHf = D > 0 ? ((C + topUpClamped) * ltFraction) / D : 999.0;
+  const topUpReachesTarget = topUpProjectedHf >= targetHf - 0.01;
+  const topUpWithinCap = topUpAmount <= maxAllowedCapUsd;
+  const topUpFeasible = topUpAmount > 0 && topUpWithinCap && topUpReachesTarget;
+  const topUpPartial = !topUpFeasible && topUpClamped > 0 && topUpProjectedHf > snapshot.healthFactor;
 
   const topUpPlan: RescuePlan = {
     planId: "plan_topup_collateral",
     type: "add-collateral",
     targetHf,
-    amountUsd: Math.round(topUpAmount * 100) / 100,
+    amountUsd: Math.round(topUpClamped * 100) / 100,
     projectedHf: Math.round(topUpProjectedHf * 100) / 100,
     isFeasible: topUpFeasible,
+    isPartialMitigation: topUpPartial,
     infeasibilityReason: topUpFeasible
       ? undefined
-      : `Required collateral $${topUpAmount.toFixed(2)} exceeds cap $${maxAllowedCapUsd.toFixed(2)}`,
-    premiumUsd: calculateBulwarkPremium(snapshot.healthFactor, topUpAmount),
+      : topUpAmount > maxAllowedCapUsd
+      ? `Required collateral $${topUpAmount.toFixed(2)} exceeds cap $${maxAllowedCapUsd.toFixed(2)} (partial projected HF ${topUpProjectedHf.toFixed(2)} < target ${targetHf})`
+      : `Projected HF ${topUpProjectedHf.toFixed(2)} cannot reach target HF ${targetHf}`,
+    premiumUsd: calculateBulwarkPremium(snapshot.healthFactor, topUpClamped),
     provenance: {
       math: "DETERMINISTIC",
       premium: "BOOKKEEPING",
@@ -270,10 +285,11 @@ export function underwritePosition(
   };
 
   const plans = [repayPlan, topUpPlan, flashPlan];
+  const eligiblePlans = allowedActions ? plans.filter((p) => allowedActions.includes(p.type)) : plans;
 
   // Select cheapest feasible plan
-  const feasiblePlans = plans.filter((p) => p.isFeasible).sort((a, b) => a.amountUsd - b.amountUsd);
-  const selectedPlan = feasiblePlans[0] ?? repayPlan;
+  const feasiblePlans = eligiblePlans.filter((p) => p.isFeasible).sort((a, b) => a.amountUsd - b.amountUsd);
+  const selectedPlan = feasiblePlans[0] ?? (eligiblePlans.find((p) => p.isPartialMitigation) ?? eligiblePlans[0] ?? repayPlan);
 
   // Generate Counterfactual Ladder
   const ladder = generateCounterfactualLadder(snapshot, maxAllowedCapUsd, costToSafetyUsd);

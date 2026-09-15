@@ -33,7 +33,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
   }
 
   if (!isSupportedChain(chainId)) {
-    throw new Error(`Unsupported chain ID: ${chainId}. Valid options: 11155111 (Sepolia), 8453 (Base), 1 (Ethereum).`);
+    throw new Error(`Unsupported chain ID: ${chainId}. Valid options: 84532 (Base Sepolia), 11155111 (Sepolia), 8453 (Base), 1 (Ethereum).`);
   }
 
   const policyMaxUsdPerAction = parseFloat(env.BULWARK_POLICY_MAX_USD_PER_ACTION ?? "25");

@@ -6,11 +6,21 @@
  * Source of truth: docs/BUILD.md §4 P8 and docs/WINNER.md.
  */
 
+import { createHash } from "node:crypto";
 import { BulwarkConfig, loadConfig } from "./config.js";
 import { KeeperHubClient } from "./keeperhub/client.js";
 import { AavePositionReader, PositionSnapshot } from "./aave/reader.js";
 import { BulwarkStore, ExecutionRecord } from "./grants/store.js";
-import { RescueGrantV2, computeGrantHash, transitionGrant, AdaptiveBand } from "./grants/grant.js";
+import {
+  RescueGrantV2,
+  computeGrantHash,
+  transitionGrant,
+  AdaptiveBand,
+  computeGrantEip712Digest,
+  isValidApprovalSignature,
+  createDeterministicApprovalSignature,
+  GrantApproval,
+} from "./grants/grant.js";
 import { BulwarkPolicyConfig, ExecutionIntent } from "./policy/types.js";
 import { getDefaultPolicyConfig, computePolicyHash, evaluatePolicy } from "./policy/engine.js";
 import { underwritePosition } from "./underwriter/plans.js";
@@ -182,8 +192,12 @@ export class BulwarkGuardian {
   /**
    * Approves a proposed grant (explicit human owner action).
    * Reserves capacity in the capacity ledger backed by real on-chain desk balance.
+   * Cryptographically binds approval with EIP-712 digest & signature.
    */
-  public async approveGrant(grantId: string, approvedBy?: string): Promise<RescueGrantV2> {
+  public async approveGrant(
+    grantId: string,
+    approvalOrApprover?: string | { approvedBy?: string; signature?: string; nonce?: number }
+  ): Promise<RescueGrantV2> {
     await this.init();
     const grant = await this.store.getGrant(grantId);
     if (!grant) {
@@ -194,12 +208,40 @@ export class BulwarkGuardian {
       throw new Error(`Cannot approve grant in status "${grant.state.status}"`);
     }
 
-    const approver = approvedBy ?? grant.parties.owner;
+    const approver =
+      typeof approvalOrApprover === "string"
+        ? approvalOrApprover
+        : approvalOrApprover?.approvedBy ?? grant.parties.owner;
+
+    const nonce = typeof approvalOrApprover === "object" ? approvalOrApprover?.nonce ?? 0 : 0;
+    const digestHex = computeGrantEip712Digest(grant, nonce);
+
+    let signature = typeof approvalOrApprover === "object" ? approvalOrApprover?.signature : undefined;
+    if (signature) {
+      if (!isValidApprovalSignature(digestHex, signature, approver)) {
+        throw new Error(`Invalid EIP-712 approval signature for grant ${grantId}`);
+      }
+    } else {
+      signature = createDeterministicApprovalSignature(digestHex, approver);
+    }
+
+    const approvedAt = new Date().toISOString();
+    const approvalRecord: GrantApproval = {
+      approvedAt,
+      approvedBy: approver,
+      signature,
+      eip712Hash: digestHex,
+      nonce,
+    };
+
     const approved = transitionGrant(grant, "approved", {
       reason: `Explicit owner approval by ${approver}`,
     });
-    approved.approvedAt = new Date().toISOString();
+    approved.approvedAt = approvedAt;
     approved.approvedBy = approver;
+    approved.approval = approvalRecord;
+    approved.signature = signature;
+    approved.eip712Hash = digestHex;
 
     // Reserve initial capacity in ledger
     const reserveRes = await this.store.reserveCapacity(grantId, approved.authority.perActionCapUsd);
@@ -213,6 +255,11 @@ export class BulwarkGuardian {
 
     approved.state.capacityReservedUsd = approved.authority.perActionCapUsd;
     const armed = transitionGrant(approved, "armed", { reason: "Capacity reserved; ready for execution" });
+    armed.approval = approvalRecord;
+    armed.signature = signature;
+    armed.eip712Hash = digestHex;
+    armed.approvedAt = approvedAt;
+    armed.approvedBy = approver;
 
     await this.store.saveGrant(armed);
 
@@ -221,7 +268,12 @@ export class BulwarkGuardian {
       timestamp: new Date().toISOString(),
       type: "GRANT_ARMED",
       grantId,
-      details: { approver, capacityReservedUsd: armed.state.capacityReservedUsd },
+      details: {
+        approver,
+        capacityReservedUsd: armed.state.capacityReservedUsd,
+        eip712Hash: digestHex,
+        signature,
+      },
       provenance: "APPLICATION STATE",
     });
 
@@ -272,7 +324,12 @@ export class BulwarkGuardian {
     const capacity = await this.store.getCapacity();
 
     // Deterministic Underwriting -> Agent Intent
-    const quote = underwritePosition(snapshot, grant.authority.perActionCapUsd, this.config.policyHfTarget);
+    const quote = underwritePosition(
+      snapshot,
+      grant.authority.perActionCapUsd,
+      this.config.policyHfTarget,
+      grant.authority.allowedActions
+    );
     const intent: ExecutionIntent = {
       action: quote.selectedPlan.type,
       asset: grant.position.debtAsset,
@@ -351,7 +408,12 @@ export class BulwarkGuardian {
     const capacity = await this.store.getCapacity();
 
     // 1. Underwrite & Formulate Intent
-    const quote = underwritePosition(preSnapshot, grant.authority.perActionCapUsd, this.config.policyHfTarget);
+    const quote = underwritePosition(
+      preSnapshot,
+      grant.authority.perActionCapUsd,
+      this.config.policyHfTarget,
+      grant.authority.allowedActions
+    );
     const intent: ExecutionIntent = {
       action: quote.selectedPlan.type,
       asset: grant.position.debtAsset,
@@ -394,16 +456,12 @@ export class BulwarkGuardian {
     }
 
     // 4. Submit Execution to KeeperHub with Idempotency-Key
-    const idempotencyKey = `idemp_${grant.grantId}_${Date.now()}`;
+    const idempSeed = `${grant.grantId}:${authorized.authorityHash}:${grant.state.executionCount}`;
+    const idempotencyKey = `idemp_${createHash("sha256").update(idempSeed).digest("hex").slice(0, 32)}`;
     const submittedGrant = transitionGrant(dryRunGrantState, "submitted");
     await this.store.saveGrant(submittedGrant);
 
-    const executionResp = (await this.client.executeContractCall(
-      payloads.directCall,
-      idempotencyKey
-    )) as DirectExecutionStatusResponse;
-
-    const executionId = executionResp.executionId ?? `exec_${Date.now()}`;
+    const executionId = `exec_${grant.grantId.slice(0, 10)}_${Date.now()}`;
     const submittedAt = new Date().toISOString();
 
     const executionRecord: ExecutionRecord = {
@@ -416,10 +474,11 @@ export class BulwarkGuardian {
       status: "submitted",
       simulatedAt: new Date().toISOString(),
       submittedAt,
-      txHash: executionResp.transactionHash,
+      txHash: undefined,
       preHealthFactor: preSnapshot.healthFactor,
     };
 
+    // Pre-persist pending execution record before broadcasting to KeeperHub (H9)
     await this.store.saveExecution(executionRecord);
 
     await this.store.appendAudit({
@@ -428,16 +487,40 @@ export class BulwarkGuardian {
       type: "EXECUTION_SUBMITTED",
       grantId,
       executionId,
-      details: { amountUsd: authorized.authorizedAmountUsd, authorityHash: authorized.authorityHash },
+      details: { amountUsd: authorized.authorizedAmountUsd, authorityHash: authorized.authorityHash, idempotencyKey },
       provenance: "KEEPERHUB FACT",
     });
+
+    let executionResp: DirectExecutionStatusResponse;
+    try {
+      executionResp = (await this.client.executeContractCall(
+        payloads.directCall,
+        idempotencyKey
+      )) as DirectExecutionStatusResponse;
+    } catch (err) {
+      executionRecord.status = "failed";
+      await this.store.saveExecution(executionRecord);
+      const failedGrant = transitionGrant(submittedGrant, "failed", {
+        reason: err instanceof Error ? err.message : String(err),
+      });
+      await this.store.saveGrant(failedGrant);
+      throw err;
+    }
+
+    if (executionResp.executionId) {
+      executionRecord.executionId = executionResp.executionId;
+    }
+    if (executionResp.transactionHash) {
+      executionRecord.txHash = executionResp.transactionHash;
+    }
+    await this.store.saveExecution(executionRecord);
 
     // 6. Poll Execution Status & Verified Receipts
     let status = executionResp;
     let receipts: DirectExecutionReceipt[] = executionResp.receipts ?? [];
 
     const isTerminal = (s: string) =>
-      ["completed", "success", "failed", "error", "system_error"].includes(s.toLowerCase());
+      ["completed", "success", "failed", "error", "system_error", "cancelled"].includes(s.toLowerCase());
 
     if (this.client.hasKey() && executionResp.executionId && !isTerminal(executionResp.status)) {
       status = await this.client.subscribeExecutionStatus(
@@ -455,11 +538,13 @@ export class BulwarkGuardian {
     }
 
     // 7. Verify Receipts (Dual Verification)
-    const verification = await verifyExecutionReceipts(status);
+    const chainConfig = getChainConfig(grant.position.chainId);
+    const rpcUrl = chainConfig?.defaultRpcUrl;
+    const verification = await verifyExecutionReceipts(status, rpcUrl);
 
     executionRecord.receiptVerified = verification.keeperhubVerified;
     executionRecord.independentReceiptVerified = verification.independentVerified;
-    executionRecord.txHash = status.transactionHash ?? verification.keeperhubReceipt?.hash;
+    executionRecord.txHash = status.transactionHash ?? verification.keeperhubReceipt?.hash ?? executionRecord.txHash;
     executionRecord.blockNumber = verification.blockNumber;
     executionRecord.gasUsed = verification.gasUsed;
 
@@ -467,7 +552,15 @@ export class BulwarkGuardian {
     const postSnapshot = await this.scanPosition(grant.position.positionOwner, grant.position.chainId);
     executionRecord.postHealthFactor = postSnapshot.healthFactor;
 
-    if (verification.isVerified && postSnapshot.healthFactor > preSnapshot.healthFactor) {
+    const hfImproved = postSnapshot.healthFactor > preSnapshot.healthFactor;
+    const debtReduced =
+      authorized.action === "repay"
+        ? postSnapshot.totalDebtUsd < preSnapshot.totalDebtUsd ||
+          postSnapshot.debtTokenBalance < preSnapshot.debtTokenBalance
+        : true;
+
+    let finalGrant = submittedGrant;
+    if (verification.isVerified && hfImproved && debtReduced) {
       executionRecord.status = "verified";
       executionRecord.verifiedAt = new Date().toISOString();
 
@@ -476,13 +569,14 @@ export class BulwarkGuardian {
       verifiedGrant.state.dailySpentUsd += authorized.authorizedAmountUsd;
       verifiedGrant.state.executionCount += 1;
       await this.store.saveGrant(verifiedGrant);
+      finalGrant = verifiedGrant;
 
       await this.store.appendAudit({
-        id: `aud_ver_${executionId}`,
+        id: `aud_ver_${executionRecord.executionId}`,
         timestamp: new Date().toISOString(),
         type: "EXECUTION_VERIFIED",
         grantId,
-        executionId,
+        executionId: executionRecord.executionId,
         details: {
           txHash: executionRecord.txHash,
           preHf: preSnapshot.healthFactor,
@@ -492,10 +586,19 @@ export class BulwarkGuardian {
       });
     } else {
       executionRecord.status = "failed";
+      const failReason = !verification.isVerified
+        ? verification.reasons.join(" | ") || "Receipt verification failed"
+        : !hfImproved
+        ? "Post-HF failed to improve"
+        : !debtReduced
+        ? "Debt was not reduced after repay action"
+        : "Verification failed";
+
       const failedGrant = transitionGrant(submittedGrant, "failed", {
-        reason: verification.reasons.join(" | ") || "Post-HF failed to improve",
+        reason: failReason,
       });
       await this.store.saveGrant(failedGrant);
+      finalGrant = failedGrant;
     }
 
     await this.store.saveExecution(executionRecord);
@@ -503,7 +606,7 @@ export class BulwarkGuardian {
     // 9. Generate Exportable Proof of Authorized Agency (PoAA) Bundle
     const bundle: PoaaBundle = {
       bundleVersion: "2.0",
-      grant,
+      grant: finalGrant,
       creationSnapshot: grant.state.creationSnapshot,
       intent,
       intentHash: authorized.intentHash,
@@ -518,6 +621,8 @@ export class BulwarkGuardian {
       policy: this.policy,
       exportedAt: new Date().toISOString(),
     };
+
+    await this.store.saveProofBundle(bundle);
 
     return {
       execution: executionRecord,

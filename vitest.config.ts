@@ -1,5 +1,15 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+// Automatically load local .env if present
+const localEnv = path.resolve(process.cwd(), ".env");
+if (fs.existsSync(localEnv) && typeof (process as any).loadEnvFile === "function") {
+  try {
+    (process as any).loadEnvFile(localEnv);
+  } catch {}
+}
 
 export default defineConfig({
   resolve: {
