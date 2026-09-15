@@ -165,7 +165,11 @@ export class McpClient {
     serverInfo: { name: string; version?: string };
   }> {
     const endpoint = isPublic ? "mcp/public" : "mcp";
-    return this.sendRpc(
+    const res = await this.sendRpc<{
+      protocolVersion: string;
+      capabilities: Record<string, unknown>;
+      serverInfo: { name: string; version?: string };
+    }>(
       endpoint,
       "initialize",
       {
@@ -178,6 +182,12 @@ export class McpClient {
       },
       !isPublic
     );
+    try {
+      await this.sendRpc(endpoint, "notifications/initialized", {}, !isPublic);
+    } catch {
+      // notifications do not require a response
+    }
+    return res;
   }
 
   /**
@@ -197,6 +207,9 @@ export class McpClient {
     args: Record<string, unknown> = {},
     isPublic = false
   ): Promise<T> {
+    if (!this.sessionId) {
+      await this.initialize(isPublic);
+    }
     const endpoint = isPublic ? "mcp/public" : "mcp";
     const res = await this.sendRpc<{ content?: Array<{ type: string; text?: string }>; isError?: boolean }>(
       endpoint,
