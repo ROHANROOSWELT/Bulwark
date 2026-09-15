@@ -31,6 +31,44 @@ export function computeIntentHash(intent: ExecutionIntent): string {
   return "0x" + createHash("sha256").update(canonical).digest("hex");
 }
 
+export function computeAuthorityHash(
+  grant: RescueGrantV2,
+  policy: BulwarkPolicyConfig,
+  intentHash: string,
+  authorizedIntent: {
+    action: string;
+    asset?: string;
+    assetAddress?: string;
+    authorizedAmountUsd: number;
+    amountWei: string;
+    repayMax?: boolean;
+    validUntil?: string;
+  }
+): string {
+  const asset = (
+    authorizedIntent.asset ||
+    authorizedIntent.assetAddress ||
+    grant.position.debtAsset ||
+    ""
+  ).toLowerCase();
+
+  const authorityCore = {
+    grantId: grant.grantId,
+    grantHash: grant.grantHash,
+    policyId: policy.policyId,
+    policyHash: computePolicyHash(policy),
+    intentHash,
+    action: authorizedIntent.action,
+    asset,
+    authorizedAmountUsd: Math.round(authorizedIntent.authorizedAmountUsd * 100) / 100,
+    amountWei: String(authorizedIntent.amountWei),
+    repayMax: Boolean(authorizedIntent.repayMax),
+    validUntil: authorizedIntent.validUntil || grant.conditions.expiresAt,
+  };
+
+  return "0x" + createHash("sha256").update(canonicalizeJson(authorityCore)).digest("hex");
+}
+
 export function compilePolicyIntent(
   intent: ExecutionIntent,
   grant: RescueGrantV2,
@@ -128,21 +166,14 @@ export function compilePolicyIntent(
   // 8. Compute Authority Hash binding Grant + Policy + Compiled Bounds
   const validUntil = new Date(now.getTime() + 15 * 60 * 1000).toISOString(); // 15-minute execution validity window
 
-  const authorityCore = {
-    grantId: grant.grantId,
-    grantHash: grant.grantHash,
-    policyId: policy.policyId,
-    policyHash: computePolicyHash(policy),
-    intentHash,
+  const authorityHash = computeAuthorityHash(grant, policy, intentHash, {
     action: intent.action,
-    asset: intent.asset.toLowerCase(),
-    authorizedAmountUsd: Math.round(authorizedAmountUsd * 100) / 100,
+    asset: intent.asset,
+    authorizedAmountUsd,
     amountWei: finalWei,
     repayMax,
     validUntil,
-  };
-
-  const authorityHash = "0x" + createHash("sha256").update(canonicalizeJson(authorityCore)).digest("hex");
+  });
   checks.push(`authority_hash_bound:${authorityHash}`);
 
   return {

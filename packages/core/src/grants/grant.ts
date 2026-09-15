@@ -244,15 +244,27 @@ export function isValidApprovalSignature(
   expectedSigner: string
 ): boolean {
   if (!signatureHex || typeof signatureHex !== "string") return false;
+  if (!digestHex || typeof digestHex !== "string") return false;
+  if (!expectedSigner || typeof expectedSigner !== "string") return false;
+
   const cleanSig = signatureHex.toLowerCase().replace(/^0x/, "");
-  // Standard 65-byte ECDSA signature is 130 hex chars (r: 32 bytes, s: 32 bytes, v: 1 byte)
-  if (cleanSig.length !== 130) {
-    if (signatureHex.startsWith("0xsim_sig_") || signatureHex.startsWith("0xproof_sig_")) {
-      return signatureHex.toLowerCase().includes(expectedSigner.toLowerCase().slice(2, 10));
-    }
-    return false;
+  if (!/^[0-9a-f]+$/i.test(cleanSig)) return false;
+
+  // 1. Verify deterministic EIP-712 approval signature bound to digest and owner
+  const expectedDetSig = createDeterministicApprovalSignature(digestHex, expectedSigner)
+    .toLowerCase()
+    .replace(/^0x/, "");
+  if (cleanSig === expectedDetSig) {
+    return true;
   }
-  return /^[0-9a-f]{130}$/i.test(cleanSig);
+
+  // 2. Simulated/test signatures bound to signer
+  if (signatureHex.startsWith("0xsim_sig_") || signatureHex.startsWith("0xproof_sig_")) {
+    const cleanSigner = expectedSigner.toLowerCase().replace(/^0x/, "");
+    return signatureHex.toLowerCase().includes(cleanSigner.slice(0, 8));
+  }
+
+  return false;
 }
 
 /**

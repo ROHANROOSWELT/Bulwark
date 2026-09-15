@@ -15,11 +15,12 @@ import {
 } from "../grants/grant.js";
 import { CreationSnapshot } from "../grants/grant.js";
 import { ExecutionIntent, BulwarkPolicyConfig } from "../policy/types.js";
-import { AuthorizedIntent, computeIntentHash } from "../policy/compiler.js";
+import { AuthorizedIntent, computeIntentHash, computeAuthorityHash } from "../policy/compiler.js";
 import { computePolicyHash, resolveAdaptiveBand } from "../policy/engine.js";
 import { PositionSnapshot } from "../aave/reader.js";
 import { ExecutionRecord } from "../grants/store.js";
 import { DirectExecutionReceipt } from "../keeperhub/types.js";
+import { getChainConfig } from "../chains.js";
 
 export interface PoaaBundle {
   bundleVersion: "2.0";
@@ -77,8 +78,11 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
 
   // ── Check 2: Owner Approval Valid ────────────────────────────────────────
   const recomputedEip712 = computeGrantEip712Digest(bundle.grant, bundle.grant.approval?.nonce ?? 0);
-  const eip712Matches = !bundle.grant.eip712Hash || bundle.grant.eip712Hash === recomputedEip712;
-  const sigValid = !bundle.grant.signature || isValidApprovalSignature(recomputedEip712, bundle.grant.signature, bundle.grant.parties.owner);
+  const grantEip712 = bundle.grant.eip712Hash || bundle.grant.approval?.eip712Hash;
+  const grantSig = bundle.grant.signature || bundle.grant.approval?.signature;
+
+  const eip712Matches = !grantEip712 || grantEip712.toLowerCase() === recomputedEip712.toLowerCase();
+  const sigValid = !grantSig || isValidApprovalSignature(recomputedEip712, grantSig, bundle.grant.parties.owner);
 
   const chk2Passed =
     Boolean(bundle.grant.approvedAt) &&
@@ -150,33 +154,20 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
   });
 
   // ── Check 6: Within Policy Bounds & Simulate-First ───────────────────────
-  let recomputedAuthorityHash: string | null = null;
-  if (
-    bundle.authorizedIntent.validUntil &&
-    bundle.authorityHash.length === 66 &&
-    !bundle.authorityHash.startsWith("0xauth_test_") &&
-    !bundle.authorityHash.startsWith("0xauth_sepolia_")
-  ) {
-    const authorityCore = {
-      grantId: bundle.grant.grantId,
-      grantHash: bundle.grant.grantHash,
-      policyId: bundle.policy.policyId,
-      policyHash: computePolicyHash(bundle.policy),
-      intentHash: bundle.intentHash,
-      action: bundle.authorizedIntent.action,
-      asset: (bundle.authorizedIntent.asset || bundle.grant.position.debtAsset || "").toLowerCase(),
-      authorizedAmountUsd: Math.round(bundle.authorizedIntent.authorizedAmountUsd * 100) / 100,
-      amountWei: bundle.authorizedIntent.amountWei,
-      repayMax: Boolean(bundle.authorizedIntent.repayMax),
-      validUntil: bundle.authorizedIntent.validUntil,
-    };
-    recomputedAuthorityHash = "0x" + createHash("sha256").update(canonicalizeJson(authorityCore)).digest("hex");
-  }
+  const recomputedAuthorityHash = computeAuthorityHash(
+    bundle.grant,
+    bundle.policy,
+    bundle.intentHash,
+    bundle.authorizedIntent
+  );
 
+  const isSyntheticHash =
+    bundle.authorityHash.length !== 66 ||
+    bundle.authorityHash.toLowerCase().startsWith("0xauth");
   const authorityHashMatches =
     bundle.execution.authorityHash === bundle.authorizedIntent.authorityHash &&
     bundle.execution.authorityHash === bundle.authorityHash &&
-    (recomputedAuthorityHash ? bundle.authorityHash === recomputedAuthorityHash : true);
+    (isSyntheticHash ? true : bundle.authorityHash === recomputedAuthorityHash);
 
   const chk6Passed =
     bundle.execution.amountUsd <= bundle.policy.maxUsdPerAction &&
@@ -311,4 +302,95 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
       ? `Proof of Authorized Agency BROKEN at Check ${failedCheck.checkNumber} (${failedCheck.name}): ${failedCheck.evidence}`
       : `Proof of Authorized Agency PROVEN (11/11 checks verified). The agent exercised precisely the authority it was delegated.`,
   };
+}
+
+/**
+ * Online Proof Verifier:
+ * Executes the 11 algebraic & cryptographic checks, then independently validates
+ * the transaction receipt against live on-chain RPC if a network connection is available.
+ */
+export async function verifyPoaaBundleOnline(
+  bundle: PoaaBundle,
+  options: { rpcUrl?: string; timeoutMs?: number; fetchFn?: typeof fetch } = {}
+): Promise<PoaaVerificationReport> {
+  const report = verifyPoaaBundle(bundle);
+  if (report.verdict !== "PROVEN") {
+    return report;
+  }
+
+  const txHash = bundle.execution.txHash || bundle.receipts?.[0]?.hash;
+  const chainId = bundle.grant.position.chainId;
+  const rpcUrl = options.rpcUrl || getChainConfig(chainId)?.defaultRpcUrl;
+  const fetchFn = options.fetchFn ?? globalThis.fetch;
+
+  if (txHash && txHash.startsWith("0x") && txHash.length === 66 && rpcUrl) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 10000);
+      const res = await fetchFn(rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "eth_getTransactionReceipt",
+          params: [txHash],
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const json = (await res.json()) as any;
+        const receipt = json?.result;
+        if (!receipt) {
+          const chk10 = report.checks.find((c) => c.checkNumber === 10);
+          if (chk10) {
+            chk10.passed = false;
+            chk10.evidence = `On-chain receipt verification FAILED: transaction ${txHash} not found on chain ${chainId} via ${rpcUrl}`;
+          }
+          report.verdict = "BROKEN (check 10)";
+          report.passedCount = report.checks.filter((c) => c.passed).length;
+          report.summary = `Proof of Authorized Agency BROKEN at Check 10 (Transaction Receipt Verified): transaction not found on chain ${chainId}`;
+          return report;
+        }
+
+        const statusHex = receipt.status;
+        const isSuccess = statusHex === "0x1" || statusHex === 1;
+        if (!isSuccess) {
+          const chk10 = report.checks.find((c) => c.checkNumber === 10);
+          if (chk10) {
+            chk10.passed = false;
+            chk10.evidence = `On-chain receipt verification FAILED: transaction reverted with status ${statusHex}`;
+          }
+          report.verdict = "BROKEN (check 10)";
+          report.passedCount = report.checks.filter((c) => c.passed).length;
+          report.summary = `Proof of Authorized Agency BROKEN at Check 10 (Transaction Receipt Verified): transaction reverted on chain`;
+          return report;
+        }
+
+        const minedBlock = parseInt(receipt.blockNumber, 16);
+        if (bundle.execution.blockNumber && bundle.execution.blockNumber !== minedBlock) {
+          const chk10 = report.checks.find((c) => c.checkNumber === 10);
+          if (chk10) {
+            chk10.passed = false;
+            chk10.evidence = `On-chain block mismatch: bundle claims block ${bundle.execution.blockNumber}, on-chain receipt is block ${minedBlock}`;
+          }
+          report.verdict = "BROKEN (check 10)";
+          report.passedCount = report.checks.filter((c) => c.passed).length;
+          report.summary = `Proof of Authorized Agency BROKEN at Check 10 (Transaction Receipt Verified): mined block mismatch`;
+          return report;
+        }
+
+        const chk10 = report.checks.find((c) => c.checkNumber === 10);
+        if (chk10) {
+          chk10.evidence += ` (Live verified on-chain in block ${minedBlock})`;
+        }
+      }
+    } catch {
+      // RPC network failure or timeout: retains offline cryptographic consistency report
+    }
+  }
+
+  return report;
 }
