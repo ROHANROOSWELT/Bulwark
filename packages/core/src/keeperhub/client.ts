@@ -195,11 +195,14 @@ export class KeeperHubClient {
     req: ContractCallRequest,
     idempotencyKey?: string
   ): Promise<DirectExecutionStatusResponse | SimulationResult | { result: string }> {
+    const body = req?.gasLimitMultiplier !== undefined
+      ? { ...req, gasLimitMultiplier: String(req.gasLimitMultiplier) }
+      : req;
     const res = await this.request<DirectExecutionStatusResponse | SimulationResult | { result: string }>(
       "/api/execute/contract-call",
       {
         method: "POST",
-        body: req,
+        body,
         idempotencyKey,
         requiresAuth: true,
       }
@@ -215,11 +218,14 @@ export class KeeperHubClient {
     req: TransferRequest,
     idempotencyKey?: string
   ): Promise<DirectExecutionStatusResponse | SimulationResult> {
+    const body = req?.gasLimitMultiplier !== undefined
+      ? { ...req, gasLimitMultiplier: String(req.gasLimitMultiplier) }
+      : req;
     const res = await this.request<DirectExecutionStatusResponse | SimulationResult>(
       "/api/execute/transfer",
       {
         method: "POST",
-        body: req,
+        body,
         idempotencyKey,
         requiresAuth: true,
       }
@@ -235,11 +241,20 @@ export class KeeperHubClient {
     req: CheckAndExecuteRequest,
     idempotencyKey?: string
   ): Promise<DirectExecutionStatusResponse | SimulationResult> {
+    const body = req?.action?.gasLimitMultiplier !== undefined
+      ? {
+          ...req,
+          action: {
+            ...req.action,
+            gasLimitMultiplier: String(req.action.gasLimitMultiplier),
+          },
+        }
+      : req;
     const res = await this.request<DirectExecutionStatusResponse | SimulationResult>(
       "/api/execute/check-and-execute",
       {
         method: "POST",
-        body: req,
+        body,
         idempotencyKey,
         requiresAuth: true,
       }

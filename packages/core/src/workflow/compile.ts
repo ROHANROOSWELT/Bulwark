@@ -67,7 +67,7 @@ export function compileExecutionPayloads(
     functionName,
     functionArgs: JSON.stringify(actionArgs),
     abi: JSON.stringify(actionAbi),
-    gasLimitMultiplier: 1.1,
+    gasLimitMultiplier: "1.1",
   };
 
   // 1b. Native Check-and-Execute Payload (Scalar Guard + Atomic Repay/Supply)
@@ -89,7 +89,7 @@ export function compileExecutionPayloads(
       functionName,
       functionArgs: JSON.stringify(actionArgs),
       abi: JSON.stringify(actionAbi),
-      gasLimitMultiplier: 1.1,
+      gasLimitMultiplier: "1.1",
     },
     simulate: false,
   };

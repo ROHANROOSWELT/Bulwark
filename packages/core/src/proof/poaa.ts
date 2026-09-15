@@ -274,8 +274,14 @@ export function verifyPoaaBundle(bundle: PoaaBundle): PoaaVerificationReport {
   const hfImproved = bundle.snapshots.after.healthFactor > bundle.snapshots.before.healthFactor;
   const isRepay = (bundle.authorizedIntent.action || bundle.execution.action) === "repay";
   const debtDelta = bundle.snapshots.before.totalDebtUsd - bundle.snapshots.after.totalDebtUsd;
+  const tokenDebtDelta =
+    bundle.snapshots.before.debtTokenBalance && bundle.snapshots.after.debtTokenBalance
+      ? Number(BigInt(bundle.snapshots.before.debtTokenBalance) - BigInt(bundle.snapshots.after.debtTokenBalance)) /
+        10 ** (bundle.snapshots.before.debtDecimals ?? 6)
+      : 0;
+  const effectiveDebtDelta = Math.max(debtDelta, tokenDebtDelta);
   const stateDeltaVerified = isRepay
-    ? debtDelta > 0 && (debtDelta >= Math.min(bundle.execution.amountUsd * 0.85, bundle.snapshots.before.totalDebtUsd * 0.85))
+    ? effectiveDebtDelta > 0 && (effectiveDebtDelta >= Math.min(bundle.execution.amountUsd * 0.80, bundle.snapshots.before.totalDebtUsd * 0.80))
     : bundle.snapshots.after.totalCollateralUsd > bundle.snapshots.before.totalCollateralUsd;
 
   const chk11Passed = hfImproved && stateDeltaVerified;

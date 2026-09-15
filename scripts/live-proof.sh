@@ -9,6 +9,13 @@ echo "=========================================================="
 echo "          BULWARK LIVE PROOF EXECUTION CYCLE              "
 echo "=========================================================="
 
+if [ -f .env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+
 if [ -z "${KEEPERHUB_API_KEY:-}" ]; then
   echo "[ERROR] KEEPERHUB_API_KEY environment variable is not set."
   echo "To run a live on-chain rescue, provide a funded KeeperHub organization API key:"
@@ -18,8 +25,8 @@ if [ -z "${KEEPERHUB_API_KEY:-}" ]; then
 fi
 
 CLI="node packages/cli/dist/index.js"
-TARGET_USER="${1:-0x0000000000000000000000000000000000000001}"
-CHAIN_ID="${BULWARK_CHAIN_ID:-11155111}"
+TARGET_USER="${1:-0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123}"
+CHAIN_ID="${BULWARK_CHAIN_ID:-84532}"
 OUTPUT_PROOF="${2:-./live-proof-bundle.json}"
 
 echo "[STEP 1/8] Running system doctor..."

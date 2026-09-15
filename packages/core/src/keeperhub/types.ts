@@ -68,7 +68,7 @@ export interface TransferRequest {
   amount: string; // decimal string
   tokenAddress?: string;
   tokenConfig?: Record<string, unknown>;
-  gasLimitMultiplier?: number;
+  gasLimitMultiplier?: number | string;
   simulate?: boolean;
 }
 
@@ -79,7 +79,7 @@ export interface ContractCallRequest {
   functionArgs: string; // JSON-array string e.g. "[\"0x...\", \"100\"]"
   abi?: string; // JSON string
   value?: string;
-  gasLimitMultiplier?: number;
+  gasLimitMultiplier?: number | string;
   simulate?: boolean;
 }
 
@@ -93,7 +93,7 @@ export interface CheckAndExecuteAction {
   functionName: string;
   functionArgs: string; // JSON-array string
   abi?: string;
-  gasLimitMultiplier?: number;
+  gasLimitMultiplier?: number | string;
 }
 
 export interface CheckAndExecuteRequest {

@@ -522,18 +522,40 @@ export class BulwarkGuardian {
     const isTerminal = (s: string) =>
       ["completed", "success", "failed", "error", "system_error", "cancelled"].includes(s.toLowerCase());
 
-    if (this.client.hasKey() && executionResp.executionId && !isTerminal(executionResp.status)) {
-      status = await this.client.subscribeExecutionStatus(
-        executionResp.executionId,
-        (update) => {
-          if (update.receipts && update.receipts.length > 0) {
-            receipts = update.receipts;
+    if (this.client.hasKey() && executionResp.executionId) {
+      if (!isTerminal(executionResp.status)) {
+        status = await this.client.subscribeExecutionStatus(
+          executionResp.executionId,
+          (update) => {
+            if (update.receipts && update.receipts.length > 0) {
+              receipts = update.receipts;
+            }
+          },
+          45000
+        );
+      }
+      let pollAttempts = 0;
+      while ((!receipts || receipts.length === 0) && pollAttempts < 6) {
+        try {
+          const poll = await this.client.getExecutionStatus(executionResp.executionId);
+          if (poll?.data) {
+            status = poll.data;
+            if (status.receipts && status.receipts.length > 0) {
+              receipts = status.receipts;
+              break;
+            }
           }
-        },
-        45000
-      );
-      if (status.receipts && status.receipts.length > 0) {
-        receipts = status.receipts;
+        } catch {
+          // ignore transient poll error
+        }
+        pollAttempts++;
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+      if (receipts && receipts.length > 0 && receipts[0]) {
+        status.receipts = receipts;
+        if (!status.transactionHash && receipts[0].hash) {
+          status.transactionHash = receipts[0].hash;
+        }
       }
     }
 
