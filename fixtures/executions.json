@@ -17,5 +17,48 @@
     "postHealthFactor": 1.3114,
     "receiptVerified": true,
     "independentReceiptVerified": true
+  },
+  {
+    "executionId": "exec_bg_1aeed51_1789486332923",
+    "grantId": "bg_1aeed5129aca1878",
+    "authorityHash": "0x0521caae30fe6e64d8c2f58d1e9a6fcd94c363af6afbbd0d4beaeab896a9e46a",
+    "action": "repay",
+    "amountUsd": 5,
+    "amountWei": "5000847",
+    "status": "failed",
+    "simulatedAt": "2026-09-15T15:32:12.923Z",
+    "submittedAt": "2026-09-15T15:32:12.923Z",
+    "preHealthFactor": 1.2650452649035189
+  },
+  {
+    "executionId": "exec_bg_a86be19_1789488108882",
+    "grantId": "bg_a86be192163cfaf7",
+    "authorityHash": "0xce5ff7fcb4d7f0d8a15c30a748f38dfe8e6f82ecedba39168e52445949d83c4f",
+    "action": "repay",
+    "amountUsd": 5,
+    "amountWei": "5000847",
+    "status": "submitted",
+    "simulatedAt": "2026-09-15T16:01:48.882Z",
+    "submittedAt": "2026-09-15T16:01:48.882Z",
+    "preHealthFactor": 1.2667754124071122
+  },
+  {
+    "executionId": "l970z8w4g4duxj9baub4m",
+    "grantId": "bg_a86be192163cfaf7",
+    "authorityHash": "0xce5ff7fcb4d7f0d8a15c30a748f38dfe8e6f82ecedba39168e52445949d83c4f",
+    "action": "repay",
+    "amountUsd": 5,
+    "amountWei": "5000847",
+    "status": "verified",
+    "simulatedAt": "2026-09-15T16:01:48.882Z",
+    "submittedAt": "2026-09-15T16:01:48.882Z",
+    "txHash": "0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1",
+    "preHealthFactor": 1.2667754124071122,
+    "receiptVerified": true,
+    "independentReceiptVerified": true,
+    "blockNumber": 46859912,
+    "gasUsed": "180896",
+    "postHealthFactor": 1.2670284777577903,
+    "verifiedAt": "2026-09-15T16:01:57.980Z"
   }
 ]

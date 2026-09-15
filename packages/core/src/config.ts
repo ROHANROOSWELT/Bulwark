@@ -26,7 +26,8 @@ export interface BulwarkConfig {
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig {
-  const chainIdStr = env.BULWARK_CHAIN_ID ?? "11155111";
+  const defaultChain = process.env.VERCEL ? "84532" : "11155111";
+  const chainIdStr = env.BULWARK_CHAIN_ID ?? defaultChain;
   const chainId = parseInt(chainIdStr, 10);
   if (isNaN(chainId)) {
     throw new Error(`Invalid BULWARK_CHAIN_ID: "${chainIdStr}". Must be a number.`);
@@ -41,7 +42,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
     throw new Error(`Invalid BULWARK_POLICY_MAX_USD_PER_ACTION: must be a positive number.`);
   }
 
-  const policyHfCritical = parseFloat(env.BULWARK_POLICY_HF_CRITICAL ?? "1.2");
+  const defaultCritical = process.env.VERCEL ? "1.35" : "1.2";
+  const policyHfCritical = parseFloat(env.BULWARK_POLICY_HF_CRITICAL ?? defaultCritical);
   if (isNaN(policyHfCritical) || policyHfCritical <= 1.0) {
     throw new Error(`Invalid BULWARK_POLICY_HF_CRITICAL: must be > 1.0.`);
   }
