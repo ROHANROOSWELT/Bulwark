@@ -30,6 +30,34 @@ function renderDoctorData(data) {
   // 1. RPC Ping
   const rpcBadge = document.getElementById("rpcStatusBadge");
   const blockVal = document.getElementById("rpcBlockVal");
+  const chainName = data.chains?.[data.chainId]?.name || (data.chainId === 84532 ? "Base Sepolia" : "Sepolia");
+
+  const rpcTitle = document.getElementById("rpcTitleText");
+  if (rpcTitle) rpcTitle.textContent = `${chainName} RPC Node`;
+
+  const cfgChainEl = document.getElementById("diagConfiguredChain");
+  if (cfgChainEl) cfgChainEl.textContent = `${data.chainId} (${chainName})`;
+
+  const rpcEpEl = document.getElementById("diagRpcEndpoint");
+  if (rpcEpEl && data.chains?.[data.chainId]?.defaultRpcUrl) {
+    try {
+      const url = new URL(data.chains[data.chainId].defaultRpcUrl);
+      rpcEpEl.textContent = url.hostname;
+    } catch {
+      rpcEpEl.textContent = data.chains[data.chainId].defaultRpcUrl;
+    }
+  }
+
+  const explorerEl = document.getElementById("diagBlockExplorer");
+  if (explorerEl && data.chains?.[data.chainId]?.blockExplorerUrl) {
+    explorerEl.href = data.chains[data.chainId].blockExplorerUrl;
+    try {
+      const url = new URL(data.chains[data.chainId].blockExplorerUrl);
+      explorerEl.textContent = `${url.hostname} ↗`;
+    } catch {
+      explorerEl.textContent = data.chains[data.chainId].blockExplorerUrl;
+    }
+  }
 
   if (data.rpcPing?.success) {
     rpcBadge.className = "chip chip-chain";
@@ -88,10 +116,15 @@ function updateWalletDiagnostics() {
     nameEl.textContent = meta.name;
     addrEl.textContent = connectedWallet.address;
 
-    const isSepolia = connectedWallet.chainId === 11155111;
-    chainEl.innerHTML = isSepolia
-      ? `<span style="color: var(--accent-emerald);">Sepolia 11155111 (Matched)</span>`
-      : `<span style="color: var(--accent-rose);">Chain ${connectedWallet.chainId} (Mismatch)</span>`;
+    const isBase = connectedWallet.chainId === 84532;
+    const isEth = connectedWallet.chainId === 11155111;
+    if (isBase) {
+      chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Base Sepolia 84532 (Active Network)</span>`;
+    } else if (isEth) {
+      chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Sepolia 11155111 (Supported Network)</span>`;
+    } else {
+      chainEl.innerHTML = `<span style="color: var(--accent-rose);">Chain ${connectedWallet.chainId} (Mismatch)</span>`;
+    }
   } else {
     badge.className = "chip chip-unavailable";
     badge.textContent = "DISCONNECTED";

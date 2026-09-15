@@ -213,30 +213,47 @@ async function connectWallet(type) {
   }
 }
 
-async function switchToSepolia() {
+async function switchToActiveNetwork() {
   if (!connectedWallet.provider) return;
+  const targetChain = window.BULWARK_ACTIVE_CHAIN_ID === 11155111 ? 11155111 : 84532;
+  const hexChainId = targetChain === 11155111 ? "0xaa36a7" : "0x14a34";
   try {
     await connectedWallet.provider.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0xaa36a7" }],
+      params: [{ chainId: hexChainId }],
     });
   } catch (switchError) {
     if (switchError.code === 4902) {
       try {
-        await connectedWallet.provider.request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: "0xaa36a7",
-              chainName: "Ethereum Sepolia",
-              nativeCurrency: { name: "Sepolia ETH", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
-              blockExplorerUrls: ["https://sepolia.etherscan.io"],
-            },
-          ],
-        });
+        if (targetChain === 84532) {
+          await connectedWallet.provider.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: "0x14a34",
+                chainName: "Base Sepolia",
+                nativeCurrency: { name: "Sepolia ETH", symbol: "ETH", decimals: 18 },
+                rpcUrls: ["https://sepolia.base.org"],
+                blockExplorerUrls: ["https://sepolia.basescan.org"],
+              },
+            ],
+          });
+        } else {
+          await connectedWallet.provider.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: "0xaa36a7",
+                chainName: "Ethereum Sepolia",
+                nativeCurrency: { name: "Sepolia ETH", symbol: "ETH", decimals: 18 },
+                rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+                blockExplorerUrls: ["https://sepolia.etherscan.io"],
+              },
+            ],
+          });
+        }
       } catch (addError) {
-        showWalletError("Failed to add Sepolia testnet to wallet.");
+        showWalletError("Failed to add network to wallet.");
       }
     } else {
       showWalletError(switchError.message || "Failed to switch network.");
@@ -284,17 +301,24 @@ function updateWalletUI() {
       if (nameEl) nameEl.textContent = meta.name;
       if (addressEl) addressEl.textContent = connectedWallet.address;
 
-      const isSepolia = connectedWallet.chainId === 11155111;
+      const activeChain = window.BULWARK_ACTIVE_CHAIN_ID || 84532;
+      const isBaseSepolia = connectedWallet.chainId === 84532;
+      const isEthSepolia = connectedWallet.chainId === 11155111;
+      const isSupported = isBaseSepolia || isEthSepolia;
+
       if (chainTagEl) {
-        if (isSepolia) {
+        if (isBaseSepolia) {
+          chainTagEl.className = "chip chip-chain";
+          chainTagEl.textContent = "Base Sepolia 84532";
+        } else if (isEthSepolia) {
           chainTagEl.className = "chip chip-chain";
           chainTagEl.textContent = "Sepolia 11155111";
         } else {
           chainTagEl.className = "chip chip-unavailable";
-          chainTagEl.textContent = `Chain ${connectedWallet.chainId || "Unknown"} (Wrong Network)`;
+          chainTagEl.textContent = `Chain ${connectedWallet.chainId || "Unknown"} (Unsupported Network)`;
         }
       }
-      if (switchBtn) switchBtn.style.display = isSepolia ? "none" : "block";
+      if (switchBtn) switchBtn.style.display = isSupported ? "none" : "block";
     }
 
     document.querySelectorAll(".wallet-option").forEach((opt) => {
@@ -421,7 +445,25 @@ async function fetchDeskState() {
 function renderDeskKpis(data) {
   if (!data) return;
 
+  if (data.chainId) {
+    window.BULWARK_ACTIVE_CHAIN_ID = data.chainId;
+  }
+
   // Header Chips
+  const chainChip = document.getElementById("chainChip");
+  if (chainChip && data.chainId) {
+    if (data.chainId === 84532) {
+      chainChip.className = "chip chip-chain";
+      chainChip.textContent = "Base Sepolia 84532";
+    } else if (data.chainId === 11155111) {
+      chainChip.className = "chip chip-chain";
+      chainChip.textContent = "Sepolia 11155111";
+    } else {
+      chainChip.className = "chip chip-chain";
+      chainChip.textContent = `Chain ${data.chainId}`;
+    }
+  }
+
   const keyChip = document.getElementById("keyChip");
   if (keyChip) {
     if (data.hasKey) {
@@ -561,7 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (switchBtn) {
-    switchBtn.addEventListener("click", switchToSepolia);
+    switchBtn.addEventListener("click", switchToActiveNetwork);
   }
 
   if (scanMyPosBtn && modalBackdrop) {

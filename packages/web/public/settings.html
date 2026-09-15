@@ -95,7 +95,7 @@
               <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
               <line x1="12" y1="20" x2="12.01" y2="20"></line>
             </svg>
-            Ethereum Sepolia RPC Node
+            <span id="rpcTitleText">Ethereum Sepolia RPC Node</span>
           </span>
           <span id="rpcStatusBadge" class="chip chip-chain">CONNECTING...</span>
         </div>
@@ -106,15 +106,15 @@
           </div>
           <div style="display: flex; justify-content: space-between;">
             <span style="color: var(--text-muted);">Configured Chain ID:</span>
-            <span style="font-family: var(--font-mono); font-weight: 700;">11155111 (Sepolia)</span>
+            <span id="diagConfiguredChain" style="font-family: var(--font-mono); font-weight: 700;">11155111 (Sepolia)</span>
           </div>
           <div style="display: flex; justify-content: space-between;">
             <span style="color: var(--text-muted);">Public Node Endpoint:</span>
-            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">ethereum-sepolia-rpc.publicnode.com</span>
+            <span id="diagRpcEndpoint" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">ethereum-sepolia-rpc.publicnode.com</span>
           </div>
           <div style="display: flex; justify-content: space-between;">
             <span style="color: var(--text-muted);">Block Explorer:</span>
-            <a href="https://sepolia.etherscan.io" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: underline;">
+            <a id="diagBlockExplorer" href="https://sepolia.etherscan.io" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: underline;">
               sepolia.etherscan.io &nearr;
             </a>
           </div>
