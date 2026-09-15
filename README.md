@@ -42,7 +42,7 @@
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
 | 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube / Loom)**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(Replace with recorded link)* | 🟡 Video Recorded / Ready for Upload |
-| ⚡ **3. KeeperHub On-Chain Tx** | [**View BaseScan Live Rescue Tx (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) & [**KeeperHub Exec ID (`vp4sp...`)**](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv) | ✅ **100% Live On-Chain Confirmed (Block 46823633)** |
+| ⚡ **3. KeeperHub On-Chain Tx** | [**BaseScan Live Rescue Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Live Rescue Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Blocks 46859912 & 46823633)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
 
@@ -102,12 +102,13 @@ All transactions are publicly verifiable on public block explorers:
 
 | Action | Chain | Target Contract / Asset | Transaction Hash / Explorer Link | Block | Gas Used | Status |
 | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
-| 🚀 **Live Debt Rescue (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | `46823633` | `180,896` | **MINED (Success)** |
+| 🚀 **Live Debt Rescue #2 (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) | `46859912` | `180,896` | **MINED (Success)** |
+| 🚀 **Live Debt Rescue #1 (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | `46823633` | `180,896` | **MINED (Success)** |
 | 💧 **Autonomous Liquidity Mint** | **Base Sepolia (84532)** | Aave Faucet (`0xD914...A6Dc`) | [`0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451`](https://sepolia.basescan.org/tx/0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451) | `46823460` | `105,420` | **MINED (Success)** |
 | 🔑 **Relayer Pre-Approval (USDC)** | **Base Sepolia (84532)** | USDC (`0xba50...d4d5f`) | [`0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b`](https://sepolia.basescan.org/tx/0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b) | `46823420` | `48,210` | **MINED (Success)** |
 | 🔑 **Relayer Pre-Approval (USDC)** | **Sepolia (11155111)** | USDC (`0x94a9...E4C8`) | [`0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888`](https://sepolia.etherscan.io/tx/0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888) | `9186210` | `49,150` | **MINED (Success)** |
 
-* **KeeperHub Execution Record:** [`https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv`](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv)
+* **KeeperHub Execution Records:** [`l970z8w4g4duxj9baub4m`](https://app.keeperhub.com/executions/l970z8w4g4duxj9baub4m) & [`vp4sp6951ipz00q2b65bv`](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv)
 * **Borrower Account Protected:** `0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123`
 * **KeeperHub Autonomous Relayer Account:** `0x83b65e22a94446790283bf2a1e579fdbd809d714`
 
@@ -603,8 +604,9 @@ Before submitting the DoraHacks form, replace the marked placeholders with your 
 | **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | ✅ Public & Up to date |
 | **Live App (Vercel)** | Production hosted web application | `https://bulwark-keeperhub.vercel.app` | ✅ Deployed & Operational |
 | **Public Verifier** | 11-Check PoAA Verification Portal | `https://bulwark-keeperhub.vercel.app/verify` | ✅ PROVEN (11/11 Checks) |
-| **Executed Tx** | BaseScan on-chain rescue transaction | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
-| **Execution ID** | KeeperHub execution dashboard URL | `https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
+| **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
+| **Executed Tx #1** | BaseScan on-chain rescue transaction #1 | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
+| **Execution IDs** | KeeperHub execution records | `l970z8w4g4duxj9baub4m`, `vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
 | **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | 🟡 Ready for upload |
 | **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email |
 | **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
