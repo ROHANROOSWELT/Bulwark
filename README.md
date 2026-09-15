@@ -51,29 +51,29 @@
 ### 📋 Official Hackathon Form Questions & Candid Responses
 
 #### **1. Which project did you integrate with, and what does the integration do?**
-* **Project Integrated:** [**Aave V3**](https://aave.com) ($17.4B TVL across EVM chains; live contract on Ethereum Sepolia at `0x6Ae43d041c5E8AEe1117f170400777174e508F87` and Base at `0xA238Dd80C259a72e81d7e4664a9801593F98d1c5`).
+* **Project Integrated:** [**Aave V3**](https://aave.com) ($17.4B TVL across EVM chains; live contracts on Base Sepolia at `0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`, Ethereum Sepolia at `0x6Ae43d041c5E8AEe1117f170400777174e508F87`, and Base Mainnet at `0xA238Dd80C259a72e81d7e4664a9801593F98d1c5`).
 * **What the Integration Does:**  
   DeFi liquidations are brutal, zero-sum market events causing 5%–10% collateral penalties, liquidation cascade MEV, and total position dismantlement. Existing automation consists of static stop-loss keepers (which fail during gas spikes) or autonomous agent demos that make probabilistic decisions *during* the panic—precisely when an unconstrained model is most dangerous.  
   **BULWARK** introduces the first **state-bound, autonomous agent backstop economy**:
-  1. Borrowers issue cryptographically bound, adaptive **RescueGrants** to an underwriting desk.
+  1. Borrowers issue cryptographically bound, adaptive **RescueGrants** to an underwriting desk with EIP-712 human owner approval.
   2. The Guardian agent continuously monitors real Aave V3 health factors via `getUserAccountData` and calculates an **exact closed-form rescue ladder** ($\Delta D^*$) to restore positions to safety ($HF \ge 2.00$).
-  3. When liquidation threatens ($HF < 1.25$), the agent forms an execution intent.
+  3. When liquidation threatens ($HF < 1.35$), the agent forms an execution intent.
   4. The **Policy Compiler** clamps the intent against immutable human-approved bands, grant caps, daily velocity budgets, and desk real reserve capacity (`authorityHash` binding). Raising limits is structurally impossible.
-  5. **KeeperHub executes the debt rescue deterministically** via Turnkey-signed direct contract calls (`Pool.repay(...)`), idempotency keys, and private mempool routing on Sepolia.
+  5. **KeeperHub executes the debt rescue deterministically** via Turnkey-signed direct contract calls (`Pool.repay(...)`), idempotency keys, and private mempool routing on Base Sepolia.
   6. Anyone can independently verify the execution on the public **`/verify`** portal via the **11-Check Proof of Authorized Agency (PoAA)** chain.
 
 #### **2. Which KeeperHub surfaces did you use?**
 We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply load-bearing across the entire lifecycle:
-1. **Direct REST Execution Engine (`POST /api/execute/contract-call`)**: Executes low-level Aave V3 debt repayments with Turnkey-backed private custody, gas re-pricing, and private mempool routing.
+1. **Direct REST Execution Engine (`POST /api/execute/contract-call`)**: Executes low-level Aave V3 debt repayments with Turnkey-backed private custody, smart gas estimation, and private mempool routing.
 2. **Simulation Preflight (`simulate: true`)**: Dry-runs transactions against real node state prior to mempool submission, asserting `wouldRevert === false` and validating gas parameters before spending borrower capital.
-3. **Streamable Model Context Protocol (MCP)**: Native TypeScript MCP client interfacing with both authenticated (`https://app.keeperhub.com/mcp`) and anonymous (`https://app.keeperhub.com/mcp/public`) endpoints over JSON-RPC 2.0 and Server-Sent Events (SSE). BULWARK dynamically discovers available tools and parameter schemas at runtime without hardcoded assumptions.
+3. **Streamable Model Context Protocol (MCP)**: Native TypeScript MCP client interfacing with both authenticated (`https://app.keeperhub.com/mcp`) and anonymous (`https://app.keeperhub.com/mcp/public`) endpoints over JSON-RPC 2.0 and Server-Sent Events (SSE). BULWARK dynamically discovers available tools (44 tools) and parameter schemas at runtime without hardcoded assumptions.
 4. **Agent-Authored Workflows & Schemas**: Dynamically compiles multi-step declarative workflows (`trigger: schedule` + `condition: read_contract` + `action: execute`) targeting KeeperHub workflow runners, validating schemas via MCP `validate_workflow`.
 5. **Idempotency & Dual-Receipt Verification**: Enforces unique `Idempotency-Key` headers on every mutation, preventing double-execution; cross-verifies execution receipts against both KeeperHub API and independent public RPCs to guarantee state finality.
-6. **Audit Trail & Spend-Cap Analytics (`GET /api/analytics/spend-cap`)**: Reads operational spend caps and outputs portable JSON-LD audit bundles via the `bulwark audit export` CLI.
+6. **Audit Trail & Spend-Cap Analytics (`GET /api/analytics/spend-cap`)**: Reads operational spend caps and outputs portable cryptographically chained JSONL audit logs with SHA-256 integrity checks.
 
 #### **3. Testnet or mainnet?**
 * **Primary Verified Testnets:**
-  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescue executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`) and mined in block `46823633`.
+  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescues executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`), mined in blocks `46859912` and `46823633`.
   - **Ethereum Sepolia Testnet (Chain ID: `11155111`)**: Live pre-approval, token reader, and oracle verification against Aave V3 Sepolia Pool (`0x6Ae43d041c5E8AEe1117f170400777174e508F87`).
 * **Production Architecture:** The codebase is natively chain-agnostic. Pre-configured contracts and RPC adapters are implemented for **Base Mainnet (Chain ID: `8453`)** and **Ethereum Mainnet (Chain ID: `1`)**.
 
@@ -81,15 +81,25 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 * **KeeperHub Composite Workflow Dry-Runs:** KeeperHub currently lacks a native sandbox or dry-run endpoint for arbitrary multi-step composite workflows. While BULWARK validates the workflow AST locally and simulates individual contract calls, the multi-node workflow execution itself cannot be dry-run atomically on KeeperHub servers before activation.
 * **`simulate:true` Footgun on Protocol Actions:** As documented in our [Platform Feedback](docs/INTEGRATION_FEEDBACK.md), KeeperHub silently ignores `simulate:true` on `/api/execute/protocol-action` routes and immediately broadcasts to the mempool. BULWARK implemented a client-side footgun guard (`assertSimulationSafety`) to reject these requests, but native server-side simulation enforcement remains desirable.
 * **Flash-Loan Atomic Unwinding:** Currently, the underwriter desk must maintain or be granted reserve capital in the borrowed debt token (e.g., USDC or WETH) to execute `Pool.repay`. Flashloan-backed atomic collateral swapping (unwinding collateral to repay debt in a single transaction) requires deploying a bespoke smart contract receiver, which is architected for the v3 mainnet rollout.
-* **Live Network Gas Dependency:** Automated CI tests run against real cryptographic vectors and RPC state reads; live on-chain transaction execution requires an active `KEEPERHUB_API_KEY` backed by a Turnkey signer funded with Sepolia ETH.
+* **Live Network Gas Dependency:** Automated CI tests run against real cryptographic vectors and RPC state reads; live on-chain transaction execution requires an active `KEEPERHUB_API_KEY` backed by a Turnkey signer funded with gas tokens.
 
 #### **5. Reachable contact information:**
 * **Email:** `prohanrooswelt@gmail.com`
-* **X (Twitter):** [`@bulwark_agent`](https://x.com) *(or personal handle placeholder: `[@YOUR_X_HANDLE]`)*
-* **Discord:** `rohan_bulwark` / `@bulwark_dev` *(or personal Discord tag: `[YOUR_DISCORD_TAG]`)*
+* **X (Twitter):** [`@bulwark_agent`](https://x.com)
+* **Discord:** `rohan_bulwark`
 * **GitHub:** [`github.com/ROHANROOSWELT`](https://github.com/ROHANROOSWELT)
 
 ---
+
+### 🎯 Alignment with DoraHacks Judging Rubric
+
+| Rubric Criterion | How BULWARK Addresses It | Verifiable Evidence |
+| :--- | :--- | :--- |
+| **1. Integration Depth** | Deep, protocol-native integration with **Aave V3** ($17.4B TVL). Decodes live borrower account data, computes closed-form repayment ladders, reads Chainlink oracle feeds, and compiles exact `IPool.repay(...)` calldata. | Real Aave V3 Base Sepolia Pool (`0x8bAB...aE27`); verified live on-chain. |
+| **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Two live on-chain debt rescues were executed on Base Sepolia with gas sponsorship. | Tx [`0xfabb40aa...`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [`0x43dbc027...`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16). |
+| **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; deterministic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
+| **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores $HF \ge 2.00$ without over-repaying. |
+| **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,303 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
 
 ## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
 
