@@ -475,6 +475,22 @@ function renderDeskKpis(data) {
     }
   }
 
+  // Azure Backend Chip
+  let backendChip = document.getElementById("backendChip");
+  if (!backendChip) {
+    backendChip = document.createElement("span");
+    backendChip.id = "backendChip";
+    const headerStatus = document.querySelector(".header-status");
+    if (headerStatus && keyChip) {
+      headerStatus.insertBefore(backendChip, keyChip);
+    }
+  }
+  if (backendChip) {
+    backendChip.className = "chip chip-policy";
+    backendChip.title = "Backend hosted on Microsoft Azure VM (20.244.4.11)";
+    backendChip.innerHTML = "☁️ Azure: 20.244.4.11";
+  }
+
   // Desk KPI Top Bar
   if (data.capacity) {
     const balanceEl = document.getElementById("deskBalanceVal");

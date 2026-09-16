@@ -18,6 +18,8 @@ export interface BulwarkConfig {
   storeDir: string;
   webPort: number;
   autoApprove: boolean;
+  frontendUrl: string;
+  backendUrl: string;
   rpcUrls: {
     sepolia?: string;
     base?: string;
@@ -76,6 +78,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
     storeDir: env.BULWARK_STORE_DIR ?? (process.env.VERCEL ? "/tmp/.bulwark" : ".bulwark"),
     webPort,
     autoApprove: env.BULWARK_AUTO_APPROVE === "1" || env.BULWARK_AUTO_APPROVE === "true",
+    frontendUrl: env.BULWARK_FRONTEND_URL ?? "https://bulwark-keeperhub.vercel.app",
+    backendUrl: env.BULWARK_BACKEND_URL ?? "http://20.244.4.11",
     rpcUrls: {
       sepolia: env.BULWARK_RPC_URL_SEPOLIA,
       base: env.BULWARK_RPC_URL_BASE,

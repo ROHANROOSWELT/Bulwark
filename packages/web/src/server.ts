@@ -232,6 +232,8 @@ export async function handleRequest(
           version: SERVER_VERSION,
           chainId: guardian.config.chainId,
           hasKey: guardian.client.hasKey(),
+          frontend: guardian.config.frontendUrl,
+          backend: guardian.config.backendUrl,
           endpoints: [
             "GET  /api/state",
             "GET  /api/doctor",
