@@ -109,6 +109,13 @@ function renderAuditTimeline(logs) {
             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">${ts}</span>
           </div>
 
+          ${log.details?.quote?.agentNarrative ? `
+            <div style="margin-top: 8px; margin-bottom: 8px; font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 3px solid #38bdf8; line-height: 1.4;">
+              <strong style="display: block; margin-bottom: 2px;">🤖 Gemini 3.5 AI Underwriter (${log.details.quote.selectionMode || 'AGENT_SELECT'}):</strong>
+              ${log.details.quote.agentNarrative.replace('[AGENT OUTPUT] ', '')}
+            </div>
+          ` : ""}
+
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-secondary);">
             <span>Subject: <strong style="font-family: var(--font-mono); color: var(--text-primary);">${entity}</strong></span>
             <button onclick="toggleAuditPayload('payload-${actualIdx}')" class="btn-sm btn-secondary" style="font-size: 10px;">

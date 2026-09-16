@@ -149,6 +149,11 @@ function renderState(data) {
             <span class="card-key">Authority Hash</span>
             <span class="card-val" style="font-family: var(--font-mono);">${grant.grantHash.slice(0, 12)}...</span>
           </div>
+          ${grant.triage?.agentNarrative ? `
+            <div style="margin-top: 8px; font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 2px solid #38bdf8; line-height: 1.4;">
+              <strong>🤖 Gemini 3.5 AI Underwriter:</strong> ${grant.triage.agentNarrative.replace('[AGENT OUTPUT] ', '')}
+            </div>
+          ` : ""}
         </div>
         <div class="grant-actions-row">
           ${isProposed ? `<button onclick="approveGrant('${grant.grantId}')" class="btn-sm btn-approve">Approve</button>` : ""}

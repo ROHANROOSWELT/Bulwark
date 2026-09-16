@@ -75,6 +75,11 @@ function renderGrantsTable(grants) {
               ${g.grantId} &boxbox;
             </div>
             <span style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">${g.grantHash.slice(0, 14)}...</span>
+            ${g.triage?.agentNarrative ? `
+              <div style="margin-top: 4px;">
+                <span class="chip chip-compiler" style="font-size: 9px; cursor: pointer; padding: 2px 6px;" onclick="inspectGrant('${g.grantId}')" title="${g.triage.agentNarrative}">🤖 AI Underwritten (${g.triage.selectionMode})</span>
+              </div>
+            ` : ""}
           </td>
           <td>
             <a href="${explorerUrl}" target="_blank" rel="noopener" style="color: var(--text-primary); font-family: var(--font-mono); text-decoration: underline;">
@@ -169,9 +174,21 @@ function inspectGrant(id) {
   const modal = document.getElementById("inspectGrantModal");
   const title = document.getElementById("inspectModalTitle");
   const textarea = document.getElementById("inspectPayloadText");
+  const aiBox = document.getElementById("inspectAiBox");
+  const aiText = document.getElementById("inspectAiNarrativeText");
+  const aiBadge = document.getElementById("inspectAiModeBadge");
 
   title.textContent = `Grant Invariant Payload: ${id}`;
   textarea.value = JSON.stringify(grant, null, 2);
+
+  if (grant.triage && grant.triage.agentNarrative) {
+    if (aiBox) aiBox.style.display = "block";
+    if (aiText) aiText.textContent = grant.triage.agentNarrative.replace("[AGENT OUTPUT] ", "");
+    if (aiBadge) aiBadge.textContent = grant.triage.selectionMode || "AGENT_SELECT";
+  } else if (aiBox) {
+    aiBox.style.display = "none";
+  }
+
   modal.style.display = "flex";
 }
 
