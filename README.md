@@ -15,7 +15,7 @@
 
 [![DoraHacks](https://img.shields.io/badge/DoraHacks-KeeperHub%20Hackathon%202026-blueviolet?style=for-the-badge)](https://dorahacks.io/hackathon/keeperhub)
 [![Track](https://img.shields.io/badge/Track-Best%20Integration%20into%20a%20Live%20Project-FF5722?style=for-the-badge)](#)
-[![Tests](https://img.shields.io/badge/Vitest-1%2C300%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
+[![Tests](https://img.shields.io/badge/Vitest-1%2C307%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8%20Strict-3178C6?style=for-the-badge&logo=typescript)](tsconfig.base.json)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20($17.4B%20TVL)-2EBAC6?style=for-the-badge)](https://aave.com)
@@ -503,16 +503,19 @@ BULWARK natively supports KeeperHub's Streamable MCP endpoint (`https://app.keep
 
 ### 7. Autonomous Agent Execution (Gemini 3.5 + KeeperHub MCP)
 
-BULWARK features a native **Autonomous Agent** powered by Google Gemini 3.5 Flash-Lite loaded with all **44 KeeperHub Model Context Protocol (MCP)** tools. The agent operates **completely autonomously without human intervention**:
+BULWARK is fully aligned with the official DoraHacks **KeeperHub - The Agent Economy Hackathon** theme:
+- **Primary Driver:** The LLM Agent powered by Google Gemini 3.5 Flash-Lite loaded directly with all **44 KeeperHub Model Context Protocol (MCP)** tools. The agent operates **autonomously without human intervention**, querying on-chain positions, resolving Solidity function overload signatures, and simulating or executing smart contract calls.
+- **Fail-Safe Invariant Rail:** Deterministic underwriting math, the clamp-only Policy Compiler, and Turnkey MPC signing act as the **tamper-proof execution and fallback layer**.
+- **Quota Safeguards:** Strict protection against the 500 requests/day free tier limit is enforced via an in-memory triage cache (2-minute TTL) and a daily budget cap (`DAILY_MAX = 480`) with automatic graceful fallback to deterministic math on HTTP 429.
 
 ```bash
-# 1. Fully Autonomous On-Chain Inspection & Rescue Simulation via Gemini + MCP
+# 1. Fully Autonomous On-Chain Inspection & Rescue Simulation via Gemini + MCP (Zero Human Intervention)
 npm run agent -- auto-transact 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 
 # 2. Free-Form Autonomous DeFi Transaction via MCP
 npm run agent -- transact "Inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute a simulated Aave V3 rescue repayment"
 
-# 3. Direct Natural Language MCP Query
+# 3. Direct Natural Language MCP Tool-Calling
 npm run agent -- ask "What is our current KeeperHub daily spending limit?"
 
 # 4. End-to-End Agent Workflow Composition & Schema Validation
@@ -586,14 +589,16 @@ BULWARK features **1,307 actual, non-mocked, passing tests** across 36 test file
 | [`poaa.fuzz.test.ts`](test/unit/proof/poaa.fuzz.test.ts) | Proof | **150** | Cross-chain state fuzzing across Sepolia (11155111), Base (8453), and Mainnet (1). |
 | [`orderbook.auction.test.ts`](test/unit/desk/orderbook.auction.test.ts) | Desk | **100** | Dutch auction decay rates, fully-funded desk routing priority, & tie-breaking. |
 | [`poaa.matrix.test.ts`](test/unit/proof/poaa.matrix.test.ts) | Proof | **100** | Systematic 11-point mutation matrix proving all checks fail closed upon tampering. |
+| [`gemini.autonomous.mcp.test.ts`](test/e2e/gemini.autonomous.mcp.test.ts) | E2E / AI | **3** | Gemini 3.5 + 44 KeeperHub MCP tools autonomous transaction, position read, & function calling. |
 | [`security.test.ts`](test/security/security.test.ts) | Security | **8** | LLM prompt injection immunity, re-entrancy, underwriter frontrunning, & replay guards. |
+| [`plans.test.ts`](test/unit/plans.test.ts) | Math / AI | **9** | Pure math targeting, counterfactual ladder, and Google AI Studio REST triage. |
 | [`guardian.e2e.test.ts`](test/e2e/guardian.e2e.test.ts) | E2E | **3** | Full lifecycle: Propose $\to$ Approve $\to$ Arm $\to$ Dry Run $\to$ Execute $\to$ PoAA Proven. |
 | [`keeperhub.live.test.ts`](test/integration/keeperhub.live.test.ts) | Live | **4** | Real network chain query (Chain ID: 11155111) & unauthenticated barrier contract. |
 | [`guardian.live.e2e.test.ts`](test/e2e/guardian.live.e2e.test.ts) | Live | **1** | Real RPC reading against Aave v3 Sepolia contract (`0x6Ae43d04...`) (0 skips). |
 | [`mcp.live.test.ts`](test/integration/mcp.live.test.ts) | Live | **1** | Online/offline streamable MCP discovery without conditional skipping. |
 | [`cli.e2e.test.ts`](test/e2e/cli.e2e.test.ts) | E2E | **4** | Real CLI subprocess spawning and stderr/stdout exit code verification. |
-| **All Other Unit Suites** | Unit | **123** | Config, reader, oracle, receipts, capacity, reputation, store, and web server. |
-| **Total Test Suite** | Monorepo | **1,300** | **100% Passed · 0 Failed · 0 Skipped** |
+| **All Other Unit Suites** | Unit | **118** | Config, reader, oracle, receipts, capacity, reputation, store, and web server. |
+| **Total Test Suite** | Monorepo | **1,307** | **100% Passed · 0 Failed · 0 Skipped** |
 
 ---
 
