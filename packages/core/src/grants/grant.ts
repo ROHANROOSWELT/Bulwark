@@ -135,8 +135,11 @@ export function canonicalizeJson(obj: unknown): string {
   if (Array.isArray(obj)) {
     return "[" + obj.map((item) => canonicalizeJson(item)).join(",") + "]";
   }
-  const keys = Object.keys(obj as Record<string, unknown>).sort();
-  const pairs = keys.map((k) => `${JSON.stringify(k)}:${canonicalizeJson((obj as Record<string, unknown>)[k])}`);
+  const rec = obj as Record<string, unknown>;
+  const keys = Object.keys(rec)
+    .filter((k) => rec[k] !== undefined)
+    .sort();
+  const pairs = keys.map((k) => `${JSON.stringify(k)}:${canonicalizeJson(rec[k])}`);
   return "{" + pairs.join(",") + "}";
 }
 
