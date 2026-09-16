@@ -512,7 +512,7 @@ export function createWebServer(options: WebServerOptions = {}): http.Server {
 }
 
 export function startWebServer(port?: number, host = "0.0.0.0"): Promise<{ server: http.Server; port: number }> {
-  const targetPort = port ?? parseInt(process.env.BULWARK_WEB_PORT || "4567", 10);
+  const targetPort = port ?? parseInt(process.env.PORT || process.env.BULWARK_WEB_PORT || "4567", 10);
   const server = createWebServer();
 
   return new Promise((resolve, reject) => {

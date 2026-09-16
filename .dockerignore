@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+.env.*
+.bulwark
+test/reports
+dist
+.vercel
+coverage
+*.log

@@ -1,0 +1,24 @@
+services:
+  bulwark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bulwark-dashboard
+    restart: unless-stopped
+    ports:
+      - "4567:4567"
+    environment:
+      - NODE_ENV=production
+      - BULWARK_CHAIN_ID=${BULWARK_CHAIN_ID:-84532}
+      - KEEPERHUB_API_KEY=${KEEPERHUB_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - BULWARK_LLM_MODEL=${BULWARK_LLM_MODEL:-gemini-3.5-flash-lite}
+      - BULWARK_POLICY_MAX_USD_PER_ACTION=${BULWARK_POLICY_MAX_USD_PER_ACTION:-25}
+      - BULWARK_POLICY_HF_CRITICAL=${BULWARK_POLICY_HF_CRITICAL:-1.35}
+      - BULWARK_POLICY_HF_TARGET=${BULWARK_POLICY_HF_TARGET:-2.0}
+    volumes:
+      - bulwark_data:/app/.bulwark
+
+volumes:
+  bulwark_data:
+    driver: local
