@@ -169,8 +169,12 @@ export async function handleRequest(
           serveFile(path.join(PUBLIC_DIR, "landing.html"), "text/html");
           return;
         }
-        if (pathname === "/overview" || pathname === "/index.html" || pathname === "/dashboard" || pathname === "/console") {
-          serveFile(path.join(PUBLIC_DIR, "index.html"), "text/html");
+        if (pathname === "/overview" || pathname === "/overview.html" || pathname === "/dashboard" || pathname === "/console") {
+          serveFile(path.join(PUBLIC_DIR, "overview.html"), "text/html");
+          return;
+        }
+        if (pathname === "/index.html") {
+          serveFile(path.join(PUBLIC_DIR, "landing.html"), "text/html");
           return;
         }
         if (pathname === "/positions" || pathname === "/positions.html") {
