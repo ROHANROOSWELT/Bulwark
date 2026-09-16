@@ -41,7 +41,7 @@
 | Required Artifact | Link / Resource | Status & Verification |
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
-| 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube / Loom)**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(Replace with recorded link)* | 🟡 Video Recorded / Ready for Upload |
+| 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(⚠️ REPLACE with final recorded YouTube/Loom link before submitting)* | 🟡 Record & Upload Required |
 | ⚡ **3. KeeperHub On-Chain Tx** | [**BaseScan Live Rescue Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Live Rescue Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Blocks 46859912 & 46823633)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
@@ -99,7 +99,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 | **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Two live on-chain debt rescues were executed on Base Sepolia with gas sponsorship. | Tx [`0xfabb40aa...`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [`0x43dbc027...`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16). |
 | **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; deterministic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
 | **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores $HF \ge 2.00$ without over-repaying. |
-| **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,303 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
+| **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,307 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
 
 ## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
 
@@ -645,7 +645,7 @@ Before submitting the DoraHacks form, replace the marked placeholders with your 
 | **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
 | **Executed Tx #1** | BaseScan on-chain rescue transaction #1 | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
 | **Execution IDs** | KeeperHub execution records | `l970z8w4g4duxj9baub4m`, `vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
-| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | 🟡 Ready for upload |
+| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | ⚠️ **Replace with final link before submitting** |
 | **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email |
 | **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
 | **Discord** | Submitter Discord username | `rohan_bulwark` | Primary Discord username |
