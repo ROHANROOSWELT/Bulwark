@@ -150,13 +150,13 @@ describe("Underwriter Pure Math & Counterfactual Ladder", () => {
   it("supports Google AI Studio native REST API response format", async () => {
     const quote = underwritePosition(sampleSnapshot, 35.0, 2.0);
     const config = loadConfig({
-      GEMINI_API_KEY: "AQ.Ab8RN6I4s3xR0-BfqA2FkcyzuwjZOSbtCBATTA4vN73eLS3IxA",
+      GEMINI_API_KEY: "dummy_mock_gemini_key_for_testing",
     });
 
     const googleAiStudioFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
       expect(String(url)).toContain("models/gemini-3.5-flash-lite:generateContent");
       const headers = init?.headers as Record<string, string>;
-      expect(headers["x-goog-api-key"]).toBe("AQ.Ab8RN6I4s3xR0-BfqA2FkcyzuwjZOSbtCBATTA4vN73eLS3IxA");
+      expect(headers["x-goog-api-key"]).toBe("dummy_mock_gemini_key_for_testing");
 
       return new Response(
         JSON.stringify({
