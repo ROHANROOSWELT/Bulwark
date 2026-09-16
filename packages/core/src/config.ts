@@ -58,6 +58,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
     throw new Error(`Invalid BULWARK_WEB_PORT: must be between 1 and 65535.`);
   }
 
+  const rawLlmKey = env.BULWARK_LLM_API_KEY ?? env.GEMINI_API_KEY;
+  const isGemini = Boolean(env.GEMINI_API_KEY || (rawLlmKey && rawLlmKey.startsWith("AIzaSy")));
+  const defaultBaseUrl = isGemini ? "https://generativelanguage.googleapis.com/v1beta/openai" : undefined;
+  const defaultModel = isGemini ? "gemini-1.5-flash" : "gpt-4o-mini";
+
   return {
     keeperhubApiKey: env.KEEPERHUB_API_KEY && env.KEEPERHUB_API_KEY !== "kh_replace_me" ? env.KEEPERHUB_API_KEY : undefined,
     keeperhubApiBase: env.KEEPERHUB_API_BASE ?? "https://app.keeperhub.com",
@@ -65,9 +70,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
     policyMaxUsdPerAction,
     policyHfCritical,
     policyHfTarget,
-    llmBaseUrl: env.BULWARK_LLM_BASE_URL,
-    llmApiKey: env.BULWARK_LLM_API_KEY,
-    llmModel: env.BULWARK_LLM_MODEL ?? "gpt-4o-mini",
+    llmBaseUrl: env.BULWARK_LLM_BASE_URL ?? defaultBaseUrl,
+    llmApiKey: rawLlmKey,
+    llmModel: env.BULWARK_LLM_MODEL ?? defaultModel,
     storeDir: env.BULWARK_STORE_DIR ?? (process.env.VERCEL ? "/tmp/.bulwark" : ".bulwark"),
     webPort,
     autoApprove: env.BULWARK_AUTO_APPROVE === "1" || env.BULWARK_AUTO_APPROVE === "true",

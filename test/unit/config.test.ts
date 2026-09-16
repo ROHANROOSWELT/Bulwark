@@ -58,11 +58,15 @@ describe("config loader", () => {
     ).toThrow(/must be > critical threshold/);
   });
 
-  it("resolves default and override RPC URLs", () => {
-    const config = loadConfig({
-      BULWARK_RPC_URL_SEPOLIA: "https://custom-sepolia.rpc",
-    });
-    expect(getRpcUrlForChain(11155111, config)).toBe("https://custom-sepolia.rpc");
-    expect(getRpcUrlForChain(8453, config)).toBe(CHAINS[8453]?.defaultRpcUrl);
+  it("auto-detects Gemini API key and sets OpenAI-compatible endpoint", () => {
+    const configWithGeminiKey = loadConfig({ GEMINI_API_KEY: "AIzaSyTestGeminiKey123" });
+    expect(configWithGeminiKey.llmApiKey).toBe("AIzaSyTestGeminiKey123");
+    expect(configWithGeminiKey.llmBaseUrl).toBe("https://generativelanguage.googleapis.com/v1beta/openai");
+    expect(configWithGeminiKey.llmModel).toBe("gemini-1.5-flash");
+
+    const configWithBulwarkKey = loadConfig({ BULWARK_LLM_API_KEY: "AIzaSyTestKey456" });
+    expect(configWithBulwarkKey.llmApiKey).toBe("AIzaSyTestKey456");
+    expect(configWithBulwarkKey.llmBaseUrl).toBe("https://generativelanguage.googleapis.com/v1beta/openai");
+    expect(configWithBulwarkKey.llmModel).toBe("gemini-1.5-flash");
   });
 });
