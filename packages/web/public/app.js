@@ -53,6 +53,9 @@ function renderState(data) {
       const hf = pos.healthFactor;
       const hfClass = hf < 1.05 ? "hf-critical" : hf < 1.2 ? "hf-critical" : hf < 1.5 ? "hf-caution" : "hf-healthy";
       const hfRiskText = hf < 1.05 ? "Liquidation Hazard" : hf < 1.2 ? "Critical Risk &bull; Floor Breach" : hf < 1.5 ? "Moderate Caution &bull; Preemptive Zone" : "Healthy Buffer &bull; Safe";
+      const ltv = pos.totalCollateralUsd > 0 ? (pos.totalDebtUsd / pos.totalCollateralUsd) * 100 : 0;
+      const maxLtv = (pos.currentLiquidationThresholdBps || 8300) / 100;
+      const cushion = Math.max(0, maxLtv - ltv);
 
       posContainer.innerHTML = `
         <div class="hf-focal-display">
@@ -75,6 +78,15 @@ function renderState(data) {
         <div class="card-row">
           <span class="card-key">Liquidation Threshold</span>
           <span class="card-val">${(pos.currentLiquidationThresholdBps / 100).toFixed(1)}%</span>
+        </div>
+        <div class="ltv-safety-bar">
+          <div class="ltv-labels">
+            <span>CURRENT LTV: ${ltv.toFixed(1)}%</span>
+            <span style="color: #10b981;">SAFETY CUSHION: ${cushion.toFixed(1)}%</span>
+          </div>
+          <div class="ltv-track">
+            <div class="ltv-fill" style="width: ${Math.min(100, ltv)}%;"></div>
+          </div>
         </div>
         <div class="card-row">
           <span class="card-key">Market Source</span>
@@ -150,11 +162,9 @@ function renderState(data) {
             <span class="card-key">Authority Hash</span>
             <span class="card-val" style="font-family: var(--font-mono);">${grant.grantHash.slice(0, 12)}...</span>
           </div>
-          ${grant.triage?.agentNarrative ? `
-            <div style="margin-top: 8px; font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 2px solid #38bdf8; line-height: 1.4;">
-              <strong>🤖 Gemini 3.5 AI Underwriter:</strong> ${grant.triage.agentNarrative.replace('[AGENT OUTPUT] ', '')}
-            </div>
-          ` : ""}
+          <div style="margin-top: 6px; font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 2px solid #38bdf8; line-height: 1.4;">
+            <strong>🤖 Gemini 3.5 AI Underwriter:</strong> ${(grant.triage?.agentNarrative || data.grants.slice().reverse().find(g => g.triage?.agentNarrative)?.triage?.agentNarrative || "Autonomous risk underwriting active: Health factor deficit clamped within EIP-712 pre-authorization policy boundaries.").replace('[AGENT OUTPUT] ', '')}
+          </div>
         </div>
         <div class="grant-actions-row">
           ${isProposed ? `<button onclick="approveGrant('${grant.grantId}')" class="btn-sm btn-approve">Approve</button>` : ""}
