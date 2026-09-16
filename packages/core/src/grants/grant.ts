@@ -112,6 +112,17 @@ export interface RescueGrantV2 {
     totalSpentUsd: number;
     executionCount: number;
   };
+  triage?: {
+    selectionMode: "DETERMINISTIC_CHEAPEST" | "AGENT_SELECT";
+    selectedPlan: {
+      planId: string;
+      type: string;
+      amountUsd: number;
+      projectedHf: number;
+      premiumUsd: number;
+    };
+    agentNarrative?: string;
+  };
 }
 
 /**

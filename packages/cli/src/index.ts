@@ -273,7 +273,7 @@ Grants Commands:
           }
 
           case "propose": {
-            const { values } = parseArgs({
+            const { values, positionals } = parseArgs({
               args: args.slice(2),
               options: {
                 address: { type: "string" },
@@ -282,10 +282,11 @@ Grants Commands:
                 amount: { type: "string" },
                 trigger: { type: "string" },
               },
+              allowPositionals: true,
               strict: false,
             });
 
-            const address = (values.address as string) || (values.user as string) || "0x0000000000000000000000000000000000000001";
+            const address = (values.address as string) || (values.user as string) || positionals[0] || "0x0000000000000000000000000000000000000001";
             const chainId = values.chain ? parseInt(String(values.chain), 10) : guardian.config.chainId;
             const capitalCapUsd = values.amount ? parseFloat(String(values.amount)) : undefined;
             const hfTriggerBelow = values.trigger ? parseFloat(String(values.trigger)) : undefined;
@@ -296,6 +297,13 @@ Grants Commands:
             log(`[POLICY INVARIANT] Canonical Grant Hash: ${grant.grantHash}`);
             log(`[POLICY INVARIANT] Status: ${grant.state.status}`);
             log(`[POLICY INVARIANT] Capital Cap: $${grant.authority.capitalCapUsd}`);
+            if (grant.triage) {
+              log(`[AGENT OUTPUT] Underwriter Selection Mode: ${grant.triage.selectionMode}`);
+              log(`[AGENT OUTPUT] Selected Plan: ${grant.triage.selectedPlan.planId} (${grant.triage.selectedPlan.type}, amount: $${grant.triage.selectedPlan.amountUsd}, projected HF: ${grant.triage.selectedPlan.projectedHf.toFixed(3)})`);
+              if (grant.triage.agentNarrative) {
+                log(`[AGENT OUTPUT] Gemini AI Narrative: ${grant.triage.agentNarrative}`);
+              }
+            }
             log(`[POLICY INVARIANT] NOTE: Grants in 'proposed' state NEVER execute without explicit human owner approval.`);
             return 0;
           }

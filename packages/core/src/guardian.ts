@@ -163,7 +163,22 @@ export class BulwarkGuardian {
     };
 
     const { grantHash, grantId } = computeGrantHash(rawCore);
-    const grant: RescueGrantV2 = { ...rawCore, grantHash, grantId };
+    const grant: RescueGrantV2 = {
+      ...rawCore,
+      grantHash,
+      grantId,
+      triage: {
+        selectionMode: quote.selectionMode,
+        selectedPlan: {
+          planId: quote.selectedPlan.planId,
+          type: quote.selectedPlan.type,
+          amountUsd: quote.selectedPlan.amountUsd,
+          projectedHf: quote.selectedPlan.projectedHf,
+          premiumUsd: quote.selectedPlan.premiumUsd,
+        },
+        agentNarrative: quote.agentNarrative,
+      },
+    };
 
     await this.store.saveGrant(grant);
 
@@ -175,7 +190,12 @@ export class BulwarkGuardian {
       details: {
         owner: userAddress,
         hf: snapshot.healthFactor,
-        quote: { selectedPlan: quote.selectedPlan.planId, amountUsd: quote.selectedPlan.amountUsd },
+        quote: {
+          selectedPlan: quote.selectedPlan.planId,
+          amountUsd: quote.selectedPlan.amountUsd,
+          selectionMode: quote.selectionMode,
+          agentNarrative: quote.agentNarrative,
+        },
       },
       provenance: "AGENT OUTPUT",
     });

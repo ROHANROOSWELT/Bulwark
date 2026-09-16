@@ -25,27 +25,29 @@ export async function triageWithLlm(
     return quote;
   }
 
-  const feasiblePlans = quote.plans.filter((p) => p.isFeasible);
-  if (feasiblePlans.length <= 1) {
+  const candidatePlans = quote.plans.filter((p) => p.isFeasible || p.isPartialMitigation);
+  if (candidatePlans.length <= 1) {
     return quote;
   }
 
   const systemPrompt =
     "You are an underwriter agent for BULWARK Aave rescue desk.\n" +
-    "You are provided a live position snapshot and a list of deterministically computed FEASIBLE plans.\n" +
+    "You are provided a live position snapshot and a list of deterministically computed candidate rescue plans.\n" +
     "Select the best plan for the position owner and provide a concise justification.\n" +
     "You MUST respond ONLY with valid JSON: { \"choice\": \"<planId>\", \"narrative\": \"<concise narrative>\" }.\n" +
-    "You CANNOT modify amounts, assets, or limits. Any choice not in the provided feasible plan list will be rejected.";
+    "You CANNOT modify amounts, assets, or limits. Any choice not in the provided candidate plan list will be rejected.";
 
   const userContent = JSON.stringify({
     healthFactor: quote.snapshot.healthFactor,
     totalCollateralUsd: quote.snapshot.totalCollateralUsd,
     totalDebtUsd: quote.snapshot.totalDebtUsd,
-    feasiblePlans: feasiblePlans.map((p) => ({
+    candidatePlans: candidatePlans.map((p) => ({
       planId: p.planId,
       type: p.type,
       amountUsd: p.amountUsd,
       projectedHf: p.projectedHf,
+      isFeasible: p.isFeasible,
+      isPartialMitigation: p.isPartialMitigation,
       premiumUsd: p.premiumUsd,
     })),
   });
@@ -125,7 +127,7 @@ export async function triageWithLlm(
     if (!content) return quote;
 
     const parsed = JSON.parse(content) as LlmTriageResponse;
-    const chosenPlan = feasiblePlans.find((p) => p.planId === parsed.choice);
+    const chosenPlan = candidatePlans.find((p) => p.planId === parsed.choice);
 
     if (chosenPlan) {
       return {
