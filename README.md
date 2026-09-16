@@ -450,11 +450,12 @@ Edit `.env` to configure your keys:
 KEEPERHUB_API_KEY=kh_your_live_api_key
 KEEPERHUB_API_BASE=https://app.keeperhub.com
 
-# Target chain: 11155111 = Ethereum Sepolia, 8453 = Base Mainnet
-BULWARK_CHAIN_ID=11155111
+# Target chain: 84532 = Base Sepolia (Live Aave V3 rescues), 11155111 = Ethereum Sepolia, 8453 = Base Mainnet
+BULWARK_CHAIN_ID=84532
 
 # Optional independent RPC for dual-receipt cross-verification
-ETHEREUM_SEPOLIA_RPC=https://rpc.sepolia.org
+BASE_SEPOLIA_RPC=https://sepolia.base.org
+ETHEREUM_SEPOLIA_RPC=https://ethereum-sepolia-rpc.publicnode.com
 ```
 
 ### 3. Build Monorepo
