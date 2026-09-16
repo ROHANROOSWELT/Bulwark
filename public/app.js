@@ -122,7 +122,8 @@ function renderState(data) {
     if (!data.grants || data.grants.length === 0) {
       grantsContainer.innerHTML = `<div class="card"><span class="card-key">No active grants in store.</span></div>`;
     } else {
-      const grant = data.grants[0]; // Overview prioritizes active grant
+      // Overview prioritizes newest active or proposed grant
+      const grant = [...data.grants].reverse().find((g) => g.state.status === "proposed" || g.state.status === "armed") || data.grants[data.grants.length - 1];
       const statusClass = `status-${grant.state.status.toLowerCase()}`;
       const isProposed = grant.state.status === "proposed";
       const isArmed = grant.state.status === "armed";

@@ -57,7 +57,9 @@ function renderGrantsTable(grants) {
     return;
   }
 
-  tbody.innerHTML = filtered
+  // Show newest grants first
+  tbody.innerHTML = [...filtered]
+    .reverse()
     .map((g) => {
       const owner = g.parties?.owner || "Unknown";
       const ownerShort = `${owner.slice(0, 8)}...${owner.slice(-6)}`;
