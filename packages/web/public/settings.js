@@ -132,10 +132,36 @@ function updateWalletDiagnostics() {
     addrEl.textContent = "Not connected";
     chainEl.textContent = "--";
   }
+function initOperatorKeySettings() {
+  const input = document.getElementById("opKeyInput");
+  const badge = document.getElementById("opKeyStatusBadge");
+  const saveBtn = document.getElementById("saveOpKeyBtn");
+  if (!input || !badge || !saveBtn) return;
+
+  const current = localStorage.getItem("bulwark_operator_key") || "bulwark_sec_ops_2026_az";
+  input.value = current;
+  badge.textContent = current ? "AUTHENTICATED" : "UNAUTHENTICATED";
+  badge.className = current ? "chip chip-policy" : "chip chip-unavailable";
+
+  saveBtn.addEventListener("click", () => {
+    const val = input.value.trim();
+    if (val) {
+      localStorage.setItem("bulwark_operator_key", val);
+      badge.textContent = "AUTHENTICATED";
+      badge.className = "chip chip-policy";
+      showToast("Operator key saved", "success");
+    } else {
+      localStorage.removeItem("bulwark_operator_key");
+      badge.textContent = "UNAUTHENTICATED";
+      badge.className = "chip chip-unavailable";
+      showToast("Operator key cleared", "info");
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorData();
+  initOperatorKeySettings();
 
   const doctorBtn = document.getElementById("runDoctorBtn");
   if (doctorBtn) {

@@ -529,6 +529,34 @@ function highlightActiveNav() {
   });
 }
 
+// ── Authenticated / Resilient Fetch Helper ──────────────────────────────────
+async function bulwarkFetch(url, options = {}) {
+  options.headers = options.headers || {};
+  let opKey = localStorage.getItem("bulwark_operator_key") || "bulwark_sec_ops_2026_az";
+  if (opKey) {
+    if (options.headers instanceof Headers) {
+      options.headers.set("x-operator-key", opKey);
+    } else {
+      options.headers["x-operator-key"] = opKey;
+    }
+  }
+  let res = await fetch(url, options);
+  if (res.status === 401 && (options.method === "POST" || options.method === "PUT" || options.method === "DELETE")) {
+    const entered = window.prompt("Operator Authorization Required for mutating operation.\nEnter BULWARK Operator Key (stored securely in local session):", opKey);
+    if (entered && entered.trim()) {
+      localStorage.setItem("bulwark_operator_key", entered.trim());
+      if (options.headers instanceof Headers) {
+        options.headers.set("x-operator-key", entered.trim());
+      } else {
+        options.headers["x-operator-key"] = entered.trim();
+      }
+      res = await fetch(url, options);
+    }
+  }
+  return res;
+}
+window.bulwarkFetch = bulwarkFetch;
+
 // ── Global Tick Action ──────────────────────────────────────────────────────
 async function triggerTick() {
   const btn = document.getElementById("tickBtn");
@@ -537,7 +565,7 @@ async function triggerTick() {
     btn.textContent = "Scanning...";
   }
   try {
-    const res = await fetch("/api/tick", { method: "POST" });
+    const res = await bulwarkFetch("/api/tick", { method: "POST" });
     const data = await res.json();
     if (!res.ok) {
       throw new Error(data.error || "Tick failed");

@@ -230,7 +230,8 @@ function renderState(data) {
 
 async function approveGrant(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/approve`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/approve`, { method: "POST" });
     if (res.ok) fetchState();
   } catch (err) {
     alert("Error approving grant: " + err.message);
@@ -239,7 +240,8 @@ async function approveGrant(id) {
 
 async function revokeGrant(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/revoke`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/revoke`, { method: "POST" });
     if (res.ok) fetchState();
   } catch (err) {
     alert("Error revoking grant: " + err.message);
@@ -248,7 +250,8 @@ async function revokeGrant(id) {
 
 async function dryRunGrant(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/dry`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/dry`, { method: "POST" });
     const json = await res.json();
     alert("Simulation Result:\n" + JSON.stringify(json, null, 2));
     fetchState();
@@ -259,7 +262,8 @@ async function dryRunGrant(id) {
 
 async function executeGrant(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
     const json = await res.json();
     alert("Execution submitted:\n" + JSON.stringify(json.execution, null, 2));
     fetchState();

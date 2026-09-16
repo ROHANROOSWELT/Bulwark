@@ -120,7 +120,8 @@ function renderGrantsTable(grants) {
 // ── Grant Actions ──────────────────────────────────────────────────────────
 async function approveGrantAction(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/approve`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/approve`, { method: "POST" });
     if (!res.ok) throw new Error("Approval failed");
     showToast(`Grant ${id} armed successfully. Ready for KeeperHub dispatch.`, "success");
     await loadGrantsData();
@@ -131,7 +132,8 @@ async function approveGrantAction(id) {
 
 async function dryRunGrantAction(id) {
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/dry`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/dry`, { method: "POST" });
     const json = await res.json();
     if (json.wouldRevert) {
       showToast(`Simulation reverted: ${json.revertReason || "Flashloan condition not met"}`, "error");
@@ -147,7 +149,8 @@ async function dryRunGrantAction(id) {
 async function executeGrantAction(id) {
   try {
     showToast(`Submitting execution to KeeperHub network for grant ${id}...`, "info");
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Execution failed");
     showToast(`Execution completed! TxHash: ${json.execution.txHash.slice(0, 10)}...`, "success");
@@ -160,7 +163,8 @@ async function executeGrantAction(id) {
 async function revokeGrantAction(id) {
   if (!confirm(`Are you sure you want to revoke authority for grant ${id}?`)) return;
   try {
-    const res = await fetch(`/api/grants/${encodeURIComponent(id)}/revoke`, { method: "POST" });
+    const doFetch = window.bulwarkFetch || fetch;
+    const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/revoke`, { method: "POST" });
     if (!res.ok) throw new Error("Revocation failed");
     showToast(`Grant ${id} has been revoked.`, "info");
     await loadGrantsData();
@@ -291,7 +295,8 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.textContent = "Proposing...";
 
       try {
-        const res = await fetch("/api/grants/propose", {
+        const doFetch = window.bulwarkFetch || fetch;
+        const res = await doFetch("/api/grants/propose", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
