@@ -20,12 +20,14 @@ if (loadLiveProofBtn) {
       if (!res.ok) throw new Error("Could not load latest proof bundle");
       const bundle = await res.json();
       bundleText.value = JSON.stringify(bundle, null, 2);
+      const fileNameDisplay = document.getElementById("fileNameDisplay");
+      if (fileNameDisplay) fileNameDisplay.textContent = "live_onchain_proof.json";
       verifyBtn.click();
     } catch (err) {
       alert("Error loading proof: " + err.message);
     } finally {
       loadLiveProofBtn.disabled = false;
-      loadLiveProofBtn.textContent = "⚡ Load Live On-Chain Rescue Proof";
+      loadLiveProofBtn.textContent = "Load Live On-Chain Rescue Proof";
     }
   });
 }
@@ -33,6 +35,8 @@ if (loadLiveProofBtn) {
 fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  const fileNameDisplay = document.getElementById("fileNameDisplay");
+  if (fileNameDisplay) fileNameDisplay.textContent = file.name;
   const reader = new FileReader();
   reader.onload = (event) => {
     bundleText.value = event.target.result;
@@ -90,6 +94,18 @@ function renderReport(report) {
     ? `VERDICT: PROVEN (11/11 CHECKS PASSED)`
     : `VERDICT: ${report.verdict}`;
 
+  const verdictChip = document.getElementById("verdictChip");
+  if (verdictChip) {
+    verdictChip.textContent = isProven ? "11/11 PROVEN" : report.verdict;
+    verdictChip.className = `chip ${isProven ? "chip-policy" : "chip-critical"}`;
+  }
+
+  const statScoreVal = document.getElementById("statScoreVal");
+  if (statScoreVal) {
+    const passedCount = report.checks ? report.checks.filter(c => c.passed).length : 0;
+    statScoreVal.textContent = `${passedCount} / 11`;
+  }
+
   checksContainer.innerHTML = report.checks.map((c) => {
     const provClass = getProvenanceClass(c.provenance);
     return `
@@ -123,3 +139,10 @@ function getProvenanceClass(prov) {
     default: return "chip-compiler";
   }
 }
+
+// Automatically load live proof on page load so the page is immediately populated and verified
+window.addEventListener("DOMContentLoaded", () => {
+  if (loadLiveProofBtn && (!bundleText.value || bundleText.value.trim() === "")) {
+    loadLiveProofBtn.click();
+  }
+});

@@ -48,9 +48,9 @@
   <!-- ── 2. COMMAND CENTER MAIN VIEWPORT ────────────────────────────────────── -->
   <main class="dashboard-grid command-center">
 
-    <!-- ── 2. MAIN HERO AREA: Story (Left) + Protection Flow (Right) ──────────── -->
+    <!-- ── 2. MAIN HERO AREA: Story ────────────────────────────────────────── -->
     <section class="overview-hero">
-      <!-- LEFT: Product / Story Area -->
+      <!-- Product / Story Area -->
       <div class="hero-story-card">
         <div class="hero-eyebrow">
           <span class="live-dot"><span class="live-dot-ping"></span><span class="live-dot-core"></span></span>
@@ -62,43 +62,6 @@
         <p class="hero-copy">
           Autonomous liquidity protection with mathematically proven agency. Preemptive debt repayment, invariant risk clamping, and cryptographic Proof of Authorized Agency executed by KeeperHub.
         </p>
-      </div>
-
-      <!-- RIGHT: Horizontal Lifecycle / Protection-Flow Component -->
-      <div class="hero-flow-card">
-        <div class="flow-header">
-          <span class="flow-title">Autonomous Protection Flow</span>
-          <span class="chip chip-policy">Zero-Revert Clamped</span>
-        </div>
-        <div class="protection-flow-track">
-          <!-- Stage 1 -->
-          <div class="flow-stage">
-            <div class="stage-num">01</div>
-            <div class="stage-name">DETECTED</div>
-            <div class="stage-desc">Aave Distress &bull; HF Breach</div>
-          </div>
-          <div class="flow-arrow">&rarr;</div>
-          <!-- Stage 2 -->
-          <div class="flow-stage">
-            <div class="stage-num">02</div>
-            <div class="stage-name">AUTHORIZED</div>
-            <div class="stage-desc">Owner EIP-712 Grant</div>
-          </div>
-          <div class="flow-arrow">&rarr;</div>
-          <!-- Stage 3 -->
-          <div class="flow-stage">
-            <div class="stage-num">03</div>
-            <div class="stage-name">EXECUTED</div>
-            <div class="stage-desc">KeeperHub Calldata</div>
-          </div>
-          <div class="flow-arrow">&rarr;</div>
-          <!-- Stage 4 -->
-          <div class="flow-stage">
-            <div class="stage-num">04</div>
-            <div class="stage-name">PROVEN</div>
-            <div class="stage-desc">11/11 PoAA Verified</div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -196,49 +159,8 @@
       </div>
     </section>
 
-    <!-- ── 4. BOTTOM SECTION: KeeperHub Execution (Left) + PoAA Proof (Right) ── -->
-    <section class="overview-dyad">
-      <!-- LEFT: KEEPERHUB EXECUTION ("Can BULWARK execute?") -->
-      <div class="command-card bottom-card" id="keeperhubExecCard">
-        <div class="card-header-clean">
-          <div>
-            <span class="card-subtitle-tag">Can BULWARK execute?</span>
-            <h2 class="card-headline">KeeperHub Execution</h2>
-          </div>
-          <a href="/executions" class="nav-link" style="padding: 2px 8px; font-size: 11px;">Ledger &rarr;</a>
-        </div>
-        <div id="executionsList" class="exec-focal-card">
-          <div class="card"><span class="card-key">Loading executions...</span></div>
-        </div>
-      </div>
-
-      <!-- RIGHT: PoAA / PROOF ("Can anyone prove it?") -->
-      <div class="command-card bottom-card poaa-card" id="poaaProofCard">
-        <div class="card-header-clean">
-          <div>
-            <span class="card-subtitle-tag highlight">Can anyone prove it?</span>
-            <h2 class="card-headline">Proof of Authorized Agency</h2>
-          </div>
-          <span class="chip chip-policy">Independent Invariant</span>
-        </div>
-        <div class="poaa-hero-body">
-          <div class="poaa-hero-title">PROOF OF AUTHORIZED AGENCY</div>
-          <div class="poaa-hero-score">11 / 11</div>
-          <div class="poaa-hero-verdict">VERIFIED</div>
-          <p class="poaa-hero-desc">
-            Independent mathematical and cryptographic verification that autonomous actions remained strictly within owner-authorized boundaries.
-          </p>
-          <div class="poaa-hero-action">
-            <a href="/verify" class="btn-primary" style="text-decoration: none;">
-              <span>View Full Proof / Independent Verifier</span>
-              <span>&rarr;</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Hidden audit container for app.js state persistence -->
+    <!-- Hidden containers for background data persistence -->
+    <div id="executionsList" style="display: none;"></div>
     <div id="auditList" style="display: none;"></div>
   </main>
 

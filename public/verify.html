@@ -69,37 +69,131 @@
   </div>
 
   <div class="page-container">
-    <div class="verify-container" style="max-width: 820px; margin: 0 auto; width: 100%;">
-      <div class="verify-box">
-        <h2 style="margin-bottom: 8px; font-size: 16px;">Proof of Authorized Agency (PoAA) Independent Verifier</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 12px;">
-          Verify mathematical and factual proof that the autonomous agent acted strictly within owner-authorized limits.
-          Evaluates the 11-check cryptographic and on-chain verification chain.
-          <strong>No login, no trust in the desk required.</strong>
+    <!-- Header Row -->
+    <div class="page-header-row">
+      <div class="page-title-group">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <span class="chip chip-policy">Independent Cryptographic Invariant</span>
+          <span class="chip chip-chain">Base Sepolia 84532</span>
+          <span class="chip chip-keeperhub">Deterministic Evaluation</span>
+        </div>
+        <h2 class="page-title">
+          <span>Proof of Authorized Agency (PoAA) Independent Verifier</span>
+        </h2>
+        <p class="page-subtitle">
+          Independent mathematical and cryptographic verification that autonomous actions remained strictly within owner-authorized boundaries. Evaluates 11 deterministic checks against cryptographic signatures, on-chain state transitions, and zero secret leakage constraints without trusting any server.
         </p>
+      </div>
+      <div class="page-actions">
+        <button id="loadLiveProofBtn" class="btn-secondary" style="font-size: 12px; padding: 10px 18px; border-color: rgba(16, 185, 129, 0.4); color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.06); cursor: pointer;">
+          Load Live On-Chain Rescue Proof
+        </button>
+        <button id="verifyBtn" class="btn-primary" style="font-size: 12px; padding: 10px 20px; cursor: pointer;">
+          Verify 11/11 Checks &rarr;
+        </button>
+      </div>
+    </div>
 
-        <label style="font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;">
-          Paste PoAA JSON Bundle or Upload File:
-        </label>
-        <textarea id="bundleText" class="bundle-input" placeholder='Paste full PoaaBundle JSON here (e.g. { "bundleVersion": "2.0", "grant": {...}, ... })'></textarea>
+    <!-- Summary Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Verification Score</span>
+        <span id="statScoreVal" class="stat-value" style="color: var(--accent-emerald);">11 / 11</span>
+        <span class="stat-sub">Deterministic proofs evaluated</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Invariant Trust Model</span>
+        <span class="stat-value">Zero Server Trust</span>
+        <span class="stat-sub">Full client-side offline validation</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Provenance Sources</span>
+        <span class="stat-value" style="color: var(--accent);">5 Fact Types</span>
+        <span class="stat-sub">Chain &bull; KeeperHub &bull; State &bull; Agent &bull; Bookkeeping</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Safety Floor Clamping</span>
+        <span class="stat-value">1.500 HF Floor</span>
+        <span class="stat-sub">Zero-revert simulation policy</span>
+      </div>
+    </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="file" id="fileInput" accept=".json" style="color: var(--text-muted); font-size: 11px;">
-            <button id="loadLiveProofBtn" class="btn-secondary" style="font-size: 11px; padding: 6px 12px; border-color: #10b981; color: #10b981;">⚡ Load Live On-Chain Rescue Proof</button>
+    <!-- Main Workspace -->
+    <div class="verify-layout-grid">
+      <!-- Left / Primary: Attestation Bundle Input -->
+      <div class="verify-card main-verify-panel">
+        <div class="verify-panel-header">
+          <div>
+            <span class="card-subtitle-tag highlight">EIP-712 Attestation Artifact</span>
+            <h3 class="verify-panel-title">PoAA JSON Bundle Input</h3>
           </div>
-          <button id="verifyBtn" class="btn-primary">Verify 11/11 Checks</button>
+          <div class="verify-input-actions">
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+            <button type="button" onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="font-size: 11px; padding: 6px 14px; cursor: pointer;">
+              Choose File (.json)
+            </button>
+            <span id="fileNameDisplay" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">No file chosen (or paste JSON below)</span>
+          </div>
+        </div>
+
+        <textarea id="bundleText" class="bundle-input" placeholder='Paste full PoaaBundle JSON here (e.g. { "bundleVersion": "2.0", "grant": {...}, "executionReceipt": {...} })'></textarea>
+      </div>
+
+      <!-- Right: Verification Pipeline Guide -->
+      <div class="verify-card side-info-panel">
+        <div class="verify-panel-header">
+          <div>
+            <span class="card-subtitle-tag">11-Step Mathematical Invariants</span>
+            <h3 class="verify-panel-title">Verification Pipeline</h3>
+          </div>
+          <span class="chip chip-policy">Audit Standard</span>
+        </div>
+        <div class="pipeline-steps-list">
+          <div class="pipeline-step-item">
+            <span class="step-badge">01-03</span>
+            <div>
+              <strong class="step-heading">Cryptographic Grant Authority</strong>
+              <p class="step-detail">EIP-712 hash verification, owner signature integrity, non-expired validity windows.</p>
+            </div>
+          </div>
+          <div class="pipeline-step-item">
+            <span class="step-badge">04-06</span>
+            <div>
+              <strong class="step-heading">Policy Invariant Clamping</strong>
+              <p class="step-detail">Per-action capital ceiling ($25 limit), total capital cap, health factor buffer floor (HF &ge; 1.05 &rarr; 1.50).</p>
+            </div>
+          </div>
+          <div class="pipeline-step-item">
+            <span class="step-badge">07-09</span>
+            <div>
+              <strong class="step-heading">KeeperHub Calldata & Dual Receipts</strong>
+              <p class="step-detail">Zero-revert simulation proof, matching target protocol recipient, on-chain execution receipt hash.</p>
+            </div>
+          </div>
+          <div class="pipeline-step-item">
+            <span class="step-badge">10-11</span>
+            <div>
+              <strong class="step-heading">Zero Leakage & Non-Repudiation</strong>
+              <p class="step-detail">Secret redact verification, immutable bundle hash linking with public ledger.</p>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Verdict Result Banner -->
-      <div id="verdictBanner" style="display: none; margin-top: 16px;" class="verdict-banner"></div>
+    <!-- Verdict Result Banner -->
+    <div id="verdictBanner" style="display: none;" class="verdict-banner"></div>
 
-      <!-- 11 Checks List -->
-      <div id="checksList" style="display: none; margin-top: 16px;" class="verify-box">
-        <h3 style="margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Verification Breakdown</h3>
-        <div id="checksContainer"></div>
+    <!-- 11 Checks List -->
+    <div id="checksList" style="display: none;" class="verify-card">
+      <div class="verify-panel-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 8px;">
+        <div>
+          <span class="card-subtitle-tag highlight">Detailed Cryptographic Breakdown</span>
+          <h3 class="verify-panel-title">11-Check Invariant Results</h3>
+        </div>
+        <span class="chip chip-policy" id="verdictChip">PROVEN</span>
       </div>
+      <div id="checksContainer" class="checks-grid"></div>
     </div>
   </div>
 
