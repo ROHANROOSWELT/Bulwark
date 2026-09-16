@@ -700,7 +700,9 @@ export class BulwarkGuardian {
 
     // 1. Check state-bound invalidations on all currently ARMED grants
     const activeGrants = await this.store.getGrants();
-    const armedGrants = activeGrants.filter((g) => g.state.status === "armed");
+    const armedGrants = activeGrants.filter(
+      (g) => g.state.status === "armed" && (g.position.chainId === this.config.chainId || !g.position.chainId)
+    );
 
     for (const grant of armedGrants) {
       const snap = await getCachedSnap(grant.position.positionOwner, grant.position.chainId);
@@ -726,6 +728,15 @@ export class BulwarkGuardian {
           await this.store.releaseCapacity(grant.grantId);
           await this.store.saveGrant(invGrant);
           invalidated++;
+        }
+      } else {
+        // Invariant checks passed: Position is below critical trigger threshold and armed for rescue.
+        // Autonomously execute rescue without requiring human operator intervention!
+        try {
+          await this.executeGrant(grant.grantId);
+          executed++;
+        } catch {
+          // If simulation reverts or execution fails, grant is transitioned safely inside executeGrant
         }
       }
     }

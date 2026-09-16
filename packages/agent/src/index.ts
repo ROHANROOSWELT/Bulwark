@@ -634,6 +634,7 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
           options: {
             once: { type: "boolean", default: false },
             interval: { type: "string" },
+            borrower: { type: "string" },
           },
           strict: false,
         });
@@ -641,8 +642,12 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
         const guardian = new BulwarkGuardian();
         await guardian.init();
 
-        log("[AGENT OUTPUT] Starting Bulwark Guardian loop...");
-        const result = await guardian.tick([]);
+        const defaultWatchlist = ["0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123"];
+        const targetBorrower = (values.borrower as string) || (args[1] && args[1].startsWith("0x") ? args[1] : undefined);
+        const watchlist = targetBorrower ? [targetBorrower] : defaultWatchlist;
+
+        log(`[AGENT OUTPUT] Starting Bulwark Guardian loop for ${watchlist.length} borrower(s)...`);
+        const result = await guardian.tick(watchlist);
         log(`[POLICY INVARIANT] Guardian tick result: Scanned=${result.scanned}, Proposed=${result.proposed}, Executed=${result.executed}, Invalidated=${result.invalidated}`);
         return 0;
       }

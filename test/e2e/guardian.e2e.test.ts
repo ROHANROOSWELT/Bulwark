@@ -205,4 +205,47 @@ describe("BulwarkGuardian Full Lifecycle E2E (FIXTURE Suite)", () => {
     expect(updated?.state.status).toBe("invalidated");
     expect(updated?.state.invalidationReason).toBe("recovered");
   });
+
+  it("tick autonomously executes rescue when armed position breaches critical trigger without human intervention", async () => {
+    const config = loadConfig({ BULWARK_STORE_DIR: testDir });
+    const store = new BulwarkStore(testDir);
+    await store.init();
+    await store.syncDeskBalance("0xdesk", 100.0);
+
+    const guardian = new BulwarkGuardian({
+      config,
+      store,
+      reader: createMockReader(),
+      client: createMockClient(false),
+    });
+
+    // 1. Borrower pre-authorizes agency in advance (signing EIP-712 RescueGrant)
+    const proposed = await guardian.proposeRescueGrant(user);
+    const armed = await guardian.approveGrant(proposed.grantId, user);
+    expect(armed.state.status).toBe("armed");
+
+    // 2. Position is in danger: currentHf = 1.18 < hfTriggerBelow (1.20)
+    currentHf = 1.18;
+
+    // 3. Autonomous Daemon Tick runs (zero human button clicks)
+    const tickRes = await guardian.tick();
+    expect(tickRes.executed).toBe(1);
+
+    // 4. Verify the grant reached 'verified' status autonomously on-chain
+    const executedGrant = await store.getGrant(proposed.grantId);
+    expect(executedGrant?.state.status).toBe("verified");
+    expect(executedGrant?.state.executionCount).toBe(1);
+
+    // 5. Verify dual-receipt execution record and PoAA bundle
+    const executions = await store.getExecutions();
+    expect(executions.length).toBe(1);
+    expect(executions[0]!.status).toBe("verified");
+    expect(executions[0]!.txHash).toBe("0x" + "c".repeat(64));
+
+    const latestProof = await store.getProofBundle(proposed.grantId);
+    expect(latestProof).toBeDefined();
+    const poaa = guardian.verifyProof(latestProof!);
+    expect(poaa.verdict).toBe("PROVEN");
+    expect(poaa.passedCount).toBe(11);
+  });
 });

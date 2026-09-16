@@ -209,7 +209,9 @@ export class BulwarkStore {
   public async saveExecution(record: ExecutionRecord): Promise<void> {
     await this.init();
     const execs = await this.getExecutions();
-    const idx = execs.findIndex((e) => e.executionId === record.executionId);
+    const idx = execs.findIndex(
+      (e) => e.executionId === record.executionId || (e.grantId === record.grantId && e.status === "submitted")
+    );
     if (idx >= 0) {
       execs[idx] = record;
     } else {

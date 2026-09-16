@@ -15,7 +15,7 @@
 
 [![DoraHacks](https://img.shields.io/badge/DoraHacks-KeeperHub%20Hackathon%202026-blueviolet?style=for-the-badge)](https://dorahacks.io/hackathon/keeperhub)
 [![Track](https://img.shields.io/badge/Track-Best%20Integration%20into%20a%20Live%20Project-FF5722?style=for-the-badge)](#)
-[![Tests](https://img.shields.io/badge/Vitest-1%2C307%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
+[![Tests](https://img.shields.io/badge/Vitest-1%2C308%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8%20Strict-3178C6?style=for-the-badge&logo=typescript)](tsconfig.base.json)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20($17.4B%20TVL)-2EBAC6?style=for-the-badge)](https://aave.com)
@@ -42,7 +42,7 @@
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
 | 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(⚠️ REPLACE with final recorded YouTube/Loom link before submitting)* | 🟡 Record & Upload Required |
-| ⚡ **3. KeeperHub On-Chain Tx** | [**BaseScan Live Rescue Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Live Rescue Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Blocks 46859912 & 46823633)** |
+| ⚡ **3. KeeperHub On-Chain Tx** | [**Autonomous Rescue Tx #3 (`0x61c57...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5), [**Tx #4 (`0xc26cd...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [**Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Base Sepolia Blocks 46906929, 46906960, 46859912, 46823633)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
 
@@ -73,7 +73,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 
 #### **3. Testnet or mainnet?**
 * **Primary Verified Testnets:**
-  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescues executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`), mined in blocks `46859912` and `46823633`.
+  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescues executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`), mined in blocks `46906960`, `46906929`, `46859912`, and `46823633`.
   - **Ethereum Sepolia Testnet (Chain ID: `11155111`)**: Live pre-approval, token reader, and oracle verification against Aave V3 Sepolia Pool (`0x6Ae43d041c5E8AEe1117f170400777174e508F87`).
 * **Production Architecture:** The codebase is natively chain-agnostic. Pre-configured contracts and RPC adapters are implemented for **Base Mainnet (Chain ID: `8453`)** and **Ethereum Mainnet (Chain ID: `1`)**.
 
@@ -96,10 +96,10 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 | Rubric Criterion | How BULWARK Addresses It | Verifiable Evidence |
 | :--- | :--- | :--- |
 | **1. Integration Depth** | Deep, protocol-native integration with **Aave V3** ($17.4B TVL). Decodes live borrower account data, computes closed-form repayment ladders, reads Chainlink oracle feeds, and compiles exact `IPool.repay(...)` calldata. | Real Aave V3 Base Sepolia Pool (`0x8bAB...aE27`); verified live on-chain. |
-| **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Two live on-chain debt rescues were executed on Base Sepolia with gas sponsorship. | Tx [`0xfabb40aa...`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [`0x43dbc027...`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16). |
+| **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Live on-chain debt rescues were executed autonomously on Base Sepolia with gas sponsorship. | Tx [`0x61c5754c...`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5), [`0xc26cd5b6...`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [`0xfabb40aa...`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [`0x43dbc027...`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16). |
 | **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; deterministic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
 | **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores $HF \ge 2.00$ without over-repaying. |
-| **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,307 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
+| **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,308 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
 
 ## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
 
@@ -112,13 +112,17 @@ All transactions are publicly verifiable on public block explorers:
 
 | Action | Chain | Target Contract / Asset | Transaction Hash / Explorer Link | Block | Gas Used | Status |
 | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
-| 🚀 **Live Debt Rescue #2 (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) | `46859912` | `180,896` | **MINED (Success)** |
-| 🚀 **Live Debt Rescue #1 (Pool.repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | `46823633` | `180,896` | **MINED (Success)** |
+| 🤖 **Autonomous Daemon Rescue #4 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f) | `46906960` | `180,896` | **MINED (Success)** |
+| 🤖 **Autonomous Daemon Rescue #3 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5) | `46906929` | `180,896` | **MINED (Success)** |
+| 🚀 **Live Debt Rescue #2 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) | `46859912` | `180,896` | **MINED (Success)** |
+| 🚀 **Live Debt Rescue #1 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | `46823633` | `180,896` | **MINED (Success)** |
+| 🤖 **Gemini 3.5 Autonomous MCP Broadcast** | **Base Sepolia (84532)** | Target Contract (`0x5af5...f07d`) | [`0xb9e5cb24e4f9fa4b150f44e44e771f2d49e0bfd0cb2e3be7e79a553523cfbe5c`](https://sepolia.basescan.org/tx/0xb9e5cb24e4f9fa4b150f44e44e771f2d49e0bfd0cb2e3be7e79a553523cfbe5c) | `46905134` | `48,146` | **MINED (Success)** |
+| ⚡ **KeeperHub Direct MCP Execution** | **Base Sepolia (84532)** | Target Contract (`0x5af5...f07d`) | [`0x2f292f504fd0b7a81660455d9c19ae010eb9b266413ff9014066e92eb53997ea`](https://sepolia.basescan.org/tx/0x2f292f504fd0b7a81660455d9c19ae010eb9b266413ff9014066e92eb53997ea) | `46905063` | `48,146` | **MINED (Success)** |
 | 💧 **Autonomous Liquidity Mint** | **Base Sepolia (84532)** | Aave Faucet (`0xD914...A6Dc`) | [`0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451`](https://sepolia.basescan.org/tx/0xf8ef28aba0c3c1977d5d471ca24da0cfccd2a00985b29fb4019cf023ee079451) | `46823460` | `105,420` | **MINED (Success)** |
 | 🔑 **Relayer Pre-Approval (USDC)** | **Base Sepolia (84532)** | USDC (`0xba50...d4d5f`) | [`0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b`](https://sepolia.basescan.org/tx/0xbe775e9e503f2dcf9287d115887c0e2aa04479e63abeece21c2ac631a4add33b) | `46823420` | `48,210` | **MINED (Success)** |
 | 🔑 **Relayer Pre-Approval (USDC)** | **Sepolia (11155111)** | USDC (`0x94a9...E4C8`) | [`0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888`](https://sepolia.etherscan.io/tx/0xe503a122ec85c59b29d4fd91cf04b79de2681cefae33b2a1de195eff54faf888) | `9186210` | `49,150` | **MINED (Success)** |
 
-* **KeeperHub Execution Records:** [`l970z8w4g4duxj9baub4m`](https://app.keeperhub.com/executions/l970z8w4g4duxj9baub4m) & [`vp4sp6951ipz00q2b65bv`](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv)
+* **KeeperHub Execution Records:** [`e74rcjzawd1pftopcwt3v`](https://app.keeperhub.com/executions/e74rcjzawd1pftopcwt3v), [`zrifs7n8qe5oufxk1eq8r`](https://app.keeperhub.com/executions/zrifs7n8qe5oufxk1eq8r), [`l970z8w4g4duxj9baub4m`](https://app.keeperhub.com/executions/l970z8w4g4duxj9baub4m) & [`vp4sp6951ipz00q2b65bv`](https://app.keeperhub.com/executions/vp4sp6951ipz00q2b65bv)
 * **Borrower Account Protected:** `0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123`
 * **KeeperHub Autonomous Relayer Account:** `0x83b65e22a94446790283bf2a1e579fdbd809d714`
 
@@ -269,53 +273,99 @@ sequenceDiagram
 
 ---
 
-## 4. System Architecture & 90-Second Mechanism Flow
+## 4. System Architecture & Autonomous Mechanism Flow
 
 ```
-┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       BULWARK ARCHITECTURE                                             │
-├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                                        │
-│    AAVE V3 PROTOCOL                    BULWARK DESK (AGENT LAYER)              KEEPERHUB INFRASTRUCTURE│
-│  ┌───────────────────────┐            ┌─────────────────────────────┐         ┌──────────────────────┐ │
-│  │ Aave Pool (Sepolia)   │◄───────────┤ Guardian Orchestrator       │         │ Turnkey Key Custody  │ │
-│  │ getUserAccountData    │  Chain Read│  • Aave Position Reader     │         │ Automated Nonces     │ │
-│  │ Debt & Collateral     │            │  • Counterfactual Ladder    │         │ Gas Re-pricing       │ │
-│  └──────────┬────────────┘            │  • Risk Telemetry           │         └──────────┬───────────┘ │
-│             │                         └──────────────┬──────────────┘                    │             │
-│             │ Health Factor                          │ Intent Formulation                │ Broadcast   │
-│             ▼                                        ▼                                   ▼             │
-│  ┌───────────────────────┐            ┌─────────────────────────────┐         ┌──────────────────────┐ │
-│  │ Emergency Condition:  │            │ Deterministic Policy Engine │         │ Private Mempool      │ │
-│  │ HF < 1.25 Threshold   ├───────────►│  • Clamp Intent to Caps     ├────────►│ Direct Contract Call │ │
-│  └───────────────────────┘            │  • Invalidation Gate        │         │ POST /execute        │ │
-│                                       │  • authorityHash Digest     │         └──────────┬───────────┘ │
-│                                       └──────────────┬──────────────┘                    │             │
-│                                                      │                                   │             │
-│                                                      ▼                                   ▼             │
-│                                       ┌─────────────────────────────┐         ┌──────────────────────┐ │
-│                                       │ Dual Receipt Verifier       │◄────────┤ Transaction Receipt  │ │
-│                                       │ KeeperHub + Public RPC Read │         │ Gas Used, Logs, Block│ │
-│                                       └──────────────┬──────────────┘         └──────────────────────┘ │
-│                                                      │                                                 │
-│                                                      ▼                                                 │
-│                                       ┌─────────────────────────────┐                                  │
-│                                       │ Proof of Authorized Agency  │                                  │
-│                                       │ Public /verify Portal       │                                  │
-│                                       │ 11/11 Cryptographic Checks  │                                  │
-│                                       └─────────────────────────────┘                                  │
-└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       BULWARK AUTONOMOUS ARCHITECTURE                                            │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                                  │
+│    AAVE V3 ON-CHAIN PROTOCOL              BULWARK AUTONOMOUS AGENT LAYER                KEEPERHUB INFRASTRUCTURE │
+│  ┌───────────────────────────┐         ┌──────────────────────────────────────┐       ┌────────────────────────┐ │
+│  │ Aave V3 Pool              │         │ 1. Autonomous Daemon Watcher         │       │ Turnkey Key Custody    │ │
+│  │ (Base Sepolia & Sepolia)  │◄────────┤  • `bulwark-agent guard`             │       │ Automated Nonces       │ │
+│  │ getUserAccountData()      │  Direct │  • REST `POST /api/tick` (Azure VM)  │       │ Gas Re-pricing         │ │
+│  │ Debt & Collateral State   │   Read  │  • Watchlist Position Ingestion      │       └───────────┬────────────┘ │
+│  └─────────────┬─────────────┘         └──────────────────┬───────────────────┘                   │              │
+│                │                                          │                                       │              │
+│                │ Health Factor Snapshot                   │ Breaches HF Trigger (< 1.35)          │              │
+│                ▼                                          ▼                                       │              │
+│  ┌───────────────────────────┐         ┌──────────────────────────────────────┐                   │              │
+│  │ Emergency Trigger:        │         │ 2. Gemini 3.5 AI Underwriter         │                   │              │
+│  │ HF < Critical Threshold   ├────────►│  • 44 KeeperHub MCP Tools Loaded     │                   │              │
+│  │ (e.g. HF < 1.35 Floor)    │         │  • Evaluates Candidate Rescue Plans  │                   │              │
+│  └───────────────────────────┘         │  • Autonomous Strategy Selection     │                   │              │
+│                                        └──────────────────┬───────────────────┘                   │              │
+│                                                           │                                       │              │
+│                                                           │ Candidate Intent                      │              │
+│                                                           ▼                                       │              │
+│                                        ┌──────────────────────────────────────┐                   │              │
+│                                        │ 3. Clamp-Only Policy Compiler        │                   │              │
+│                                        │  • Pre-Authorized EIP-712 Agency     │                   │              │
+│                                        │  • Math Clamp: ΔDebt Targeting Eq.   │                   │              │
+│                                        │  • authorityHash Digest Anchoring    │                   │              │
+│                                        └──────────────────┬───────────────────┘                   │              │
+│                                                           │                                       │              │
+│                                                           │ Clamped Action Payload                │              │
+│                                                           ▼                                       │              │
+│                                        ┌──────────────────────────────────────┐                   │              │
+│                                        │ 4. Pre-Flight Simulation Gate        │                   │ Broadcast    │
+│                                        │  • KeeperHub `simulate: true`        ├──────────────────►│ (Simulate)   │
+│                                        │  • Asserts `wouldRevert === false`   │                   │              │
+│                                        └──────────────────┬───────────────────┘                   │              │
+│                                                           │                                       │              │
+│                                                           │ Simulation Verified Safe              │              │
+│                                                           ▼                                       ▼              │
+│                                        ┌──────────────────────────────────────┐       ┌────────────────────────┐ │
+│                                        │ 5. Autonomous Broadcast Engine       │       │ Private Mempool        │ │
+│                                        │  • `simulate: false`                 ├──────►│ Direct Contract Call   │ │
+│                                        │  • SHA-256 Idempotency-Key Guard     │       │ POST /api/execute      │ │
+│                                        └──────────────────┬───────────────────┘       └───────────┬────────────┘ │
+│                                                           │                                       │              │
+│                                                           │ Polls Execution Status                │ Receipts     │
+│                                                           ▼                                       ▼              │
+│                                        ┌──────────────────────────────────────┐       ┌────────────────────────┐ │
+│                                        │ 6. Dual-Receipt On-Chain Verifier    │◄──────┤ Transaction Receipts   │ │
+│                                        │  • KeeperHub Receipt Match           │       │ Block, Gas, Log Proofs │ │
+│                                        │  • Independent Base Sepolia RPC Match│       └────────────────────────┘ │
+│                                        │  • Verifies Post-HF Improvement      │                                  │
+│                                        └──────────────────┬───────────────────┘                                  │
+│                                                           │                                                      │
+│                                                           ▼                                                      │
+│                                        ┌──────────────────────────────────────┐                                  │
+│                                        │ 7. Proof of Authorized Agency (PoAA) │                                  │
+│                                        │  • Public `/verify` Portal Validator │                                  │
+│                                        │  • 11/11 Mathematical Checks PROVEN  │                                  │
+│                                        └──────────────────────────────────────┘                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### The 8-Step Lifecycle
-1. **Read:** Guardian reads borrower collateral ($C$) and debt ($D$) directly from Aave v3 Pool contract.
-2. **Underwrite:** Bounded underwriter calculates counterfactual ladder and quotes dynamic premium.
-3. **Propose:** Borrower creates a `RescueGrant` specifying health factor bands, grant ceilings, and expiry.
-4. **Approve:** Position owner approves the grant via Web UI or CLI (`bulwark grants approve`). Status becomes `ARMED`.
-5. **Compile:** Policy Compiler clamps proposed intent to the active band ceiling and signs `authorityHash`.
-6. **Simulate:** KeeperHub dry-runs the payload with `simulate: true`, confirming zero execution reverts.
-7. **Execute:** KeeperHub signs via Turnkey and broadcasts to the private mempool with an `Idempotency-Key`.
-8. **Prove:** The dual-receipt verifier constructs a cryptographic bundle and uploads it to the public `/verify` portal.
+### The 6-Stage Autonomous Lifecycle
+
+```mermaid
+flowchart TD
+    A["1. Continuous Scanner Daemon\n(bulwark-agent guard / POST /api/tick)"] --> B["2. On-Chain Position Ingestion\n(Aave V3 Base Sepolia & Sepolia)"]
+    B --> C{"Health Factor < Critical Floor?\n(e.g., HF < 1.35)"}
+    C -- No --> A
+    C -- Yes --> D["3. Gemini AI Underwriter\n(Plan Selection: Repay / Flash-Deleverage)"]
+    D --> E["4. Policy Invariant Clamp\nΔDebt = TotalDebt - (Collateral × LiqThresh)/1.500"]
+    E --> F["5. Pre-Flight KeeperHub Simulation\n(simulate: true)"]
+    F --> G{"Simulation Success?\n(wouldRevert == false)"}
+    G -- Reverts --> H["Abort & Log Reason\n(Zero Gas Wasted)"]
+    G -- Safe --> I["6. Autonomous KeeperHub Broadcast\n(simulate: false + Idempotency-Key)"]
+    I --> J["Dual-Receipt On-Chain Verification\n(KeeperHub + Independent RPC)"]
+    J --> K["11-Invariant PoAA Bundle Generated\n(Verdict: PROVEN)"]
+```
+
+### Detailed Lifecycle Stages:
+1. **Continuous Ingestion:** Guardian daemon queries Aave V3 `getUserAccountData` on Base Sepolia (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`) or Ethereum Sepolia via RPC and KeeperHub views.
+2. **AI Underwriting:** When a position drops below critical threshold ($HF < 1.35$), Gemini 3.5 Flash-Lite evaluates candidate recovery strategies (`repay`, `flash-deleverage`, `add-collateral`) using 44 KeeperHub MCP tools and outputs an underwriter narrative.
+3. **Pre-Authorized Agency:** Borrowers pre-authorize rescue limits via EIP-712 RescueGrants. The Policy Compiler mathematically clamps the proposed action:
+   $$\Delta \text{Debt}^* = D - \frac{C \cdot L}{1.500}$$
+   Ensuring target $HF \ge 1.500$ without ever exceeding borrower-approved capital caps or desk available capacity.
+4. **Pre-Flight Simulation:** Executes pre-flight dry-run via KeeperHub with `simulate: true`. If the transaction would revert (e.g., no debt or slippage), execution immediately halts with zero gas burned.
+5. **Autonomous Broadcast:** Dispatches transaction with `simulate: false` and a deterministic `Idempotency-Key` (`sha256(grantId:authorityHash:nonce)`), routing to private mempools via Turnkey signers.
+6. **Dual-Receipt Verification & PoAA:** Confirms receipt across both KeeperHub and independent Base Sepolia RPC nodes, verifies $HF_{\text{post}} > HF_{\text{pre}}$, and emits an exportable 11-check PoAA bundle.
 
 ---
 
@@ -510,16 +560,23 @@ BULWARK is fully aligned with the official DoraHacks **KeeperHub - The Agent Eco
 - **Quota Safeguards:** Strict protection against the 500 requests/day free tier limit is enforced via an in-memory triage cache (2-minute TTL) and a daily budget cap (`DAILY_MAX = 480`) with automatic graceful fallback to deterministic math on HTTP 429.
 
 ```bash
-# 1. Fully Autonomous On-Chain Inspection & Rescue Simulation via Gemini + MCP (Zero Human Intervention)
+# 1. Continuous Autonomous Daemon Loop (Zero Human Clicks)
+# Monitors watchlist on Base Sepolia, underwrites via Gemini, clamps invariants, and executes:
+npm run agent -- guard --once
+
+# Or run continuous background interval watcher:
+npm run agent -- guard --interval 30
+
+# 2. Fully Autonomous On-Chain Inspection & Rescue Simulation via Gemini + MCP
 npm run agent -- auto-transact 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 
-# 2. Free-Form Autonomous DeFi Transaction via MCP
+# 3. Free-Form Autonomous DeFi Transaction via MCP
 npm run agent -- transact "Inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute a simulated Aave V3 rescue repayment"
 
-# 3. Direct Natural Language MCP Tool-Calling
+# 4. Direct Natural Language MCP Tool-Calling
 npm run agent -- ask "What is our current KeeperHub daily spending limit?"
 
-# 4. End-to-End Agent Workflow Composition & Schema Validation
+# 5. End-to-End Agent Workflow Composition & Schema Validation
 npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 
 # Detailed Test & Audit Report:
@@ -566,16 +623,16 @@ pnpm --filter @bulwark/cli exec bulwark audit export --out audit-bundle.json
 
 ## 10. Comprehensive Verification & Testing Matrix
 
-BULWARK features **1,307 actual, non-mocked, passing tests** across 36 test files. Every test executes real cryptographic hashing, ABI serialization, BigInt math, Gemini MCP tool-calling, or auction ordering.
+BULWARK features **1,308 actual, non-mocked, passing tests** across 36 test files. Every test executes real cryptographic hashing, ABI serialization, BigInt math, Gemini MCP tool-calling, or auction ordering.
 
 ```
 ══════════════════════════════════════════════════════════════════════════════════════
                             BULWARK VERIFICATION SUITE
 ══════════════════════════════════════════════════════════════════════════════════════
   Test Files : 36 passed (36)
-  Tests      : 1,307 passed (1,307)
+  Tests      : 1,308 passed (1,308)
   Skipped    : 0 skipped (All live tests assert real contract security boundaries)
-  Duration   : 33.23s
+  Duration   : 32.01s
 ══════════════════════════════════════════════════════════════════════════════════════
 ```
 
@@ -593,13 +650,13 @@ BULWARK features **1,307 actual, non-mocked, passing tests** across 36 test file
 | [`gemini.autonomous.mcp.test.ts`](test/e2e/gemini.autonomous.mcp.test.ts) | E2E / AI | **3** | Gemini 3.5 + 44 KeeperHub MCP tools autonomous transaction, position read, & function calling. |
 | [`security.test.ts`](test/security/security.test.ts) | Security | **8** | LLM prompt injection immunity, re-entrancy, underwriter frontrunning, & replay guards. |
 | [`plans.test.ts`](test/unit/plans.test.ts) | Math / AI | **9** | Pure math targeting, counterfactual ladder, and Google AI Studio REST triage. |
-| [`guardian.e2e.test.ts`](test/e2e/guardian.e2e.test.ts) | E2E | **3** | Full lifecycle: Propose $\to$ Approve $\to$ Arm $\to$ Dry Run $\to$ Execute $\to$ PoAA Proven. |
+| [`guardian.e2e.test.ts`](test/e2e/guardian.e2e.test.ts) | E2E | **4** | Full lifecycle: Propose $\to$ Approve $\to$ Arm $\to$ Dry Run $\to$ Autonomous Tick Execute $\to$ PoAA Proven. |
 | [`keeperhub.live.test.ts`](test/integration/keeperhub.live.test.ts) | Live | **4** | Real network chain query (Chain ID: 11155111) & unauthenticated barrier contract. |
 | [`guardian.live.e2e.test.ts`](test/e2e/guardian.live.e2e.test.ts) | Live | **1** | Real RPC reading against Aave v3 Sepolia contract (`0x6Ae43d04...`) (0 skips). |
 | [`mcp.live.test.ts`](test/integration/mcp.live.test.ts) | Live | **1** | Online/offline streamable MCP discovery without conditional skipping. |
 | [`cli.e2e.test.ts`](test/e2e/cli.e2e.test.ts) | E2E | **4** | Real CLI subprocess spawning and stderr/stdout exit code verification. |
 | **All Other Unit Suites** | Unit | **118** | Config, reader, oracle, receipts, capacity, reputation, store, and web server. |
-| **Total Test Suite** | Monorepo | **1,307** | **100% Passed · 0 Failed · 0 Skipped** |
+| **Total Test Suite** | Monorepo | **1,308** | **100% Passed · 0 Failed · 0 Skipped** |
 
 ---
 
@@ -642,9 +699,11 @@ Before submitting the DoraHacks form, replace the marked placeholders with your 
 | **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | ✅ Public & Up to date |
 | **Live App (Vercel)** | Production hosted web application | `https://bulwark-keeperhub.vercel.app` | ✅ Deployed & Operational |
 | **Public Verifier** | 11-Check PoAA Verification Portal | `https://bulwark-keeperhub.vercel.app/verify` | ✅ PROVEN (11/11 Checks) |
+| **Autonomous Tx #4** | BaseScan on-chain rescue transaction #4 | `0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f` | ✅ Mined in Block 46906960 |
+| **Autonomous Tx #3** | BaseScan on-chain rescue transaction #3 | `0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5` | ✅ Mined in Block 46906929 |
 | **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
 | **Executed Tx #1** | BaseScan on-chain rescue transaction #1 | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
-| **Execution IDs** | KeeperHub execution records | `l970z8w4g4duxj9baub4m`, `vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
+| **Execution IDs** | KeeperHub execution records | `e74rcjzawd1pftopcwt3v`, `zrifs7n8qe5oufxk1eq8r`, `l970z8w4g4duxj9baub4m`, `vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
 | **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | ⚠️ **Replace with final link before submitting** |
 | **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email |
 | **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
