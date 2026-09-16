@@ -192,7 +192,10 @@ describe("BULWARK Web Dashboard & Public /verify (P11)", () => {
   });
 
   it("handles POST /api/tick", async () => {
-    const res = await fetch(`${baseUrl}/api/tick`, { method: "POST" });
+    const operatorKey = process.env.BULWARK_OPERATOR_KEY;
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (operatorKey) headers["x-operator-key"] = operatorKey;
+    const res = await fetch(`${baseUrl}/api/tick`, { method: "POST", headers });
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.scanned).toBeDefined();
@@ -206,20 +209,24 @@ describe("BULWARK Web Dashboard & Public /verify (P11)", () => {
     });
     expect(grant.state.status).toBe("proposed");
 
+    const operatorKey = process.env.BULWARK_OPERATOR_KEY;
+    const authHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    if (operatorKey) authHeaders["x-operator-key"] = operatorKey;
+
     // 1. POST /api/grants/:id/approve
-    const approveRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/approve`, { method: "POST" });
+    const approveRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/approve`, { method: "POST", headers: authHeaders });
     expect(approveRes.status).toBe(200);
     const approvedData = await approveRes.json();
     expect(approvedData.state.status).toBe("armed");
 
     // 2. POST /api/grants/:id/dry
-    const dryRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/dry`, { method: "POST" });
+    const dryRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/dry`, { method: "POST", headers: authHeaders });
     expect(dryRes.status).toBe(200);
     const dryData = await dryRes.json();
     expect(dryData.wouldRevert).toBe(false);
 
     // 3. POST /api/grants/:id/revoke
-    const revokeRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/revoke`, { method: "POST" });
+    const revokeRes = await fetch(`${baseUrl}/api/grants/${grant.grantId}/revoke`, { method: "POST", headers: authHeaders });
     expect(revokeRes.status).toBe(200);
     const revokeData = await revokeRes.json();
     expect(revokeData.state.status).toBe("revoked");
