@@ -688,12 +688,22 @@ export class BulwarkGuardian {
     let executed = 0;
     let invalidated = 0;
 
+    // Per-tick snapshot cache to eliminate redundant RPC roundtrips for the same position
+    const snapshotCache = new Map<string, PositionSnapshot>();
+    const getCachedSnap = async (owner: string, chainId?: number) => {
+      const key = `${owner.toLowerCase()}:${chainId ?? this.config.chainId}`;
+      if (!snapshotCache.has(key)) {
+        snapshotCache.set(key, await this.scanPosition(owner, chainId));
+      }
+      return snapshotCache.get(key)!;
+    };
+
     // 1. Check state-bound invalidations on all currently ARMED grants
     const activeGrants = await this.store.getGrants();
     const armedGrants = activeGrants.filter((g) => g.state.status === "armed");
 
     for (const grant of armedGrants) {
-      const snap = await this.scanPosition(grant.position.positionOwner, grant.position.chainId);
+      const snap = await getCachedSnap(grant.position.positionOwner, grant.position.chainId);
       const cap = await this.store.getCapacity();
       const evalRes = evaluatePolicy(this.policy, grant, snap, cap.availableUsd);
 
@@ -723,7 +733,7 @@ export class BulwarkGuardian {
     // 2. Scan watchlist positions
     for (const userAddress of watchlist) {
       scanned++;
-      const snap = await this.scanPosition(userAddress);
+      const snap = await getCachedSnap(userAddress);
       if (snap.healthFactor > 0 && snap.healthFactor < this.config.policyHfCritical) {
         // Position below critical: propose grant if none active
         const existing = activeGrants.find(

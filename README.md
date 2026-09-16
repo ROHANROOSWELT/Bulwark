@@ -25,7 +25,7 @@
 
 ### **"Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."**
 
-[**Live Production App (Vercel)**](https://bulwark-keeperhub.vercel.app) • [**Public /verify Portal**](https://bulwark-keeperhub.vercel.app/verify) • [**Live On-Chain Proof**](#-live-on-chain-proof--verification-zero-mocks) • [**PoAA Verifier (11/11)**](#6-proof-of-authorized-agency-poaa-verification-engine) • [**Local Console**](http://localhost:4567)
+[**Live Production App (Vercel)**](https://bulwark-keeperhub.vercel.app) • [**Public /verify Portal**](https://bulwark-keeperhub.vercel.app/verify) • [**Persistent Azure Engine**](http://20.244.4.11) • [**Live On-Chain Proof**](#-live-on-chain-proof--verification-zero-mocks) • [**PoAA Verifier (11/11)**](#6-proof-of-authorized-agency-poaa-verification-engine) • [**Local Console**](http://localhost:4567)
 
 </div>
 
@@ -476,7 +476,8 @@ pnpm web
 ```
 Open your browser:
 * **Live Vercel Production:** [https://bulwark-keeperhub.vercel.app](https://bulwark-keeperhub.vercel.app)
-* **Operator Console:** [http://localhost:4567](http://localhost:4567)
+* **Persistent Azure Backend VM:** [http://20.244.4.11](http://20.244.4.11)
+* **Local Operator Console:** [http://localhost:4567](http://localhost:4567)
 * **Public Verifier:** [http://localhost:4567/verify](http://localhost:4567/verify)
 
 ### 6. Connect AI Agents via Model Context Protocol (MCP)
