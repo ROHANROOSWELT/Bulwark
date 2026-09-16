@@ -17,9 +17,9 @@
     "test:failure": "vitest run --config vitest.config.ts test/failure",
     "test:security": "vitest run --config vitest.config.ts test/security",
     "smoke": "bash scripts/smoke.sh",
-    "cli": "node packages/cli/dist/index.js",
-    "agent": "node packages/agent/dist/index.js",
-    "web": "node packages/web/dist/server.js"
+    "cli": "node --env-file-if-exists=.env packages/cli/dist/index.js",
+    "agent": "node --env-file-if-exists=.env packages/agent/dist/index.js",
+    "web": "node --env-file-if-exists=.env packages/web/dist/server.js"
   },
   "dependencies": {
     "@bulwark/core": "workspace:*",
