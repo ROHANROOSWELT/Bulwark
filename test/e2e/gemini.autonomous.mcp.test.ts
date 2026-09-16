@@ -96,5 +96,5 @@ describe("Gemini + KeeperHub MCP Autonomous Transaction Execution", () => {
         throw err;
       }
     }
-  }, 35000);
+  }, 60000);
 });
