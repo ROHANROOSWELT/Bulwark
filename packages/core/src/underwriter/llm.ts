@@ -54,30 +54,74 @@ export async function triageWithLlm(
   const timer = setTimeout(() => controller.abort(), 10_000);
 
   try {
-    const url = `${config.llmBaseUrl.replace(/\/$/, "")}/chat/completions`;
-    const res = await fetchFn(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.llmApiKey}`,
-      },
-      body: JSON.stringify({
-        model: config.llmModel,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userContent },
-        ],
-        temperature: 0.1,
-      }),
-      signal: controller.signal,
-    });
+    const isGoogleAiStudioNative =
+      config.llmBaseUrl.includes("generativelanguage.googleapis.com") &&
+      !config.llmBaseUrl.includes("/openai");
 
-    if (!res.ok) {
-      return quote; // Fallback to deterministic
+    let content: string | undefined;
+
+    if (isGoogleAiStudioNative) {
+      // ── Official Google AI Studio REST API (v1beta / models/{model}:generateContent) ──
+      const model = config.llmModel.startsWith("gemini") ? config.llmModel : "gemini-2.0-flash";
+      const url = `${config.llmBaseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`;
+
+      const res = await fetchFn(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": config.llmApiKey,
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: userContent }],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.1,
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        return quote; // Fallback to deterministic
+      }
+
+      const data = (await res.json()) as any;
+      content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    } else {
+      // ── Standard OpenAI-compatible format (OpenAI, OpenRouter, Groq, or Gemini /openai) ──
+      const url = `${config.llmBaseUrl.replace(/\/+$/, "")}/chat/completions`;
+      const res = await fetchFn(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.llmApiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.llmModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userContent },
+          ],
+          temperature: 0.1,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        return quote; // Fallback to deterministic
+      }
+
+      const data = (await res.json()) as any;
+      content = data?.choices?.[0]?.message?.content;
     }
-
-    const data = (await res.json()) as any;
-    const content = data?.choices?.[0]?.message?.content;
     if (!content) return quote;
 
     const parsed = JSON.parse(content) as LlmTriageResponse;

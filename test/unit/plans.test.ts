@@ -147,6 +147,44 @@ describe("Underwriter Pure Math & Counterfactual Ladder", () => {
     expect(triaged.selectionMode).toBe("DETERMINISTIC_CHEAPEST");
   });
 
+  it("supports Google AI Studio native REST API response format", async () => {
+    const quote = underwritePosition(sampleSnapshot, 35.0, 2.0);
+    const config = loadConfig({
+      GEMINI_API_KEY: "AIzaSyTestKey123",
+    });
+
+    const googleAiStudioFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+      expect(String(url)).toContain("models/gemini-2.0-flash:generateContent");
+      const headers = init?.headers as Record<string, string>;
+      expect(headers["x-goog-api-key"]).toBe("AIzaSyTestKey123");
+
+      return new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      choice: "plan_repay_optimal",
+                      narrative: "Google AI Studio Gemini 2.0 selected optimal plan.",
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    };
+
+    const triaged = await triageWithLlm(quote, config, googleAiStudioFetch);
+    expect(triaged.selectionMode).toBe("AGENT_SELECT");
+    expect(triaged.agentNarrative).toContain("Google AI Studio Gemini 2.0");
+    expect(triaged.selectedPlan.planId).toBe("plan_repay_optimal");
+  });
+
   it("calculates exact closed-form BigInt debt reduction targeting exact HF", () => {
     // C = 100 base, LT = 8000 (0.80), D = 70 base
     // Coverage = 100 * 0.80 = 80 base

@@ -60,8 +60,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BulwarkConfig 
 
   const rawLlmKey = env.BULWARK_LLM_API_KEY ?? env.GEMINI_API_KEY;
   const isGemini = Boolean(env.GEMINI_API_KEY || (rawLlmKey && rawLlmKey.startsWith("AIzaSy")));
-  const defaultBaseUrl = isGemini ? "https://generativelanguage.googleapis.com/v1beta/openai" : undefined;
-  const defaultModel = isGemini ? "gemini-1.5-flash" : "gpt-4o-mini";
+  const defaultBaseUrl = isGemini ? "https://generativelanguage.googleapis.com/v1beta" : undefined;
+  const defaultModel = isGemini ? "gemini-2.0-flash" : "gpt-4o-mini";
 
   return {
     keeperhubApiKey: env.KEEPERHUB_API_KEY && env.KEEPERHUB_API_KEY !== "kh_replace_me" ? env.KEEPERHUB_API_KEY : undefined,
