@@ -162,7 +162,7 @@ function renderState(data) {
             <span class="card-key">Authority Hash</span>
             <span class="card-val" style="font-family: var(--font-mono);">${grant.grantHash.slice(0, 12)}...</span>
           </div>
-          <div style="margin-top: 6px; font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 2px solid #38bdf8; line-height: 1.4;">
+          <div style="margin-top: 6px; font-size: 11px; color: #065f46; background: rgba(16, 185, 129, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 3px solid #10b981; line-height: 1.4;">
             <strong>🤖 Gemini 3.5 AI Underwriter:</strong> ${(grant.triage?.agentNarrative || data.grants.slice().reverse().find(g => g.triage?.agentNarrative)?.triage?.agentNarrative || "Autonomous risk underwriting active: Health factor deficit clamped within EIP-712 pre-authorization policy boundaries.").replace('[AGENT OUTPUT] ', '')}
           </div>
         </div>
