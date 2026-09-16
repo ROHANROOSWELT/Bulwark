@@ -521,6 +521,12 @@ export function startWebServer(port?: number, host = "0.0.0.0"): Promise<{ serve
       const actualPort = typeof address === "object" && address ? address.port : targetPort;
       console.log(`[POLICY INVARIANT] Bulwark Web Dashboard listening on http://${host}:${actualPort}`);
       console.log(`[POLICY INVARIANT] Public PoAA Verifier ready at http://${host}:${actualPort}/verify`);
+      const guardian = getDefaultGuardian();
+      const cfg = guardian.config;
+      const aiStatus = cfg.llmApiKey ? `Active (Google AI Studio: ${cfg.llmModel})` : "Disabled (Deterministic Fallback)";
+      console.log(`[AGENT OUTPUT] AI Underwriter: ${aiStatus}`);
+      console.log(`[KEEPERHUB FACT] KeeperHub API Key: ${guardian.client.hasKey() ? "Active" : "Not Set"}`);
+      console.log(`[CHAIN FACT] Network Chain ID: ${cfg.chainId}`);
       resolve({ server, port: actualPort });
     });
     server.on("error", reject);
