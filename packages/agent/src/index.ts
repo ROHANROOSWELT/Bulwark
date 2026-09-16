@@ -207,31 +207,44 @@ export class McpClient {
   }
 
   /**
-   * Calls a tool over MCP.
+   * Calls a tool over MCP with retry on temporary rate limits.
    */
   public async callTool<T = unknown>(
     toolName: string,
     args: Record<string, unknown> = {},
-    isPublic = false
+    isPublic = false,
+    retries = 2
   ): Promise<T> {
     if (!this.sessionId) {
       await this.initialize(isPublic);
     }
     const endpoint = isPublic ? "mcp/public" : "mcp";
-    const res = await this.sendRpc<{ content?: Array<{ type: string; text?: string }>; isError?: boolean }>(
-      endpoint,
-      "tools/call",
-      {
-        name: toolName,
-        arguments: args,
-      },
-      !isPublic
-    );
-    if (res && res.isError) {
-      const errorText = res.content?.map((c) => c.text).filter(Boolean).join("; ") || `Tool '${toolName}' execution returned error`;
-      throw new Error(`MCP tool error (${toolName}): ${errorText}`);
+    try {
+      const res = await this.sendRpc<{ content?: Array<{ type: string; text?: string }>; isError?: boolean }>(
+        endpoint,
+        "tools/call",
+        {
+          name: toolName,
+          arguments: args,
+        },
+        !isPublic
+      );
+      if (res && res.isError) {
+        const errorText = res.content?.map((c) => c.text).filter(Boolean).join("; ") || `Tool '${toolName}' execution returned error`;
+        if (retries > 0 && (errorText.includes("429") || errorText.includes("Rate limit"))) {
+          await new Promise((resolve) => setTimeout(resolve, 2500));
+          return this.callTool<T>(toolName, args, isPublic, retries - 1);
+        }
+        throw new Error(`MCP tool error (${toolName}): ${errorText}`);
+      }
+      return res as T;
+    } catch (err: any) {
+      if (retries > 0 && (err.message?.includes("429") || err.message?.includes("Rate limit"))) {
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        return this.callTool<T>(toolName, args, isPublic, retries - 1);
+      }
+      throw err;
     }
-    return res as T;
   }
 }
 
@@ -251,6 +264,8 @@ USAGE:
 
 COMMANDS:
   ask "<prompt>"                     Ask Gemini 3.5 AI with direct KeeperHub MCP tool calling
+  transact "<instruction>"           Autonomous Gemini transaction execution via MCP
+  auto-transact [address]            Fully autonomous on-chain inspection & simulation via Gemini + MCP
   compose [address]                  Agent composes rescue workflow via MCP & dry runs on-chain
   discover [--public] [--out <path>] Persist real MCP capability inventory
   validate <workflow.json>           Validate workflow using validate_workflow
@@ -330,7 +345,7 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
           return clean;
         }
 
-        const toolDefs = tools.slice(0, 35).map((t) => ({
+        const toolDefs = tools.map((t) => ({
           name: t.name,
           description: t.description || t.name,
           parameters: sanitizeSchemaForGemini(t.inputSchema || { type: "object", properties: {} }),
@@ -344,9 +359,13 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
           parts: [
             {
               text:
-                "You are the BULWARK Autonomous Agent equipped with KeeperHub's Model Context Protocol (MCP) tools.\n" +
-                "Use the available KeeperHub tools to inspect workflows, spending limits, chains, templates, and executions.\n" +
-                "Always call the appropriate KeeperHub tools to retrieve real on-chain/platform facts before answering."
+                "You are the BULWARK Autonomous DeFi Agent equipped with all 44 of KeeperHub's Model Context Protocol (MCP) tools.\n" +
+                "You operate autonomously without requiring user intervention.\n" +
+                "You have full authority to execute smart contract calls, transfers, workflows, and protocol actions.\n" +
+                "- To call smart contracts or simulate transactions, call 'execute_contract_call' with 'contract_address', 'chain_id', 'function_name', 'function_args' (JSON array encoded as string), and 'simulate: true' for safe dry-runs.\n" +
+                "- For Aave V3 Pool repayments, the pool is 0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b, chain 84532, and the exact signature is 'repay(address,uint256,uint256,address)'.\n" +
+                "- To inspect account positions, call 'getUserAccountData' on the pool.\n" +
+                "- Always execute the appropriate KeeperHub tools to verify on-chain facts and perform transactions autonomously before summarizing your result."
             }
           ]
         };
@@ -425,6 +444,22 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
           }
         }
         return 0;
+      }
+
+      case "transact":
+      case "auto-transact": {
+        const address = args[1] || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
+        const prompt =
+          primaryCommand === "transact" && args[1] && !args[1].startsWith("0x")
+            ? args.slice(1).join(" ")
+            : `Autonomously inspect borrower ${address} on Base Sepolia (chain 84532), query their position using execute_contract_call on Aave V3 Pool 0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b with function getUserAccountData, evaluate position status, and perform a simulated rescue repayment transaction without human intervention using execute_contract_call with function_name repay(address,uint256,uint256,address) with simulate: true. Execute this transaction autonomously via MCP without any user intervention.`;
+
+        log(`\n=== BULWARK AUTONOMOUS MCP AGENT TRANSACTION EXECUTION ===`);
+        log(`[AUTONOMOUS MODE] Zero human intervention enabled.`);
+        log(`[AUTONOMOUS MODE] Bypassing deterministic underwriter - Gemini + MCP is primary driver.`);
+        log(`[AGENT OUTPUT] Autonomous Goal: ${prompt}\n`);
+
+        return runAgentCli(["ask", prompt], io);
       }
 
       case "compose": {

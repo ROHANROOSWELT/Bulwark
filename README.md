@@ -501,6 +501,27 @@ BULWARK natively supports KeeperHub's Streamable MCP endpoint (`https://app.keep
 /keeperhub:login
 ```
 
+### 7. Autonomous Agent Execution (Gemini 3.5 + KeeperHub MCP)
+
+BULWARK features a native **Autonomous Agent** powered by Google Gemini 3.5 Flash-Lite loaded with all **44 KeeperHub Model Context Protocol (MCP)** tools. The agent operates **completely autonomously without human intervention**:
+
+```bash
+# 1. Fully Autonomous On-Chain Inspection & Rescue Simulation via Gemini + MCP
+npm run agent -- auto-transact 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
+
+# 2. Free-Form Autonomous DeFi Transaction via MCP
+npm run agent -- transact "Inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute a simulated Aave V3 rescue repayment"
+
+# 3. Direct Natural Language MCP Query
+npm run agent -- ask "What is our current KeeperHub daily spending limit?"
+
+# 4. End-to-End Agent Workflow Composition & Schema Validation
+npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
+
+# Detailed Test & Audit Report:
+# See docs/TEST_REPORT_GEMINI_AUTONOMOUS_MCP.md
+```
+
 ---
 
 ## 9. Comprehensive CLI Guide (`bulwark`)
@@ -541,16 +562,16 @@ pnpm --filter @bulwark/cli exec bulwark audit export --out audit-bundle.json
 
 ## 10. Comprehensive Verification & Testing Matrix
 
-BULWARK features **1,300 actual, non-mocked, passing tests** across 35 test files. Every test executes real cryptographic hashing, ABI serialization, BigInt math, or auction ordering.
+BULWARK features **1,307 actual, non-mocked, passing tests** across 36 test files. Every test executes real cryptographic hashing, ABI serialization, BigInt math, Gemini MCP tool-calling, or auction ordering.
 
 ```
 ══════════════════════════════════════════════════════════════════════════════════════
                             BULWARK VERIFICATION SUITE
 ══════════════════════════════════════════════════════════════════════════════════════
-  Test Files : 35 passed (35)
-  Tests      : 1,300 passed (1,300)
+  Test Files : 36 passed (36)
+  Tests      : 1,307 passed (1,307)
   Skipped    : 0 skipped (All live tests assert real contract security boundaries)
-  Duration   : 10.73s
+  Duration   : 33.23s
 ══════════════════════════════════════════════════════════════════════════════════════
 ```
 

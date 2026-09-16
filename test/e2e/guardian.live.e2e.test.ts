@@ -32,7 +32,14 @@ describe("BulwarkGuardian Live End-to-End Cycle", () => {
         expect(sim).toBeDefined();
         expect(sim.status === "simulated" || sim.wouldRevert === false).toBe(true);
       } catch (e: any) {
-        if (e.message?.includes("fetch failed") || e.message?.includes("ENOTFOUND") || e.message?.includes("timeout")) {
+        if (
+          e.message?.includes("fetch failed") ||
+          e.message?.includes("ENOTFOUND") ||
+          e.message?.includes("timeout") ||
+          e.message?.includes("Rate limit") ||
+          e.status === 429 ||
+          e.statusCode === 429
+        ) {
           ctx.skip();
         } else {
           throw e;

@@ -15,6 +15,20 @@ export interface LlmTriageResponse {
   narrative: string;
 }
 
+// ── In-memory triage cache (2 min TTL) to preserve Google AI Studio free tier quota (500 req/day) ──
+const triageCache = new Map<string, { quote: UnderwriterQuote; expiresAt: number }>();
+let dailyCount = 0;
+let currentDate = new Date().toISOString().slice(0, 10);
+const DAILY_MAX = 480;
+
+export function getLlmQuotaStatus() {
+  return {
+    dailyRequestsUsed: dailyCount,
+    dailyBudget: DAILY_MAX,
+    cachedEntries: triageCache.size,
+  };
+}
+
 export async function triageWithLlm(
   quote: UnderwriterQuote,
   config: BulwarkConfig,
@@ -28,6 +42,29 @@ export async function triageWithLlm(
   const candidatePlans = quote.plans.filter((p) => p.isFeasible || p.isPartialMitigation);
   if (candidatePlans.length <= 1) {
     return quote;
+  }
+
+  // Quota & Reset check
+  const today = new Date().toISOString().slice(0, 10);
+  if (today !== currentDate) {
+    currentDate = today;
+    dailyCount = 0;
+  }
+
+  if (dailyCount >= DAILY_MAX) {
+    console.warn(`[POLICY INVARIANT] Gemini daily quota budget reached (${dailyCount}/${DAILY_MAX}). Using deterministic underwriter fallback.`);
+    return quote;
+  }
+
+  const isDefaultFetch = fetchFn === globalThis.fetch;
+
+  // Cache lookup (only for default fetch in production/runtime)
+  const cacheKey = `${quote.snapshot?.userAddress || "anon"}_${quote.snapshot?.healthFactor?.toFixed(3) || "0"}_${quote.snapshot?.totalDebtUsd?.toFixed(0) || "0"}`;
+  if (isDefaultFetch) {
+    const cached = triageCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.quote;
+    }
   }
 
   const systemPrompt =
@@ -130,12 +167,19 @@ export async function triageWithLlm(
     const chosenPlan = candidatePlans.find((p) => p.planId === parsed.choice);
 
     if (chosenPlan) {
-      return {
+      if (isDefaultFetch) {
+        dailyCount++;
+      }
+      const resultQuote: UnderwriterQuote = {
         ...quote,
         selectedPlan: chosenPlan,
         selectionMode: "AGENT_SELECT",
         agentNarrative: parsed.narrative ? `[AGENT OUTPUT] ${parsed.narrative}` : undefined,
       };
+      if (isDefaultFetch) {
+        triageCache.set(cacheKey, { quote: resultQuote, expiresAt: Date.now() + 120_000 });
+      }
+      return resultQuote;
     }
   } catch {
     // Degrade gracefully to deterministic mode
