@@ -59,14 +59,14 @@ describe("config loader", () => {
   });
 
   it("auto-detects Gemini API key and sets official Google AI Studio v1beta endpoint", () => {
-    const configWithGeminiKey = loadConfig({ GEMINI_API_KEY: "AIzaSyTestGeminiKey123" });
-    expect(configWithGeminiKey.llmApiKey).toBe("AIzaSyTestGeminiKey123");
+    const configWithGeminiKey = loadConfig({ GEMINI_API_KEY: "AQ.TestGeminiKey123" });
+    expect(configWithGeminiKey.llmApiKey).toBe("AQ.TestGeminiKey123");
     expect(configWithGeminiKey.llmBaseUrl).toBe("https://generativelanguage.googleapis.com/v1beta");
-    expect(configWithGeminiKey.llmModel).toBe("gemini-2.0-flash");
+    expect(configWithGeminiKey.llmModel).toBe("gemini-3.5-flash-lite");
 
     const configWithBulwarkKey = loadConfig({ BULWARK_LLM_API_KEY: "AIzaSyTestKey456" });
     expect(configWithBulwarkKey.llmApiKey).toBe("AIzaSyTestKey456");
     expect(configWithBulwarkKey.llmBaseUrl).toBe("https://generativelanguage.googleapis.com/v1beta");
-    expect(configWithBulwarkKey.llmModel).toBe("gemini-2.0-flash");
+    expect(configWithBulwarkKey.llmModel).toBe("gemini-3.5-flash-lite");
   });
 });

@@ -150,13 +150,13 @@ describe("Underwriter Pure Math & Counterfactual Ladder", () => {
   it("supports Google AI Studio native REST API response format", async () => {
     const quote = underwritePosition(sampleSnapshot, 35.0, 2.0);
     const config = loadConfig({
-      GEMINI_API_KEY: "AIzaSyTestKey123",
+      GEMINI_API_KEY: "AQ.Ab8RN6I4s3xR0-BfqA2FkcyzuwjZOSbtCBATTA4vN73eLS3IxA",
     });
 
     const googleAiStudioFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
-      expect(String(url)).toContain("models/gemini-2.0-flash:generateContent");
+      expect(String(url)).toContain("models/gemini-3.5-flash-lite:generateContent");
       const headers = init?.headers as Record<string, string>;
-      expect(headers["x-goog-api-key"]).toBe("AIzaSyTestKey123");
+      expect(headers["x-goog-api-key"]).toBe("AQ.Ab8RN6I4s3xR0-BfqA2FkcyzuwjZOSbtCBATTA4vN73eLS3IxA");
 
       return new Response(
         JSON.stringify({
@@ -167,7 +167,7 @@ describe("Underwriter Pure Math & Counterfactual Ladder", () => {
                   {
                     text: JSON.stringify({
                       choice: "plan_repay_optimal",
-                      narrative: "Google AI Studio Gemini 2.0 selected optimal plan.",
+                      narrative: "Google AI Studio Gemini 3.5 selected optimal plan.",
                     }),
                   },
                 ],
@@ -181,7 +181,7 @@ describe("Underwriter Pure Math & Counterfactual Ladder", () => {
 
     const triaged = await triageWithLlm(quote, config, googleAiStudioFetch);
     expect(triaged.selectionMode).toBe("AGENT_SELECT");
-    expect(triaged.agentNarrative).toContain("Google AI Studio Gemini 2.0");
+    expect(triaged.agentNarrative).toContain("Google AI Studio Gemini 3.5");
     expect(triaged.selectedPlan.planId).toBe("plan_repay_optimal");
   });
 

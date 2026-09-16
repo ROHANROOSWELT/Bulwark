@@ -62,7 +62,7 @@ export async function triageWithLlm(
 
     if (isGoogleAiStudioNative) {
       // ── Official Google AI Studio REST API (v1beta / models/{model}:generateContent) ──
-      const model = config.llmModel.startsWith("gemini") ? config.llmModel : "gemini-2.0-flash";
+      const model = config.llmModel.startsWith("gemini") ? config.llmModel : "gemini-3.5-flash-lite";
       const url = `${config.llmBaseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`;
 
       const res = await fetchFn(url, {
