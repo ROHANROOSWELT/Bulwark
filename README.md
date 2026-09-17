@@ -274,6 +274,26 @@ BULWARK solves this with a **Dual-Access Security Gateway**:
      * `[BULWARK GATEWAY] Interactive Self-Custody Mode: Connected wallet (0x...) • On-chain broadcast requires manual signature.`
      * `[BULWARK GATEWAY] 24/7 Autonomous Guardian Mode: Active key for (0x...) • Zero manual signatures required.`
 
+### E. Guaranteed Zero-Storage & Private Key Protection Architecture
+
+BULWARK enforces a strict, mathematical **Zero-Storage Security Policy** for private keys entered into the application. Users and operators can rest assured that their private keys are **100% protected and NEVER stored anywhere**:
+
+1. **Zero Client-Side Persistence**:
+   * **No LocalStorage**: Private keys are **never** written to `localStorage`, `sessionStorage`, IndexedDB, or web cookies. The client explicitly executes `localStorage.removeItem("bulwark_auth_key")` on startup to scrub any legacy artifact.
+   * **No Window / Global Variable Leakage**: The client runtime object `window.bulwarkAuth` retains strictly the public checksum address (`0x...`) and authentication mode (`"private_key"` or `"wallet"`). The private key itself is completely absent from browser memory.
+
+2. **Transient In-Memory Verification Only**:
+   * When an operator inputs a key in Option 2 (or clicks the demo testnet shortcut), the key is evaluated purely in volatile memory via `POST /api/auth/verify-key`.
+   * The backend applies native Node.js elliptic-curve cryptography (`crypto.createECDH("secp256k1")`) to derive the uncompressed public key and Keccak-256 address hash.
+   * As soon as the public address is derived, the input buffer is discarded. The private key is **never written to disk, databases, log files, or persisted in any form**.
+
+3. **Instant DOM Sanitization & Permanent Masking**:
+   * The password input element is immediately cleared (`input.value = ""`) the millisecond authentication begins, preventing the key from lingering in the browser DOM tree or memory inspection snapshots.
+   * The input field is permanently locked to `type="password"`, `autocomplete="off"`, and `spellcheck="false"`, preventing browser auto-fill caches, screen scraping, or visual shoulder surfing.
+
+4. **Self-Custody Alternative Always Available**:
+   * For users who prefer zero key entry whatsoever, **Option 1 (Interactive Web3 Wallet)** integrates MetaMask, OKX, Coinbase Wallet, and Rabby via EIP-1193, where private keys never leave the hardware or extension sandbox and every transaction requires a physical signature prompt.
+
 ---
 
 ## 3. The Multi-Agent Dutch Auction Orderbook

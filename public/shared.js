@@ -991,7 +991,7 @@ function renderGatewayKeySection(keySection) {
             </div>
             <span class="connected-address-full" style="font-family: var(--font-mono); font-size: 11px; word-break: break-all;">${address}</span>
             <div style="margin-top: 6px; font-size: 11px; color: var(--accent-emerald, #10b981); font-weight: 600;">
-              ✓ Zero manual confirmations required &bull; Continuous background protection active
+              ✓ Zero-Storage Protected &bull; Private key is NOT stored anywhere &bull; 24/7 background protection active
             </div>
           </div>
         </div>
@@ -1023,9 +1023,14 @@ function renderGatewayKeySection(keySection) {
         <div style="font-size: 11px; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">
           <strong style="color: var(--text-primary);">24/7 Autonomous Protection:</strong> Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, and execute backstop debt repayments continuously without waiting for browser signatures.
         </div>
-        <div style="font-size: 11px; color: #10b981; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 8px; background: rgba(16, 185, 129, 0.08); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.2); line-height: 1.45;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span><strong>Zero-Storage Protection:</strong> BULWARK never saves your private key in localStorage, cookies, or browser memory. Credentials are verified strictly for cryptographic address derivation and instantly discarded.</span>
+        <div style="font-size: 11px; color: #10b981; margin-bottom: 14px; background: rgba(16, 185, 129, 0.09); padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25); line-height: 1.5;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 4px; color: #10b981;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Guaranteed Zero-Storage Protection</span>
+          </div>
+          <div style="color: var(--text-secondary); font-size: 11px;">
+            Your private key is <strong>100% protected and NEVER stored</strong> anywhere. It is processed exclusively in transient volatile memory to cryptographically derive your public account address and is immediately scrubbed. It is never written to disk, database, localStorage, cookies, or logs.
+          </div>
         </div>
         <button type="button" id="btnSubmitPrivateKey" class="btn-primary" style="width: 100%; justify-content: center; padding: 11px 16px; font-weight: 700; cursor: pointer;">
           Authenticate 24/7 Autonomous Key &rarr;
