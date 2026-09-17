@@ -1033,7 +1033,7 @@ function renderGatewayKeySection(keySection) {
           </div>
         </div>
         <button type="button" id="btnSubmitPrivateKey" class="btn-primary" style="width: 100%; justify-content: center; padding: 11px 16px; font-weight: 700; cursor: pointer;">
-          Authenticate 24/7 Autonomous Key &rarr;
+          Authenticate 24/7 Guardian &rarr;
         </button>
         <div id="gatewayKeyError" class="auth-error-msg" style="display: none; color: #dc2626; font-size: 11.5px; font-weight: 600; margin-top: 10px; padding: 8px 12px; background: #fee2e2; border-radius: 6px;"></div>
       </div>
@@ -1045,7 +1045,7 @@ function renderGatewayKeySection(keySection) {
     if (demoBtn && input) {
       demoBtn.addEventListener("click", () => {
         input.value = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-        submitPrivateKey();
+        input.focus();
       });
     }
 
@@ -1115,7 +1115,7 @@ async function submitPrivateKey() {
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Authenticate 24/7 Autonomous Key →";
+      submitBtn.textContent = "Authenticate 24/7 Guardian →";
     }
   }
 }

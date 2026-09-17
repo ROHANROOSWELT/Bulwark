@@ -95,7 +95,7 @@ function renderReport(report) {
   const isProven = report.verdict === "PROVEN";
   verdictBanner.className = `verdict-banner ${isProven ? "verdict-proven" : "verdict-broken"}`;
   verdictBanner.textContent = isProven
-    ? `VERDICT: PROVEN (11/11 CHECKS PASSED)`
+    ? `VERDICT: PROVEN (11/11 Invariant Checks Verified)`
     : `VERDICT: ${report.verdict}`;
 
   const verdictChip = document.getElementById("verdictChip");

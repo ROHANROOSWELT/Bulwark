@@ -115,7 +115,7 @@ function renderExecutionsTable(executions) {
             ${deltaBadge}
           </td>
           <td>
-            <span class="chip chip-dual">Dual Verified</span>
+            <span class="chip chip-dual" style="background: rgba(16, 185, 129, 0.12); color: #047857; border-color: rgba(16, 185, 129, 0.3); font-weight: 700;">DUAL VERIFIED &mdash; RPC + KEEPERHUB</span>
           </td>
           <td style="text-align: right;">
             <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
