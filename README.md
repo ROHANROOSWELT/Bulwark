@@ -514,7 +514,7 @@ Keeperhub/
 │       ├── src/
 │       │   ├── server.ts      # HTTP server with secure API routes & SSE telemetry
 │       │   └── public/        # Zero-build glassmorphic dashboard & /verify portal
-├── test/                      # Comprehensive 1,300-Test Verification Suite
+├── test/                      # Comprehensive 1,308-Test Verification Suite (36 test files)
 │   ├── unit/                  # Cryptography, ABI codecs, Math, Compiler, Orderbook
 │   ├── integration/           # Live KeeperHub REST & Public MCP testnet verification
 │   ├── e2e/                   # Full Lifecycle Guardian E2E & CLI runner tests
@@ -569,11 +569,11 @@ pnpm build
 pnpm type-check
 ```
 
-### 4. Run the 1,300 Passing Tests
+### 4. Run the 1,308 Passing Tests
 ```bash
 pnpm test
 ```
-*Executes all 35 test files and 1,300 real tests in ~10 seconds with 0 skipped and 0 failed.*
+*Executes all 36 test files and 1,308 real tests in ~25 seconds with 0 skipped and 0 failed.*
 
 ### 5. Launch the Web Console & Public Verifier
 ```bash
