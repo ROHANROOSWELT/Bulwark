@@ -774,6 +774,10 @@ main.dashboard-grid.command-center {
   display: none !important;
 }
 
+.triad-hidden {
+  display: none !important;
+}
+
 .hero-story-badges {
   display: flex;
   gap: 10px;

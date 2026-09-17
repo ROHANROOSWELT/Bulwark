@@ -574,20 +574,27 @@ function initAgentDecisionConsole() {
   // Live Terminal Visibility Toggle Button
   const btnToggle = document.getElementById("btnToggleTerminal");
   const terminalSection = document.getElementById("agentDecisionConsoleSection");
+  const triadSection = document.getElementById("overviewTriadSection");
   const toggleTitle = document.getElementById("terminalToggleTitle");
   const toggleSub = document.getElementById("terminalToggleSub");
+  const btnShowTriad = document.getElementById("btnShowTriadCards");
 
   function setTerminalVisibility(visible, animateScroll = false) {
     if (!terminalSection) return;
     if (visible) {
+      // Show terminal and hide the 3-column triad (opening terminal up to the hero)
       terminalSection.style.display = "";
       terminalSection.classList.remove("terminal-hidden");
+      if (triadSection) {
+        triadSection.style.display = "none";
+        triadSection.classList.add("triad-hidden");
+      }
       if (btnToggle) {
         btnToggle.classList.add("active");
         btnToggle.setAttribute("aria-pressed", "true");
       }
       if (toggleTitle) toggleTitle.textContent = "Hide Live Terminal";
-      if (toggleSub) toggleSub.textContent = "Gemini 3.5 + KeeperHub MCP (Visible)";
+      if (toggleSub) toggleSub.textContent = "Showing Terminal (3 Cards Hidden)";
       localStorage.setItem("bulwark_terminal_visible", "true");
       if (animateScroll) {
         setTimeout(() => {
@@ -595,15 +602,25 @@ function initAgentDecisionConsole() {
         }, 120);
       }
     } else {
+      // Hide terminal and show the 3-column triad (Monitored Position, Rescue Engine, Authorization)
       terminalSection.style.display = "none";
       terminalSection.classList.add("terminal-hidden");
+      if (triadSection) {
+        triadSection.style.display = "";
+        triadSection.classList.remove("triad-hidden");
+      }
       if (btnToggle) {
         btnToggle.classList.remove("active");
         btnToggle.setAttribute("aria-pressed", "false");
       }
       if (toggleTitle) toggleTitle.textContent = "Show Live Terminal";
-      if (toggleSub) toggleSub.textContent = "Gemini 3.5 + KeeperHub MCP (Hidden)";
+      if (toggleSub) toggleSub.textContent = "Showing 3-Card Triad Overview";
       localStorage.setItem("bulwark_terminal_visible", "false");
+      if (animateScroll && triadSection) {
+        setTimeout(() => {
+          triadSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 120);
+      }
     }
   }
 
@@ -612,7 +629,7 @@ function initAgentDecisionConsole() {
   if (btnToggle) {
     btnToggle.addEventListener("click", () => {
       const isCurrentlyVisible = !terminalSection?.classList.contains("terminal-hidden") && terminalSection?.style.display !== "none";
-      setTerminalVisibility(!isCurrentlyVisible, !isCurrentlyVisible);
+      setTerminalVisibility(!isCurrentlyVisible, true);
     });
 
     const saved = localStorage.getItem("bulwark_terminal_visible");
@@ -621,6 +638,12 @@ function initAgentDecisionConsole() {
     } else {
       setTerminalVisibility(true, false);
     }
+  }
+
+  if (btnShowTriad) {
+    btnShowTriad.addEventListener("click", () => {
+      setTerminalVisibility(false, true);
+    });
   }
 
   const btnDemo = document.getElementById("btnRunAgentDemo");
