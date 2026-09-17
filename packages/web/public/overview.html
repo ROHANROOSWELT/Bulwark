@@ -66,7 +66,7 @@
         </div>
         <div class="hero-terminal-toggle-area">
           <button id="btnToggleTerminal" class="btn-terminal-toggle active" type="button" aria-pressed="true" title="Toggle visibility of the Gemini 3.5 &amp; KeeperHub MCP Live Terminal">
-            <span class="terminal-toggle-icon">🖥️</span>
+            <span class="terminal-toggle-icon" style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent);">&gt;_</span>
             <div class="terminal-toggle-text">
               <span class="terminal-toggle-title" id="terminalToggleTitle">Hide Live Terminal</span>
               <span class="terminal-toggle-sub" id="terminalToggleSub">Gemini 3.5 + KeeperHub MCP (Visible)</span>
@@ -195,7 +195,7 @@
             <span class="card-subtitle-tag highlight" style="color: var(--accent-emerald);">Live Autonomous Agent Engine</span>
             <span class="chip chip-compiler" style="font-size: 10px;">gemini-3.5-flash-lite</span>
             <span class="chip chip-chain" style="font-size: 10px;">KeeperHub MCP (44 Tools)</span>
-            <span class="chip chip-caution" id="autoDispatchPill" style="font-size: 10px; font-weight: 600;">⚡ ZERO-TOUCH AUTONOMOUS MODE</span>
+            <span class="chip chip-caution" id="autoDispatchPill" style="font-size: 10px; font-weight: 600;">ZERO-TOUCH AUTONOMOUS MODE</span>
           </div>
           <h2 class="card-headline large" style="margin-top: 4px;">Gemini 3.5 AI &amp; KeeperHub MCP Decision Stream</h2>
           <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
@@ -205,16 +205,16 @@
 
         <div class="agent-console-actions">
           <button id="btnRunAgentDemo" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16,185,129,0.35); font-weight: 700; display: flex; align-items: center; gap: 6px;">
-            <span>⚡ Trigger Autonomous Cycle</span>
+            <span>Trigger Autonomous Cycle</span>
           </button>
           <button id="btnShowTriadCards" class="btn-secondary" title="Hide terminal and show 3-Card Triad (Monitored Position, Rescue Engine, Authorization)">
-            <span>📊 Show 3-Card Triad</span>
+            <span>Show 3-Card Triad</span>
           </button>
           <button id="btnReplayTrace" class="btn-secondary" title="Replay verified trace from live Base Sepolia on-chain scan">
-            <span>🔄 Replay Live Trace</span>
+            <span>Replay Live Trace</span>
           </button>
           <button id="btnClearTerminal" class="btn-secondary" title="Clear console output">
-            <span>🧹 Clear</span>
+            <span>Clear</span>
           </button>
         </div>
       </div>
@@ -227,7 +227,7 @@
             <span class="flow-node-num">Stage 01</span>
             <span id="stageBadge1" class="chip chip-chain" style="font-size: 9px;">Ready</span>
           </div>
-          <div class="flow-node-title">🌐 MCP Discovery</div>
+          <div class="flow-node-title">MCP Discovery</div>
           <div class="flow-node-sub" id="stageSub1">44 KeeperHub tools loaded</div>
         </div>
 
@@ -237,7 +237,7 @@
             <span class="flow-node-num">Stage 02</span>
             <span id="stageBadge2" class="chip chip-compiler" style="font-size: 9px;">Standby</span>
           </div>
-          <div class="flow-node-title">🧠 Gemini AI Intent</div>
+          <div class="flow-node-title">Gemini AI Intent</div>
           <div class="flow-node-sub" id="stageSub2">Strategy triage formulation</div>
         </div>
 
@@ -247,7 +247,7 @@
             <span class="flow-node-num">Stage 03</span>
             <span id="stageBadge3" class="chip chip-keeperhub" style="font-size: 9px;">Pending</span>
           </div>
-          <div class="flow-node-title">⚡ Tool Invocation</div>
+          <div class="flow-node-title">Tool Invocation</div>
           <div class="flow-node-sub" id="stageSub3">execute_contract_call</div>
         </div>
 
@@ -257,7 +257,7 @@
             <span class="flow-node-num">Stage 04</span>
             <span id="stageBadge4" class="chip chip-policy" style="font-size: 9px;">Guard</span>
           </div>
-          <div class="flow-node-title">🔒 Invariant Clamp</div>
+          <div class="flow-node-title">Invariant Clamp</div>
           <div class="flow-node-sub" id="stageSub4">Target HF 1.500 &bull; $5.00 Cap</div>
         </div>
 
@@ -267,7 +267,7 @@
             <span class="flow-node-num">Stage 05</span>
             <span id="stageBadge5" class="chip chip-chain" style="font-size: 9px;">Awaiting</span>
           </div>
-          <div class="flow-node-title">🛡️ Autonomous Strategy</div>
+          <div class="flow-node-title">Autonomous Strategy</div>
           <div class="flow-node-sub" id="stageSub5">Deterministic execution plan</div>
         </div>
       </div>
@@ -289,7 +289,7 @@
             BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP
           </div>
           <div class="term-line" style="color: #64748b; margin-bottom: 12px;">
-            Type a prompt below or click <strong style="color: #10b981;">⚡ Run 10s Demo: Scan &amp; Rescue</strong> to observe Gemini taking live tool-calling decisions.
+            Type a prompt below or click <strong style="color: #10b981;">Run 10s Demo: Scan &amp; Rescue</strong> to observe Gemini taking live tool-calling decisions.
           </div>
           <div class="term-line" id="termCurrentLine">
             <span style="color: #10b981;">gemini@bulwark:~$</span> <span id="termActiveText">Ready for prompt...</span><span class="term-cursor" id="termCursor"></span>
@@ -299,10 +299,10 @@
         <div class="term-controls">
           <!-- Preset Prompt Chips -->
           <div class="term-chips-row">
-            <button class="term-chip-preset" data-prompt="Autonomously inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute simulated rescue via KeeperHub MCP without asking for confirmation">🤖 Zero-Touch Auto-Rescue</button>
-            <button class="term-chip-preset" data-prompt="Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy">⚡ Scan &amp; Formulate Rescue</button>
-            <button class="term-chip-preset" data-prompt="Query Aave V3 pool for borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 using execute_contract_call">🔍 Query Aave V3 getUserAccountData via MCP</button>
-            <button class="term-chip-preset" data-prompt="Verify invariant clamping bounds and adaptive bands for health factor 1.256">🔒 Verify Adaptive Band Clamping ($5.00 Cap)</button>
+            <button class="term-chip-preset" data-prompt="Autonomously inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute simulated rescue via KeeperHub MCP without asking for confirmation">Zero-Touch Auto-Rescue</button>
+            <button class="term-chip-preset" data-prompt="Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy">Scan &amp; Formulate Rescue</button>
+            <button class="term-chip-preset" data-prompt="Query Aave V3 pool for borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 using execute_contract_call">Query Aave V3 getUserAccountData via MCP</button>
+            <button class="term-chip-preset" data-prompt="Verify invariant clamping bounds and adaptive bands for health factor 1.256">Verify Adaptive Band Clamping ($5.00 Cap)</button>
           </div>
 
           <!-- Custom Input Row -->

@@ -488,7 +488,7 @@ function renderDeskKpis(data) {
   if (backendChip) {
     backendChip.className = "chip chip-policy";
     backendChip.title = "Backend hosted on Microsoft Azure VM (20.244.4.11)";
-    backendChip.innerHTML = "☁️ Azure: 20.244.4.11";
+    backendChip.innerHTML = "Azure: 20.244.4.11";
   }
 
   // Desk KPI Top Bar

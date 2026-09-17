@@ -615,7 +615,7 @@ Grants Commands:
 
           log("=== PROOF OF AUTHORIZED AGENCY (PoAA) VERIFICATION ===");
           for (const c of report.checks) {
-            const icon = c.passed ? "✓ PASS" : "✗ FAIL";
+            const icon = c.passed ? "[PASS]" : "[FAIL]";
             log(`Check #${c.checkNumber} [${c.name}]: ${icon}`);
             if (!c.passed && c.evidence) {
               log(`  -> Evidence: ${c.evidence}`);

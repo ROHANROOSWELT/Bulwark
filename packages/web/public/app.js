@@ -163,7 +163,7 @@ function renderState(data) {
             <span class="card-val" style="font-family: var(--font-mono);">${grant.grantHash.slice(0, 12)}...</span>
           </div>
           <div style="margin-top: 6px; font-size: 11px; color: #065f46; background: rgba(16, 185, 129, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 3px solid #10b981; line-height: 1.4;">
-            <strong>🤖 Gemini 3.5 AI Underwriter:</strong> ${(grant.triage?.agentNarrative || data.grants.slice().reverse().find(g => g.triage?.agentNarrative)?.triage?.agentNarrative || "Autonomous risk underwriting active: Health factor deficit clamped within EIP-712 pre-authorization policy boundaries.").replace('[AGENT OUTPUT] ', '')}
+            <strong>Gemini 3.5 AI Underwriter:</strong> ${(grant.triage?.agentNarrative || data.grants.slice().reverse().find(g => g.triage?.agentNarrative)?.triage?.agentNarrative || "Autonomous risk underwriting active: Health factor deficit clamped within EIP-712 pre-authorization policy boundaries.").replace('[AGENT OUTPUT] ', '')}
           </div>
         </div>
         <div class="grant-actions-row">
@@ -300,7 +300,7 @@ function checkAutonomousTrigger(pos) {
   const autoPill = document.getElementById("autoDispatchPill");
   if (autoPill) {
     autoPill.className = "chip chip-caution";
-    autoPill.textContent = `⚡ AUTO-TRIGGER ARMED (HF ${pos.healthFactor.toFixed(3)} < 1.350)`;
+    autoPill.textContent = `AUTO-TRIGGER ARMED (HF ${pos.healthFactor.toFixed(3)} < 1.350)`;
   }
 
   const termStatus = document.getElementById("termStatusPill");
@@ -350,7 +350,7 @@ function setStage(stageNum, state, subText) {
   } else if (state === "completed") {
     node.className = "flow-stage-node completed";
     badge.className = "chip chip-chain";
-    badge.textContent = "✓ Verified";
+    badge.textContent = "Verified";
   } else {
     node.className = "flow-stage-node";
     badge.className = "chip chip-unavailable";
@@ -450,7 +450,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
             } else if (line.includes("Tool") && line.includes("executed successfully over MCP")) {
               setStage(3, "completed", "Aave V3 state fetched");
               setStage(4, "active", "Invariant clamping check");
-              appendTermLine(`<span class="term-keeperhub">✓ ${escapeHtml(line)}</span>`);
+              appendTermLine(`<span class="term-keeperhub">[OK] ${escapeHtml(line)}</span>`);
 
               // Highlight Rescue Engine Card in sync with the tool call
               const rescueCard = document.getElementById("rescueEngineCard");
@@ -524,7 +524,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
       } else if (step.type === "fact" && step.text.includes("executed successfully")) {
         setStage(3, "completed", "Aave V3 state fetched");
         setStage(4, "active", "Invariant clamping check");
-        appendTermLine(`<span class="term-keeperhub">✓ ${escapeHtml(step.text)}</span>`);
+        appendTermLine(`<span class="term-keeperhub">[OK] ${escapeHtml(step.text)}</span>`);
 
         // Highlight Rescue Engine Card in sync
         const rescueCard = document.getElementById("rescueEngineCard");
@@ -556,7 +556,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
   // Completion summary footer in terminal
   appendTermLine(`
     <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center;">
-      <span style="color: #34d399; font-weight: 700;">✓ Autonomous MCP Cycle Completed &bull; Zero Manual Intervention &bull; Invariants Preserved</span>
+      <span style="color: #34d399; font-weight: 700;">Autonomous MCP Cycle Completed &bull; Zero Manual Intervention &bull; Invariants Preserved</span>
       <a href="/verify" style="color: var(--accent); text-decoration: underline; font-size: 11px;">Verify PoAA Proof &rarr;</a>
     </div>
   `);
@@ -670,7 +670,7 @@ function initAgentDecisionConsole() {
       if (termBody) {
         termBody.innerHTML = `
           <div class="term-line" style="color: #64748b;">BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP</div>
-          <div class="term-line" style="color: #64748b; margin-bottom: 12px;">Terminal cleared. Click <strong style="color: #10b981;">⚡ Run 10s Demo: Scan &amp; Rescue</strong> to launch.</div>
+          <div class="term-line" style="color: #64748b; margin-bottom: 12px;">Terminal cleared. Click <strong style="color: #10b981;">Run 10s Demo: Scan &amp; Rescue</strong> to launch.</div>
           <div class="term-line"><span style="color: #10b981;">gemini@bulwark:~$</span> Ready for prompt...<span class="term-cursor"></span></div>
         `;
       }

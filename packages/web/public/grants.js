@@ -79,7 +79,7 @@ function renderGrantsTable(grants) {
             <span style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">${g.grantHash.slice(0, 14)}...</span>
             ${g.triage?.agentNarrative ? `
               <div style="margin-top: 4px;">
-                <span class="chip chip-compiler" style="font-size: 9px; cursor: pointer; padding: 2px 6px;" onclick="inspectGrant('${g.grantId}')" title="${g.triage.agentNarrative}">🤖 AI Underwritten (${g.triage.selectionMode})</span>
+                <span class="chip chip-compiler" style="font-size: 9px; cursor: pointer; padding: 2px 6px;" onclick="inspectGrant('${g.grantId}')" title="${g.triage.agentNarrative}">AI Underwritten (${g.triage.selectionMode})</span>
               </div>
             ` : ""}
           </td>
