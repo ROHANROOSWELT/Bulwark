@@ -190,7 +190,7 @@ function renderState(data) {
   if (execsContainer) {
     const hasExecs = data.executions && data.executions.length > 0;
     const latest = hasExecs ? data.executions[0] : null;
-    const isBase = latest?.txHash?.startsWith("0x43dbc") || data.grants?.some(g => g.grantId === latest?.grantId && g.position?.chainId === 84532);
+    const isBase = latest?.chainId !== 11155111;
     const explorerBase = isBase ? "https://sepolia.basescan.org" : "https://sepolia.etherscan.io";
     const hfRecoveryText = (typeof latest?.preHealthFactor === "number" && typeof latest?.postHealthFactor === "number")
       ? `${latest.preHealthFactor.toFixed(4)} &rarr; ${latest.postHealthFactor.toFixed(4)}`
