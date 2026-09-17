@@ -17,6 +17,7 @@
 [![Track](https://img.shields.io/badge/Track-Best%20Integration%20into%20a%20Live%20Project-FF5722?style=for-the-badge)](#)
 [![Tests](https://img.shields.io/badge/Vitest-1%2C308%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8%20Strict-3178C6?style=for-the-badge&logo=typescript)](tsconfig.base.json)
+[![SDK](https://img.shields.io/badge/SDK-@bulwark/core%20v0.1.0-blue?style=for-the-badge&logo=npm)](https://github.com/ROHANROOSWELT/Bulwark/releases/tag/v0.1.0)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![Security Policy](https://img.shields.io/badge/Security-Policy%20Enforced-critical?style=for-the-badge&logo=shield)](SECURITY.md)
 [![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20--%20$17.4B%20TVL-2EBAC6?style=for-the-badge)](https://aave.com)
@@ -489,7 +490,7 @@ BULWARK is structured as a high-performance, strictly-typed TypeScript monorepo 
 ```
 Keeperhub/
 ├── packages/
-│   ├── core/                  # Pure TypeScript Engine (Zero network dependencies)
+│   ├── core/                  # @bulwark/core SDK (Standalone Pure TypeScript Engine)
 │   │   ├── src/
 │   │   │   ├── crypto/        # Pure Keccak-256 sponge & hash utilities
 │   │   │   ├── abi/           # EVM ABI encoding/decoding (uint256, address, calldata)
@@ -787,16 +788,54 @@ Ready-to-record video script matching the DoraHacks judging rubric:
 
 ---
 
-## 14. Standalone Release Artifacts
+## 14. Developer SDK (@bulwark/core) & Release Artifacts
 
-Pre-compiled production tarballs and SHA-256 integrity checksums are generated in `release-artifacts/`:
+BULWARK is fully packaged and distributed as an open-source TypeScript SDK (`@bulwark/core`) and operational CLI (`@bulwark/cli`). Any DeFi protocol, risk DAO, or autonomous agent can integrate BULWARK's closed-form targeting equations, clamp-only policy compiler, and 11-check PoAA verifier directly into their codebase.
 
+### Installation
+
+Install the official `v0.1.0` standalone SDK directly via npm or pnpm:
+
+```bash
+# Install @bulwark/core SDK
+npm install https://github.com/ROHANROOSWELT/Bulwark/releases/download/v0.1.0/bulwark-core-0.1.0.tgz
+
+# Or install @bulwark/cli globally
+npm install -g https://github.com/ROHANROOSWELT/Bulwark/releases/download/v0.1.0/bulwark-cli-0.1.0.tgz
 ```
-release-artifacts/
-├── bulwark-cli-0.1.0.tgz       (SHA-256: 64bee05dab194a31dfeabe64b2178023f04267128ce58d219846157ea281e783)
-├── bulwark-core-0.1.0.tgz      (SHA-256: 4b16363853f2ea9d1407e27563b4ccb55a8408df91596e53508eb6530d94f59c)
-└── CHECKSUMS.txt
+
+### SDK Quickstart Example
+
+```typescript
+import { 
+  AavePositionReader, 
+  underwritePosition, 
+  PolicyCompiler, 
+  verifyPoaaBundle 
+} from "@bulwark/core";
+
+// 1. Read live Aave V3 position on Base Sepolia (chain 84532)
+const reader = new AavePositionReader();
+const snapshot = await reader.readPosition(84532, "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123");
+console.log(`Current Health Factor: ${snapshot.healthFactor}`);
+
+// 2. Compute closed-form exact debt repayment to target HF 2.0
+const quote = underwritePosition(snapshot, 15000, 2.0);
+console.log(`Exact Repayment Required: $${quote.selectedPlan.amountUsd} USDC`);
+
+// 3. Verify 11/11 PoAA cryptographic checks client-side
+const verdict = await verifyPoaaBundle(proofBundle);
+console.log(`PoAA Verdict: ${verdict.verdict} (${verdict.passedCount}/11 checks passed)`);
 ```
+
+### Published Release Artifacts & SHA-256 Checksums
+
+Pre-compiled production tarballs and cryptographic integrity checksums are available on the [**GitHub v0.1.0 Release**](https://github.com/ROHANROOSWELT/Bulwark/releases/tag/v0.1.0):
+
+| Package | Version | Artifact Download | SHA-256 Checksum |
+| :--- | :---: | :--- | :--- |
+| **`@bulwark/core`** | `0.1.0` | [`bulwark-core-0.1.0.tgz`](https://github.com/ROHANROOSWELT/Bulwark/releases/download/v0.1.0/bulwark-core-0.1.0.tgz) | `4b16363853f2ea9d1407e27563b4ccb55a8408df91596e53508eb6530d94f59c` |
+| **`@bulwark/cli`** | `0.1.0` | [`bulwark-cli-0.1.0.tgz`](https://github.com/ROHANROOSWELT/Bulwark/releases/download/v0.1.0/bulwark-cli-0.1.0.tgz) | `64bee05dab194a31dfeabe64b2178023f04267128ce58d219846157ea281e783` |
 
 To re-package and verify release artifacts at any time:
 ```bash
