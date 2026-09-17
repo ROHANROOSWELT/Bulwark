@@ -297,35 +297,15 @@ async function executeGrant(id) {
   }
 }
 
-// ── Autonomous Guardian Zero-Touch Trigger ─────────────────────────────────────
-let hasAutoTriggeredForRisk = false;
-
+// ── Autonomous Guardian Risk Alert ─────────────────────────────────────────
 function checkAutonomousTrigger(pos) {
-  if (hasAutoTriggeredForRisk || isAgentRunning) return;
   if (!pos || typeof pos.healthFactor !== "number" || pos.healthFactor <= 0 || pos.healthFactor >= 1.350) return;
-
-  hasAutoTriggeredForRisk = true;
 
   const autoPill = document.getElementById("autoDispatchPill");
   if (autoPill) {
     autoPill.className = "chip chip-caution";
-    autoPill.textContent = `AUTO-TRIGGER ARMED (HF ${pos.healthFactor.toFixed(3)} < 1.350)`;
+    autoPill.textContent = `RISK DETECTED (HF ${pos.healthFactor.toFixed(3)} < 1.350) • READY FOR CYCLE`;
   }
-
-  const termStatus = document.getElementById("termStatusPill");
-  if (termStatus) {
-    termStatus.className = "term-status-pill busy";
-    termStatus.textContent = `CRITICAL HF ${pos.healthFactor.toFixed(3)} DETECTED • AUTO-DISPATCHING`;
-  }
-
-  // Auto-launch autonomous decision flow after 1.2s delay so user sees cards render first
-  setTimeout(() => {
-    runAgentDecisionFlow(
-      `Autonomous Alert: Borrower ${pos.userAddress.slice(0, 8)}... HF ${pos.healthFactor.toFixed(3)} is below critical threshold 1.350. Autonomously inspect position, call execute_contract_call via KeeperHub MCP, and execute rescue strategy without manual confirmation.`,
-      true,
-      true
-    );
-  }, 1200);
 }
 
 // ── Live Autonomous Agent Decision Console Controller ──────────────────────────
@@ -401,6 +381,24 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+let activeEventSource = null;
+
+function stopAgentFlow() {
+  if (activeEventSource) {
+    try {
+      activeEventSource.close();
+    } catch (e) {}
+    activeEventSource = null;
+  }
+  isAgentRunning = false;
+  const termStatus = document.getElementById("termStatusPill");
+  if (termStatus) {
+    termStatus.className = "term-status-pill";
+    termStatus.textContent = "STOPPED • IDLE";
+  }
+  appendTermLine(`<div style="color: #f87171; font-weight: 700; margin-top: 8px; padding: 4px 8px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444;">[STOPPED] Agent execution stopped. Zero pending requests.</div>`);
+}
+
 async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTriggered = false) {
   if (isAgentRunning) return;
   isAgentRunning = true;
@@ -440,7 +438,15 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
       await new Promise((resolve) => {
         const url = `/api/agent/stream?prompt=${encodeURIComponent(promptText)}`;
         const es = new EventSource(url);
+        activeEventSource = es;
         let hasSeenToolCall = false;
+
+        const cleanup = () => {
+          if (activeEventSource === es) {
+            activeEventSource = null;
+          }
+          try { es.close(); } catch {}
+        };
 
         es.onmessage = (e) => {
           try {
@@ -497,7 +503,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
             }
 
             if (ev.type === "done") {
-              es.close();
+              cleanup();
               liveSuccess = true;
               setStage(5, "completed", "Rescue plan ready");
               resolve();
@@ -508,13 +514,13 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
         };
 
         es.onerror = () => {
-          es.close();
+          cleanup();
           resolve();
         };
 
         // Safety timeout of 35 seconds for live Gemini LLM + MCP execution
         setTimeout(() => {
-          es.close();
+          cleanup();
           resolve();
         }, 35000);
       });
@@ -589,6 +595,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
   }
 
   isAgentRunning = false;
+  activeEventSource = null;
   fetchState(); // Refresh dashboard state
 }
 
@@ -623,13 +630,7 @@ function initAgentDecisionConsole() {
           terminalSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 120);
       }
-
-      // Automatically trigger live autonomous agent flow if not already running
-      if (!isAgentRunning) {
-        setTimeout(() => {
-          runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", true);
-        }, 250);
-      }
+      // Strictly manual: do not auto-dispatch requests when toggling visibility
     } else {
       // Hide terminal and show the 3-column triad (Monitored Position, Rescue Engine, Authorization)
       terminalSection.style.display = "none";
@@ -676,6 +677,7 @@ function initAgentDecisionConsole() {
   }
 
   const btnDemo = document.getElementById("btnRunAgentDemo");
+  const btnStop = document.getElementById("btnStopAgent");
   const btnReplay = document.getElementById("btnReplayTrace");
   const btnClear = document.getElementById("btnClearTerminal");
   const promptForm = document.getElementById("agentPromptForm");
@@ -687,6 +689,12 @@ function initAgentDecisionConsole() {
     });
   }
 
+  if (btnStop) {
+    btnStop.addEventListener("click", () => {
+      stopAgentFlow();
+    });
+  }
+
   if (btnReplay) {
     btnReplay.addEventListener("click", () => {
       runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", false);
@@ -695,6 +703,7 @@ function initAgentDecisionConsole() {
 
   if (btnClear) {
     btnClear.addEventListener("click", () => {
+      stopAgentFlow();
       const termBody = document.getElementById("agentTerminalBody");
       if (termBody) {
         termBody.innerHTML = `
