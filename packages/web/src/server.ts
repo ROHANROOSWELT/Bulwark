@@ -356,6 +356,7 @@ export async function handleRequest(
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
             "Access-Control-Allow-Origin": "*",
+            "X-Accel-Buffering": "no",
           });
 
           const sendEvent = (event: { type: string; text: string; data?: any }) => {
