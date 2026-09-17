@@ -583,6 +583,11 @@ function initAgentDecisionConsole() {
 // ── App Initialization ─────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initAgentDecisionConsole();
+  if (window.location.search.includes("demo=1")) {
+    setTimeout(() => {
+      runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", false);
+    }, 600);
+  }
 });
 fetchState();
 setInterval(fetchState, 3000);
