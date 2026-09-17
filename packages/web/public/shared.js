@@ -144,34 +144,34 @@ window.bulwarkAuth = {
   authenticated: false,
   mode: null, // "wallet" | "private_key"
   address: null,
-  privateKey: null,
 };
 
 function initBulwarkAuth() {
+  // Proactively purge any legacy stored private key from browser localStorage
+  try {
+    localStorage.removeItem("bulwark_auth_key");
+  } catch (e) {}
+
   const savedMode = localStorage.getItem("bulwark_auth_mode");
   const savedAddress = localStorage.getItem("bulwark_auth_address");
-  const savedKey = localStorage.getItem("bulwark_auth_key");
 
-  if (savedMode === "private_key" && savedAddress && savedKey) {
+  if (savedMode === "private_key" && savedAddress) {
     window.bulwarkAuth = {
       authenticated: true,
       mode: "private_key",
       address: savedAddress,
-      privateKey: savedKey,
     };
   } else if (savedMode === "wallet" && savedAddress) {
     window.bulwarkAuth = {
       authenticated: true,
       mode: "wallet",
       address: savedAddress,
-      privateKey: null,
     };
   } else {
     window.bulwarkAuth = {
       authenticated: false,
       mode: null,
       address: null,
-      privateKey: null,
     };
   }
   applyAuthStateUI();
@@ -348,7 +348,6 @@ async function connectWallet(type) {
       authenticated: true,
       mode: "wallet",
       address: accounts[0],
-      privateKey: null,
     };
 
     listenToProviderEvents(provider);
@@ -427,7 +426,6 @@ function disconnectAuth() {
     authenticated: false,
     mode: null,
     address: null,
-    privateKey: null,
   };
 
   connectedWallet = {
@@ -552,7 +550,6 @@ function listenToProviderEvents(provider) {
         authenticated: true,
         mode: "wallet",
         address: accounts[0],
-        privateKey: null,
       };
       localStorage.setItem("bulwark_auth_address", accounts[0]);
       updateWalletUI();
@@ -595,7 +592,6 @@ async function autoReconnectWallet() {
         authenticated: true,
         mode: "wallet",
         address: accounts[0],
-        privateKey: null,
       };
       listenToProviderEvents(provider);
       updateWalletUI();
@@ -1022,10 +1018,14 @@ function renderGatewayKeySection(keySection) {
           </button>
         </div>
         <div style="margin-bottom: 10px;">
-          <input type="password" id="gatewayPrivateKeyInput" class="gateway-key-input" placeholder="0x... or 64-character hex private key" autocomplete="off" />
+          <input type="password" id="gatewayPrivateKeyInput" class="gateway-key-input" placeholder="0x... or 64-character hex private key" autocomplete="off" spellcheck="false" />
         </div>
-        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px;">
+        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">
           <strong style="color: var(--text-primary);">24/7 Autonomous Protection:</strong> Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, and execute backstop debt repayments continuously without waiting for browser signatures.
+        </div>
+        <div style="font-size: 11px; color: #10b981; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 8px; background: rgba(16, 185, 129, 0.08); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.2); line-height: 1.45;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span><strong>Zero-Storage Protection:</strong> BULWARK never saves your private key in localStorage, cookies, or browser memory. Credentials are verified strictly for cryptographic address derivation and instantly discarded.</span>
         </div>
         <button type="button" id="btnSubmitPrivateKey" class="btn-primary" style="width: 100%; justify-content: center; padding: 11px 16px; font-weight: 700; cursor: pointer;">
           Authenticate 24/7 Autonomous Key &rarr;
@@ -1040,8 +1040,7 @@ function renderGatewayKeySection(keySection) {
     if (demoBtn && input) {
       demoBtn.addEventListener("click", () => {
         input.value = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-        input.type = "text";
-        setTimeout(() => { input.type = "password"; }, 2500);
+        submitPrivateKey();
       });
     }
 
@@ -1058,6 +1057,9 @@ async function submitPrivateKey() {
   if (!input) return;
 
   const key = input.value.trim();
+  // Immediately scrub raw key from DOM input element
+  input.value = "";
+
   if (!key) {
     if (errEl) {
       errEl.textContent = "Please enter a valid 32-byte hex private key.";
@@ -1087,11 +1089,13 @@ async function submitPrivateKey() {
       authenticated: true,
       mode: "private_key",
       address: data.address,
-      privateKey: key,
     };
     localStorage.setItem("bulwark_auth_mode", "private_key");
     localStorage.setItem("bulwark_auth_address", data.address);
-    localStorage.setItem("bulwark_auth_key", key);
+    // CRITICAL: NEVER store private key in localStorage
+    try {
+      localStorage.removeItem("bulwark_auth_key");
+    } catch (e) {}
 
     applyAuthStateUI();
     showToast(`24/7 Autonomous Guardian Activated for ${data.address.slice(0, 6)}...${data.address.slice(-4)}`, "success");

@@ -152,7 +152,8 @@ function initOperatorKeySettings() {
   if (!input || !badge || !saveBtn) return;
 
   const current = localStorage.getItem("bulwark_operator_key") || "bulwark_sec_ops_2026_az";
-  input.value = current;
+  input.value = "";
+  input.placeholder = current ? "•••••••••••••••• (Authorized Session Key)" : "Enter Operator Key";
   badge.textContent = current ? "AUTHENTICATED" : "UNAUTHENTICATED";
   badge.className = current ? "chip chip-policy" : "chip chip-unavailable";
 
@@ -160,11 +161,15 @@ function initOperatorKeySettings() {
     const val = input.value.trim();
     if (val) {
       localStorage.setItem("bulwark_operator_key", val);
+      input.value = "";
+      input.placeholder = "•••••••••••••••• (Authorized Session Key)";
       badge.textContent = "AUTHENTICATED";
       badge.className = "chip chip-policy";
       showToast("Operator key saved", "success");
     } else {
       localStorage.removeItem("bulwark_operator_key");
+      input.value = "";
+      input.placeholder = "Enter Operator Key";
       badge.textContent = "UNAUTHENTICATED";
       badge.className = "chip chip-unavailable";
       showToast("Operator key cleared", "info");
