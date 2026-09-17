@@ -153,6 +153,8 @@ function toggleAuditPayload(elemId) {
   el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
+window.toggleAuditPayload = toggleAuditPayload;
+
 document.addEventListener("DOMContentLoaded", () => {
   loadAuditData();
   setInterval(loadAuditData, 4000);

@@ -32,19 +32,22 @@ if (loadLiveProofBtn) {
   });
 }
 
-fileInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const fileNameDisplay = document.getElementById("fileNameDisplay");
-  if (fileNameDisplay) fileNameDisplay.textContent = file.name;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    bundleText.value = event.target.result;
-  };
-  reader.readAsText(file);
-});
+if (fileInput) {
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (bundleText) bundleText.value = event.target.result;
+    };
+    reader.readAsText(file);
+  });
+}
 
-verifyBtn.addEventListener("click", async () => {
+if (verifyBtn && bundleText) {
+  verifyBtn.addEventListener("click", async () => {
   const rawText = bundleText.value.trim();
   if (!rawText) {
     alert("Please paste a PoAA JSON bundle or select a file.");
@@ -82,7 +85,8 @@ verifyBtn.addEventListener("click", async () => {
     verifyBtn.disabled = false;
     verifyBtn.textContent = "Verify 11/11 Checks";
   }
-});
+  });
+}
 
 function renderReport(report) {
   verdictBanner.style.display = "block";

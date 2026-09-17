@@ -109,29 +109,42 @@ function updateWalletDiagnostics() {
 
   if (!badge) return;
 
-  if (connectedWallet && connectedWallet.address) {
+  const isAuthed = !!(window.bulwarkAuth && window.bulwarkAuth.authenticated);
+  const isKeyMode = isAuthed && window.bulwarkAuth.mode === "private_key";
+
+  if (isKeyMode) {
+    badge.className = "chip chip-keeperhub";
+    badge.textContent = "24/7 GUARDIAN ACTIVE";
+    if (nameEl) nameEl.textContent = "24/7 Autonomous Guardian Key";
+    if (addrEl) addrEl.textContent = window.bulwarkAuth.address;
+    if (chainEl) chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Base Sepolia 84532 (Zero-Prompt Mode)</span>`;
+  } else if (connectedWallet && connectedWallet.address) {
     badge.className = "chip chip-dual";
     badge.textContent = "ACTIVE SESSION";
     const meta = WALLET_METADATA[connectedWallet.type] || WALLET_METADATA.injected;
-    nameEl.textContent = meta.name;
-    addrEl.textContent = connectedWallet.address;
+    if (nameEl) nameEl.textContent = meta.name;
+    if (addrEl) addrEl.textContent = connectedWallet.address;
 
     const isBase = connectedWallet.chainId === 84532;
     const isEth = connectedWallet.chainId === 11155111;
-    if (isBase) {
-      chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Base Sepolia 84532 (Active Network)</span>`;
-    } else if (isEth) {
-      chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Sepolia 11155111 (Supported Network)</span>`;
-    } else {
-      chainEl.innerHTML = `<span style="color: var(--accent-rose);">Chain ${connectedWallet.chainId} (Mismatch)</span>`;
+    if (chainEl) {
+      if (isBase) {
+        chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Base Sepolia 84532 (Active Network)</span>`;
+      } else if (isEth) {
+        chainEl.innerHTML = `<span style="color: var(--accent-emerald);">Sepolia 11155111 (Supported Network)</span>`;
+      } else {
+        chainEl.innerHTML = `<span style="color: var(--accent-rose);">Chain ${connectedWallet.chainId} (Mismatch)</span>`;
+      }
     }
   } else {
     badge.className = "chip chip-unavailable";
     badge.textContent = "DISCONNECTED";
-    nameEl.textContent = "None";
-    addrEl.textContent = "Not connected";
-    chainEl.textContent = "--";
+    if (nameEl) nameEl.textContent = "None";
+    if (addrEl) addrEl.textContent = "Not connected";
+    if (chainEl) chainEl.textContent = "--";
   }
+}
+
 function initOperatorKeySettings() {
   const input = document.getElementById("opKeyInput");
   const badge = document.getElementById("opKeyStatusBadge");
@@ -168,7 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
     doctorBtn.addEventListener("click", loadDoctorData);
   }
 
+  window.addEventListener("bulwarkAuthChanged", updateWalletDiagnostics);
   window.addEventListener("walletAccountChanged", updateWalletDiagnostics);
   window.addEventListener("walletChainChanged", updateWalletDiagnostics);
   setTimeout(updateWalletDiagnostics, 500);
 });
+

@@ -908,6 +908,153 @@ pnpm --filter @bulwark/cli exec bulwark audit export --out audit-bundle.jsonld</
     </div>
   </div>
 
+  <!-- Web3 Wallet Connection Modal -->
+  <div id="walletModal" class="wallet-modal-backdrop" style="display: none;">
+    <div class="wallet-modal">
+      <div class="wallet-modal-header">
+        <div class="wallet-modal-title">
+          <h3>Connect Web3 Wallet</h3>
+          <p>Select your preferred wallet to manage Aave positions and authorize RescueGrants.</p>
+        </div>
+        <button id="closeWalletModal" class="wallet-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Connected State Banner (Shown when an active wallet is connected) -->
+      <div id="walletConnectedSection" class="wallet-connected-section" style="display: none;">
+        <div class="wallet-active-card">
+          <div class="wallet-avatar" id="walletAvatar">MM</div>
+          <div class="wallet-details">
+            <div class="wallet-name-row">
+              <span id="connectedWalletName" class="connected-wallet-name">MetaMask</span>
+              <span id="connectedChainTag" class="chip chip-chain">Sepolia 11155111</span>
+            </div>
+            <span id="connectedAddressFull" class="connected-address-full">0x0000...0000</span>
+          </div>
+        </div>
+        <div class="wallet-actions-row">
+          <button id="switchNetworkBtn" class="btn-primary" style="display: none;">Switch to Sepolia</button>
+          <button id="scanConnectedPosBtn" class="btn-secondary">Scan My Position</button>
+          <button id="disconnectWalletBtn" class="btn-danger">Disconnect</button>
+        </div>
+      </div>
+
+      <!-- Wallet Options Grid -->
+      <div id="walletListSection" class="wallet-list">
+        <!-- 1. MetaMask -->
+        <button class="wallet-option" data-wallet="metamask" id="opt-metamask">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <path d="M29.07 4L18.43 11.89L20.35 7.16L29.07 4Z" fill="#E2761B"/>
+                <path d="M2.93 4L11.57 7.21L13.57 11.89L2.93 4Z" fill="#E4761B"/>
+                <path d="M24.89 22.38L22.18 26.54L28.39 28.24L30.17 22.48L24.89 22.38Z" fill="#E4761B"/>
+                <path d="M1.83 22.48L3.61 28.24L9.82 26.54L7.11 22.38L1.83 22.48Z" fill="#E4761B"/>
+                <path d="M9.54 14.28L7.82 16.89L13.88 17.22L13.68 10.61L9.54 14.28Z" fill="#E4761B"/>
+                <path d="M22.46 14.28L18.27 10.56L18.12 17.22L24.18 16.89L22.46 14.28Z" fill="#E4761B"/>
+                <path d="M9.82 26.54L13.34 24.83L10.37 21.99L9.82 26.54Z" fill="#D7C1B3"/>
+                <path d="M18.66 24.83L22.18 26.54L21.63 21.99L18.66 24.83Z" fill="#D7C1B3"/>
+                <path d="M13.34 24.83L16 28.75L18.66 24.83L18.91 21.44L13.09 21.44L13.34 24.83Z" fill="#233447"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">MetaMask</span>
+              <span class="wallet-option-desc">Connect using MetaMask browser extension</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-metamask">Available</span>
+        </button>
+
+        <!-- 2. OKX Wallet -->
+        <button class="wallet-option" data-wallet="okx" id="opt-okx">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#000000"/>
+                <rect x="7" y="7" width="6" height="6" fill="#FFFFFF"/>
+                <rect x="19" y="7" width="6" height="6" fill="#FFFFFF"/>
+                <rect x="13" y="13" width="6" height="6" fill="#FFFFFF"/>
+                <rect x="7" y="19" width="6" height="6" fill="#FFFFFF"/>
+                <rect x="19" y="19" width="6" height="6" fill="#FFFFFF"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">OKX Wallet</span>
+              <span class="wallet-option-desc">Leading Web3 multi-chain portal</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-okx">Available</span>
+        </button>
+
+        <!-- 3. Coinbase Wallet -->
+        <button class="wallet-option" data-wallet="coinbase" id="opt-coinbase">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#0052FF"/>
+                <circle cx="16" cy="16" r="9" fill="#FFFFFF"/>
+                <rect x="13" y="13" width="6" height="6" rx="1.5" fill="#0052FF"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Coinbase Wallet</span>
+              <span class="wallet-option-desc">Self-custody crypto wallet & passkeys</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-coinbase">Available</span>
+        </button>
+
+        <!-- 4. Rabby Wallet -->
+        <button class="wallet-option" data-wallet="rabby" id="opt-rabby">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#8697FF"/>
+                <path d="M10 22C10 18 13 14 16 14C19 14 22 18 22 22" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="13" cy="11" r="2" fill="#FFFFFF"/>
+                <circle cx="19" cy="11" r="2" fill="#FFFFFF"/>
+                <path d="M11 7C11 7 13 8 13 10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 7C21 7 19 8 19 10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Rabby Wallet</span>
+              <span class="wallet-option-desc">DeFi wallet with pre-transaction simulation</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-rabby">Available</span>
+        </button>
+
+        <!-- 5. Generic Injected Browser Wallet -->
+        <button class="wallet-option" data-wallet="injected" id="opt-injected">
+          <div class="wallet-option-left">
+            <div class="wallet-brand-icon">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#1e293b"/>
+                <path d="M16 8L24 12.5V21.5L16 26L8 21.5V12.5L16 8Z" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M16 17V26M16 17L8 12.5M16 17L24 12.5" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="wallet-option-info">
+              <span class="wallet-option-name">Browser Injected</span>
+              <span class="wallet-option-desc">Connect any standard EIP-1193 provider</span>
+            </div>
+          </div>
+          <span class="wallet-badge" id="badge-injected">Available</span>
+        </button>
+      </div>
+
+      <!-- Feedback / Error Notice -->
+      <div id="walletErrorMsg" class="wallet-error-msg" style="display: none;"></div>
+
+      <div class="wallet-modal-footer">
+        <span class="wallet-footer-tip">Non-custodial &middot; Signatures stay strictly within your wallet</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Application Scripts -->
+  <script src="/shared.js"></script>
+
   <script>
     // Copy code snippet helper
     function copyCode(btn) {
@@ -966,60 +1113,7 @@ pnpm --filter @bulwark/cli exec bulwark audit export --out audit-bundle.jsonld</
         });
       }
     });
-
-    // Populate live state in header/KPI
-    async function updateLiveTelemetry() {
-      try {
-        const res = await fetch('/api/state');
-        if (!res.ok) return;
-        const state = await res.json();
-        
-        if (state.hasKey) {
-          const kChip = document.getElementById('keyChip');
-          if (kChip) {
-            kChip.className = 'chip chip-chain';
-            kChip.innerText = 'KEY ACTIVE';
-          }
-        }
-        if (state.capacity) {
-          if (document.getElementById('deskBalanceVal')) {
-            document.getElementById('deskBalanceVal').innerText = `$${Number(state.capacity.totalCapacityUsd || 500000).toLocaleString()}`;
-          }
-          if (document.getElementById('availableCapVal')) {
-            document.getElementById('availableCapVal').innerText = `$${Number(state.capacity.availableCapacityUsd || 485000).toLocaleString()}`;
-          }
-          if (document.getElementById('reservedCapVal')) {
-            document.getElementById('reservedCapVal').innerText = `$${Number(state.capacity.reservedCapacityUsd || 15000).toLocaleString()}`;
-          }
-        }
-        if (state.executions) {
-          const verified = state.executions.filter(e => e.status === 'verified' || e.status === 'completed').length;
-          if (document.getElementById('verifiedRescuesVal')) {
-            document.getElementById('verifiedRescuesVal').innerText = verified.toString();
-          }
-        }
-      } catch (err) {
-        // silent fallback
-      }
-    }
-    updateLiveTelemetry();
-    setInterval(updateLiveTelemetry, 10000);
-
-    // Trigger tick handler
-    const tickBtn = document.getElementById('tickBtn');
-    if (tickBtn) {
-      tickBtn.addEventListener('click', async () => {
-        tickBtn.disabled = true;
-        tickBtn.innerText = 'Scanning...';
-        try {
-          await fetch('/api/tick', { method: 'POST' });
-          await updateLiveTelemetry();
-        } finally {
-          tickBtn.disabled = false;
-          tickBtn.innerText = 'Trigger Tick';
-        }
-      });
-    }
   </script>
 </body>
 </html>
+

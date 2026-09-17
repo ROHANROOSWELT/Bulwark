@@ -329,6 +329,11 @@ async function executeGrant(id) {
   }
 }
 
+window.approveGrant = approveGrant;
+window.revokeGrant = revokeGrant;
+window.dryRunGrant = dryRunGrant;
+window.executeGrant = executeGrant;
+
 // ── Autonomous Guardian Risk Alert ─────────────────────────────────────────
 function checkAutonomousTrigger(pos) {
   if (!pos || typeof pos.healthFactor !== "number" || pos.healthFactor <= 0 || pos.healthFactor >= 1.350) return;
@@ -451,6 +456,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
          <div class="term-line" style="color: #94a3b8; font-size: 11px; margin-bottom: 6px;">
            State-bound policy armed &bull; Prompting Gemini 3.5 Flash-Lite with 44 KeeperHub MCP tools without asking user.
          </div>`
+      : "";
     const authMode = window.bulwarkAuth?.mode;
     const authAddr = window.bulwarkAuth?.address;
     let authNotice = "";

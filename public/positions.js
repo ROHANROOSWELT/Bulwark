@@ -201,11 +201,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const scanInput = document.getElementById("scanAddressInput");
   if (useWalletBtn && scanInput) {
     useWalletBtn.addEventListener("click", () => {
-      if (connectedWallet && connectedWallet.address) {
-        scanInput.value = connectedWallet.address;
-        performOnChainScan(connectedWallet.address);
+      const activeAddress = window.bulwarkAuth?.address || (connectedWallet && connectedWallet.address);
+      if (activeAddress) {
+        scanInput.value = activeAddress;
+        performOnChainScan(activeAddress);
       } else {
-        showToast("No Web3 wallet currently connected. Click 'Connect Wallet' in the header.", "error");
+        showToast("No Web3 wallet or guardian currently active. Click 'Connect Wallet' in the header.", "error");
       }
     });
   }

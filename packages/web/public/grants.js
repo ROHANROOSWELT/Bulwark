@@ -218,6 +218,12 @@ function inspectGrant(id) {
   modal.style.display = "flex";
 }
 
+window.approveGrantAction = approveGrantAction;
+window.dryRunGrantAction = dryRunGrantAction;
+window.executeGrantAction = executeGrantAction;
+window.revokeGrantAction = revokeGrantAction;
+window.inspectGrant = inspectGrant;
+
 // ── Setup Listeners ────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   loadGrantsData();
@@ -272,8 +278,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (openProposeBtn && proposeModal) {
     openProposeBtn.addEventListener("click", () => {
-      if (connectedWallet && connectedWallet.address && propOwnerInput && !propOwnerInput.value) {
-        propOwnerInput.value = connectedWallet.address;
+      const activeAddr = window.bulwarkAuth?.address || (connectedWallet && connectedWallet.address);
+      if (activeAddr && propOwnerInput && !propOwnerInput.value) {
+        propOwnerInput.value = activeAddr;
       }
       proposeModal.style.display = "flex";
     });
@@ -293,10 +300,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (propUseWalletBtn && propOwnerInput) {
     propUseWalletBtn.addEventListener("click", () => {
-      if (connectedWallet && connectedWallet.address) {
-        propOwnerInput.value = connectedWallet.address;
+      const activeAddr = window.bulwarkAuth?.address || (connectedWallet && connectedWallet.address);
+      if (activeAddr) {
+        propOwnerInput.value = activeAddr;
       } else {
-        showToast("No wallet connected. Please connect wallet first.", "error");
+        showToast("No active wallet or guardian. Please authenticate first.", "error");
       }
     });
   }

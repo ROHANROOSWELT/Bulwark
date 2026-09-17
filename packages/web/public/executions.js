@@ -142,6 +142,8 @@ function inspectReceipt(execId) {
   modal.style.display = "flex";
 }
 
+window.inspectReceipt = inspectReceipt;
+
 document.addEventListener("DOMContentLoaded", () => {
   loadExecutionsData();
   setInterval(loadExecutionsData, 4000);
