@@ -571,6 +571,58 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
 }
 
 function initAgentDecisionConsole() {
+  // Live Terminal Visibility Toggle Button
+  const btnToggle = document.getElementById("btnToggleTerminal");
+  const terminalSection = document.getElementById("agentDecisionConsoleSection");
+  const toggleTitle = document.getElementById("terminalToggleTitle");
+  const toggleSub = document.getElementById("terminalToggleSub");
+
+  function setTerminalVisibility(visible, animateScroll = false) {
+    if (!terminalSection) return;
+    if (visible) {
+      terminalSection.style.display = "";
+      terminalSection.classList.remove("terminal-hidden");
+      if (btnToggle) {
+        btnToggle.classList.add("active");
+        btnToggle.setAttribute("aria-pressed", "true");
+      }
+      if (toggleTitle) toggleTitle.textContent = "Hide Live Terminal";
+      if (toggleSub) toggleSub.textContent = "Gemini 3.5 + KeeperHub MCP (Visible)";
+      localStorage.setItem("bulwark_terminal_visible", "true");
+      if (animateScroll) {
+        setTimeout(() => {
+          terminalSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 120);
+      }
+    } else {
+      terminalSection.style.display = "none";
+      terminalSection.classList.add("terminal-hidden");
+      if (btnToggle) {
+        btnToggle.classList.remove("active");
+        btnToggle.setAttribute("aria-pressed", "false");
+      }
+      if (toggleTitle) toggleTitle.textContent = "Show Live Terminal";
+      if (toggleSub) toggleSub.textContent = "Gemini 3.5 + KeeperHub MCP (Hidden)";
+      localStorage.setItem("bulwark_terminal_visible", "false");
+    }
+  }
+
+  window.setTerminalVisibility = setTerminalVisibility;
+
+  if (btnToggle) {
+    btnToggle.addEventListener("click", () => {
+      const isCurrentlyVisible = !terminalSection?.classList.contains("terminal-hidden") && terminalSection?.style.display !== "none";
+      setTerminalVisibility(!isCurrentlyVisible, !isCurrentlyVisible);
+    });
+
+    const saved = localStorage.getItem("bulwark_terminal_visible");
+    if (saved === "false") {
+      setTerminalVisibility(false, false);
+    } else {
+      setTerminalVisibility(true, false);
+    }
+  }
+
   const btnDemo = document.getElementById("btnRunAgentDemo");
   const btnReplay = document.getElementById("btnReplayTrace");
   const btnClear = document.getElementById("btnClearTerminal");
