@@ -41,7 +41,7 @@ export async function triageWithLlm(
   }
 
   const candidatePlans = quote.plans.filter((p) => p.isFeasible || p.isPartialMitigation);
-  if (candidatePlans.length <= 1) {
+  if (candidatePlans.length === 0) {
     return quote;
   }
 
