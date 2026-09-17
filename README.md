@@ -828,27 +828,7 @@ Before submitting the DoraHacks form, replace the marked placeholders with your 
 | **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
 | **Discord** | Submitter Discord username | `rohan_bulwark` | Primary Discord username |
 
----
-
-## 13. Demo Video Scripts & Storyboards
-
-Two ready-to-record video scripts are provided matching the DoraHacks judging rubric:
-1. **[Full Master Demo Script (~4 to 4.5 Minutes)](file:///home/rohan/Desktop/BULWARK_FINAL_DEMO_SCRIPT.md):** Complete step-by-step recording guide covering the Security Gateway, zero-storage key math, live Base Sepolia Aave position, deterministic rescue calculations, Gemini autonomous underwriting, clamp-only policy enforcement, KeeperHub MCP two-phase execution, BaseScan receipt, Dual-Truth verification, and 11/11 PoAA verification.
-2. **90-Second Fast Pitch Storyboard (below):** Quick-cut executive summary for lightning rounds.
-
-| Time | Screen Display | Narration Voiceover Script |
-| :---: | :--- | :--- |
-| **0:00 - 0:12** | **Title & Security Lock Gate:** Load `https://bulwark-keeperhub.vercel.app`. Show grayscale locked UI, inactive grey dot, and amber security banner. Click the BULWARK logo to reveal the **Access Gateway Modal**. | *"DeFi liquidations cost borrowers millions in penalties. Meet BULWARK: an autonomous, state-bound liquidation backstop on KeeperHub. To guarantee self-custody, the app starts locked until the operator authenticates via our Access Gateway."* |
-| **0:12 - 0:26** | **Dual-Access Gateway:** Toggle between Option 1 (Interactive Web3 Wallet) and Option 2 (24/7 Autonomous Guardian). Click **"⚡ Use Demo 24/7 Key (Testnet)"** & click **"Authenticate 24/7 Guardian &rarr;"**. | *"Borrowers choose between Interactive Self-Custody—signing every rescue in MetaMask—or 24/7 Autonomous Guardian mode with a zero-signature private key. Private keys are never stored; they are derived ephemerally via secp256k1 and wiped."* |
-| **0:26 - 0:40** | **Vibrant Dashboard & Monitored Position:** The UI turns full color, live green dot pulses. Show monitored Aave V3 position on Base Sepolia (`0xE406...8123`) with low Health Factor ($HF \approx 1.277$). | *"Immediately, the UI unlocks into full color. BULWARK monitors live Aave V3 positions on Base Sepolia. Here, borrower 0xE406... has a distressed health factor of 1.277, facing imminent liquidation."* |
-| **0:40 - 0:55** | **Closed-Form Underwriting & Policy Clamp:** Show Gemini 3.5 autonomous underwriter selecting Debt Repayment, proposing $4.98 USDC, and Policy Compiler clamping against the $5.00 RescueGrant Band 1 cap. | *"Gemini evaluates candidate rescue plans and proposes the optimal debt repayment. The clamp-only Policy Compiler mathematically clamps the plan to human-authorized caps before any broadcast. The AI chooses the amount; it can never choose its own limit."* |
-| **0:55 - 1:12** | **Gemini 3.5 AI Terminal (Two-Phase Live Auto-Rescue):** Click the preset prompt chip. Show Phase 1 (`simulate: true` &rarr; `wouldRevert: false`), then Phase 2 (`simulate: false` &rarr; live broadcast via KeeperHub). | *"In our live terminal, Gemini executes a two-phase protocol over KeeperHub MCP: first dry-running simulation to verify safety, then broadcasting live to Base Sepolia through KeeperHub's Turnkey relayer."* |
-| **1:12 - 1:22** | **BaseScan Explorer & Telemetry:** Show confirmed transaction hash `0x61c5754c...` on BaseScan block 46906929 with 180,896 gas and instant HF recovery (+0.0005 delta). | *"The transaction is mined on Base Sepolia block 46906929. $4.98 USDC debt is burned, health factor recovers to safe territory, and the borrower pays zero gas fees."* |
-| **1:22 - 1:30** | **Public `/verify` Portal:** Click PoAA /verify, load the live proof bundle, and show 11/11 cryptographic checkmarks passing. | *"Every rescue produces a Proof of Authorized Agency bundle. Paste it into /verify: all 11 invariant checks pass. Verdict: PROVEN. Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."* |
-
----
-
-## 14. Developer SDK (@bulwark/core) & Release Artifacts
+## 13. Developer SDK (@bulwark/core) & Release Artifacts
 
 BULWARK is fully packaged and distributed as an open-source TypeScript SDK (`@bulwark/core`) and operational CLI (`@bulwark/cli`). Any DeFi protocol, risk DAO, or autonomous agent can integrate BULWARK's closed-form targeting equations, clamp-only policy compiler, and 11-check PoAA verifier directly into their codebase.
 
@@ -904,7 +884,7 @@ To re-package and verify release artifacts at any time:
 
 ---
 
-## 15. License & Team
+## 14. License & Team
 
 * **License:** [MIT License](LICENSE) — Open source and permissionless.
 * **Track:** *Best Integration into a Live Project* — DoraHacks "KeeperHub — The Agent Economy Hackathon" (September 2026).
