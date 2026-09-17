@@ -4041,9 +4041,13 @@ body.bulwark-locked .page-container,
 body.bulwark-locked .stats-grid,
 body.bulwark-locked .table-wrapper {
   filter: grayscale(0.85);
-  opacity: 0.55;
-  pointer-events: none;
+  opacity: 0.7;
   transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+body.bulwark-locked .btn-terminal-toggle {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 /* Floating Inactive / Locked Banner */

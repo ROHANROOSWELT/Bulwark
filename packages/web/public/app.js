@@ -652,7 +652,7 @@ function initAgentDecisionConsole() {
     if (!terminalSection) return;
     if (visible) {
       // Show terminal and hide the 3-column triad (opening terminal up to the hero)
-      terminalSection.style.display = "";
+      terminalSection.style.display = "block";
       terminalSection.classList.remove("terminal-hidden");
       if (triadSection) {
         triadSection.style.display = "none";
@@ -676,7 +676,7 @@ function initAgentDecisionConsole() {
       terminalSection.style.display = "none";
       terminalSection.classList.add("terminal-hidden");
       if (triadSection) {
-        triadSection.style.display = "";
+        triadSection.style.display = "grid";
         triadSection.classList.remove("triad-hidden");
       }
       if (btnToggle) {
@@ -697,7 +697,9 @@ function initAgentDecisionConsole() {
   window.setTerminalVisibility = setTerminalVisibility;
 
   if (btnToggle) {
-    btnToggle.addEventListener("click", () => {
+    btnToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const isCurrentlyVisible = !terminalSection?.classList.contains("terminal-hidden") && terminalSection?.style.display !== "none";
       setTerminalVisibility(!isCurrentlyVisible, true);
     });
