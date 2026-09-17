@@ -183,9 +183,8 @@ function renderState(data) {
     const latest = hasExecs ? data.executions[0] : null;
     const isBase = latest?.txHash?.startsWith("0x43dbc") || data.grants?.some(g => g.grantId === latest?.grantId && g.position?.chainId === 84532);
     const explorerBase = isBase ? "https://sepolia.basescan.org" : "https://sepolia.etherscan.io";
-    const explorerLink = latest?.txHash ? `${explorerBase}/tx/${latest.txHash}` : null;
     const hfRecoveryText = (typeof latest?.preHealthFactor === "number" && typeof latest?.postHealthFactor === "number")
-      ? `${latest.preHealthFactor.toFixed(3)} &rarr; ${latest.postHealthFactor.toFixed(3)}`
+      ? `${latest.preHealthFactor.toFixed(4)} &rarr; ${latest.postHealthFactor.toFixed(4)}`
       : "Target 1.500";
 
     execsContainer.innerHTML = `

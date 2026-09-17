@@ -58,8 +58,15 @@ function renderExecutionsTable(executions) {
       const ownerShort = `${owner.slice(0, 8)}...${owner.slice(-6)}`;
       const ownerUrl = `${explorerBase}/address/${owner}`;
 
-      const preHf = typeof e.preHealthFactor === "number" ? e.preHealthFactor.toFixed(3) : "UNAVAILABLE";
-      const postHf = typeof e.postHealthFactor === "number" ? e.postHealthFactor.toFixed(3) : "UNAVAILABLE";
+      const hasNumbers = typeof e.preHealthFactor === "number" && typeof e.postHealthFactor === "number";
+      const delta = hasNumbers ? (e.postHealthFactor - e.preHealthFactor) : null;
+      const preHf = typeof e.preHealthFactor === "number" ? e.preHealthFactor.toFixed(4) : "UNAVAILABLE";
+      const postHf = typeof e.postHealthFactor === "number" ? e.postHealthFactor.toFixed(4) : "UNAVAILABLE";
+      const deltaBadge = delta !== null && delta > 0
+        ? `<div style="color: var(--accent-emerald); font-size: 10px; font-weight: 700; margin-top: 2px;">+${delta.toFixed(5)} HF</div>`
+        : delta !== null && delta < 0
+        ? `<div style="color: var(--accent-rose); font-size: 10px; margin-top: 2px;">${delta.toFixed(5)} HF</div>`
+        : '';
 
       return `
         <tr>
@@ -89,7 +96,8 @@ function renderExecutionsTable(executions) {
             }
           </td>
           <td style="font-family: var(--font-mono); font-size: 11px;">
-            <span style="color: var(--accent-rose);">${preHf}</span> &rarr; <span style="color: var(--accent-emerald); font-weight: 700;">${postHf}</span>
+            <div><span style="color: var(--accent-rose);">${preHf}</span> &rarr; <span style="color: var(--accent-emerald); font-weight: 700;">${postHf}</span></div>
+            ${deltaBadge}
           </td>
           <td>
             <span class="chip chip-dual">Dual Verified</span>
