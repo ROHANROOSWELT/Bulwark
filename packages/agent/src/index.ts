@@ -354,9 +354,17 @@ export async function runAutonomousUnderwriting(
     log(`  * Plan: ${p.planId} (${p.type}) => amount: $${p.amountUsd.toFixed(2)} USDC | projectedHF: ${p.projectedHf.toFixed(3)} | feasible: ${Boolean(p.isFeasible || p.isPartialMitigation)}`);
   }
 
-  // Step 3: Gemini selection
+  // Step 3: Gemini autonomous underwriting decision
+  // Gemini receives the closed-form reference calculation and decides:
+  //   1. Which plan to select (choice)
+  //   2. What repayment amount to propose (proposedAmountUsd)
+  //   3. Its narrative justification
+  // Policy Compiler then clamps Gemini's proposal to the human-approved grant limit.
   let selectedStrategy = "Aave V3 Debt Repayment (USDC)";
-  let proposedAmount = 4.98;
+  // Fallback: use the deterministic closed-form reference amount (e.g. $4.98 to reach HF 2.0)
+  let proposedAmount = initialQuote.costToSafetyUsd > 0
+    ? Math.round(initialQuote.costToSafetyUsd * 100) / 100
+    : initialQuote.selectedPlan.amountUsd;
   let narrative = "Selected closed-form debt repayment to stabilize Health Factor within human-authorized risk parameters.";
 
   if (config.llmApiKey) {
@@ -364,15 +372,18 @@ export async function runAutonomousUnderwriting(
       const quote = await triageWithLlm(initialQuote, config);
       if (quote.selectedPlan) {
         selectedStrategy = `Aave V3 Debt Repayment (${snapshot.debtSymbol || "USDC"})`;
-        if (quote.selectedPlan.amountUsd > 0 && quote.selectedPlan.amountUsd <= 25) {
-          proposedAmount = 4.98;
+        if (typeof quote.proposedAmountUsd === "number" && quote.proposedAmountUsd > 0) {
+          // Gemini's autonomous amount decision
+          proposedAmount = quote.proposedAmountUsd;
+        } else if (quote.selectedPlan.amountUsd > 0) {
+          proposedAmount = quote.selectedPlan.amountUsd;
         }
       }
       if (quote.agentNarrative) {
         narrative = quote.agentNarrative.replace(/^\[AGENT OUTPUT\]\s*/, "");
       }
     } catch {
-      // Deterministic fallback
+      // Deterministic fallback — closed-form reference amount used
     }
   }
 

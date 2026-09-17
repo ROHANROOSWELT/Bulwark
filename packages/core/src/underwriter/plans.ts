@@ -42,6 +42,7 @@ export interface UnderwriterQuote {
   ladder: LadderRung[];
   selectionMode: "DETERMINISTIC_CHEAPEST" | "AGENT_SELECT";
   agentNarrative?: string;
+  proposedAmountUsd?: number;
 }
 
 /**

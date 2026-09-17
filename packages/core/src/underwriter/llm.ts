@@ -13,6 +13,7 @@ import { BulwarkConfig } from "../config.js";
 export interface LlmTriageResponse {
   choice: string;
   narrative: string;
+  proposedAmountUsd?: number;
 }
 
 // ── In-memory triage cache (2 min TTL) to preserve Google AI Studio free tier quota (500 req/day) ──
@@ -67,17 +68,26 @@ export async function triageWithLlm(
     }
   }
 
+  // The deterministic engine gives us the closed-form reference (e.g. $4.98 to target HF 2.0).
+  // Gemini acts as autonomous underwriter: it evaluates the position risk, reviews the
+  // reference calculation, selects the plan, and proposes a repayment amount.
+  // Policy Compiler will then clamp whatever Gemini proposes to the human-approved grant limit.
+  const referenceAmount = quote.costToSafetyUsd > 0 ? quote.costToSafetyUsd : quote.selectedPlan.amountUsd;
+
   const systemPrompt =
-    "You are an underwriter agent for BULWARK Aave rescue desk.\n" +
-    "You are provided a live position snapshot and a list of deterministically computed candidate rescue plans.\n" +
-    "Select the best plan for the position owner and provide a concise justification.\n" +
-    "You MUST respond ONLY with valid JSON: { \"choice\": \"<planId>\", \"narrative\": \"<concise narrative>\" }.\n" +
-    "You CANNOT modify amounts, assets, or limits. Any choice not in the provided candidate plan list will be rejected.";
+    "You are an autonomous underwriter agent for the BULWARK Aave rescue desk.\n" +
+    "You are provided a live Aave V3 position snapshot, a closed-form reference repayment calculation, and a list of valid candidate rescue plans.\n" +
+    "Your role: evaluate the position risk, select the best rescue plan, and propose a repayment amount in USD (proposedAmountUsd).\n" +
+    "The closed-form reference calculation is the mathematically exact amount to reach target HF — use it as your primary reference unless you have strong risk reasoning to deviate.\n" +
+    "You MUST respond ONLY with valid JSON: { \"choice\": \"<planId>\", \"proposedAmountUsd\": <number>, \"narrative\": \"<concise justification of your amount and plan selection>\" }.\n" +
+    "Any choice not in the provided candidate plan list will be rejected by policy.";
 
   const userContent = JSON.stringify({
     healthFactor: quote.snapshot.healthFactor,
     totalCollateralUsd: quote.snapshot.totalCollateralUsd,
     totalDebtUsd: quote.snapshot.totalDebtUsd,
+    referenceCalculatedRepayUsd: Math.round(referenceAmount * 100) / 100,
+    referenceTargetHf: config.policyHfTarget || 2.0,
     candidatePlans: candidatePlans.map((p) => ({
       planId: p.planId,
       type: p.type,
@@ -170,11 +180,21 @@ export async function triageWithLlm(
       if (isDefaultFetch) {
         dailyCount++;
       }
+      // Extract Gemini's autonomous proposedAmountUsd decision
+      let proposedAmountUsd: number | undefined = undefined;
+      if (
+        typeof parsed.proposedAmountUsd === "number" &&
+        !isNaN(parsed.proposedAmountUsd) &&
+        parsed.proposedAmountUsd > 0
+      ) {
+        proposedAmountUsd = Math.round(parsed.proposedAmountUsd * 100) / 100;
+      }
       const resultQuote: UnderwriterQuote = {
         ...quote,
         selectedPlan: chosenPlan,
         selectionMode: "AGENT_SELECT",
         agentNarrative: parsed.narrative ? `[AGENT OUTPUT] ${parsed.narrative}` : undefined,
+        proposedAmountUsd,
       };
       if (isDefaultFetch) {
         triageCache.set(cacheKey, { quote: resultQuote, expiresAt: Date.now() + 120_000 });
