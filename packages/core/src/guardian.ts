@@ -468,11 +468,12 @@ export class BulwarkGuardian {
     });
 
     if (simResult.wouldRevert) {
+      const reasonStr = simResult.revertReason || "Aave V3 contract simulation reverted (Account has no active debt or insufficient collateral)";
       const failed = transitionGrant(dryRunGrantState, "simulation_reverted", {
-        reason: simResult.revertReason ?? "Simulation indicated revert",
+        reason: reasonStr,
       });
       await this.store.saveGrant(failed);
-      throw new Error(`Execution aborted: simulation reverted with reason "${simResult.revertReason}"`);
+      throw new Error(`Execution aborted: simulation reverted with reason "${reasonStr}"`);
     }
 
     // 4. Submit Execution to KeeperHub with Idempotency-Key

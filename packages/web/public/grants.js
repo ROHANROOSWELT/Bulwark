@@ -162,6 +162,11 @@ async function dryRunGrantAction(id) {
 }
 
 async function executeGrantAction(id) {
+  if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+    if (typeof openAccessGatewayModal === "function") openAccessGatewayModal();
+    if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before executing rescue grants.", "error");
+    return;
+  }
   try {
     showToast(`Submitting execution to KeeperHub network for grant ${id}...`, "info");
     const doFetch = window.bulwarkFetch || fetch;

@@ -139,6 +139,146 @@ let connectedWallet = {
   balanceEth: null,
 };
 
+// ── BULWARK Dual-Access Authentication & Security Gateway ─────────────────────
+window.bulwarkAuth = {
+  authenticated: false,
+  mode: null, // "wallet" | "private_key"
+  address: null,
+  privateKey: null,
+};
+
+function initBulwarkAuth() {
+  const savedMode = localStorage.getItem("bulwark_auth_mode");
+  const savedAddress = localStorage.getItem("bulwark_auth_address");
+  const savedKey = localStorage.getItem("bulwark_auth_key");
+
+  if (savedMode === "private_key" && savedAddress && savedKey) {
+    window.bulwarkAuth = {
+      authenticated: true,
+      mode: "private_key",
+      address: savedAddress,
+      privateKey: savedKey,
+    };
+  } else if (savedMode === "wallet" && savedAddress) {
+    window.bulwarkAuth = {
+      authenticated: true,
+      mode: "wallet",
+      address: savedAddress,
+      privateKey: null,
+    };
+  } else {
+    window.bulwarkAuth = {
+      authenticated: false,
+      mode: null,
+      address: null,
+      privateKey: null,
+    };
+  }
+  applyAuthStateUI();
+}
+
+function applyAuthStateUI() {
+  const isAuthed = !!(window.bulwarkAuth && window.bulwarkAuth.authenticated);
+  const mode = window.bulwarkAuth?.mode;
+  const address = window.bulwarkAuth?.address;
+  const shortAddr = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
+
+  // 1. Body class: Dim and disable UI if not authenticated
+  if (isAuthed) {
+    document.body.classList.remove("bulwark-locked");
+  } else {
+    document.body.classList.add("bulwark-locked");
+  }
+
+  // 2. Banner management
+  let banner = document.getElementById("lockedGatewayBanner");
+  if (!isAuthed) {
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "lockedGatewayBanner";
+      banner.className = "locked-gateway-banner";
+      banner.innerHTML = `
+        <div class="locked-gateway-content">
+          <div class="locked-gateway-info">
+            <div class="locked-gateway-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="locked-gateway-title">BULWARK Application Locked &bull; Authentication Required</div>
+              <div class="locked-gateway-desc">Connect your Web3 wallet for interactive self-custody or supply a 24/7 autonomous guardian key to unlock backstop operations and agent execution.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn-primary" id="bannerUnlockBtn" type="button" style="padding: 9px 20px; font-weight:700; cursor:pointer;">
+              Unlock BULWARK &rarr;
+            </button>
+          </div>
+        </div>
+      `;
+      const header = document.querySelector("header.app-header");
+      if (header && header.nextSibling) {
+        header.parentNode.insertBefore(banner, header.nextSibling);
+      } else {
+        document.body.prepend(banner);
+      }
+      const unlockBtn = banner.querySelector("#bannerUnlockBtn");
+      if (unlockBtn) {
+        unlockBtn.addEventListener("click", () => openAccessGatewayModal());
+      }
+    } else {
+      banner.style.display = "block";
+    }
+  } else if (banner) {
+    banner.style.display = "none";
+  }
+
+  // 3. Key Chip in Header
+  const keyChip = document.getElementById("keyChip");
+  if (keyChip) {
+    if (!isAuthed) {
+      keyChip.className = "chip chip-unavailable";
+      keyChip.textContent = "INACTIVE • AUTH REQUIRED";
+      keyChip.title = "Application locked. Click logo or Connect Wallet to authenticate.";
+    } else if (mode === "wallet") {
+      keyChip.className = "chip chip-keeperhub";
+      keyChip.textContent = `WALLET: ${shortAddr}`;
+      keyChip.title = `Connected Web3 Wallet: ${address} (Interactive Mode - signs per tx)`;
+    } else if (mode === "private_key") {
+      keyChip.className = "chip chip-keeperhub";
+      keyChip.textContent = `24/7 GUARDIAN: ${shortAddr}`;
+      keyChip.title = `24/7 Autonomous Guardian Active: ${address} (Zero manual signatures required)`;
+    }
+  }
+
+  // 4. Update Header Connect Wallet Button
+  const btn = document.getElementById("connectWalletBtn");
+  const label = document.getElementById("walletBtnLabel");
+  const icon = document.getElementById("walletBtnIcon");
+  if (btn) {
+    if (isAuthed) {
+      btn.className = "btn-wallet connected";
+      if (label) label.textContent = shortAddr;
+      if (icon) {
+        icon.textContent = mode === "private_key" ? "⚡" : (WALLET_METADATA[connectedWallet?.type]?.avatar || "👛");
+      }
+    } else {
+      btn.className = "btn-wallet";
+      if (label) label.textContent = "Connect Wallet";
+      if (icon) {
+        icon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="4"></rect><path d="M16 12h.01"></path><path d="M2 10h20"></path></svg>`;
+      }
+    }
+  }
+
+  // 5. Dispatch event for page listeners
+  window.dispatchEvent(new CustomEvent("bulwarkAuthChanged", { detail: window.bulwarkAuth }));
+}
+window.initBulwarkAuth = initBulwarkAuth;
+window.applyAuthStateUI = applyAuthStateUI;
+
 function getWalletProvider(type) {
   const meta = WALLET_METADATA[type];
   if (!meta) return null;
@@ -200,9 +340,25 @@ async function connectWallet(type) {
     };
 
     localStorage.setItem("bulwark_wallet_type", type);
+    localStorage.setItem("bulwark_auth_mode", "wallet");
+    localStorage.setItem("bulwark_auth_address", accounts[0]);
+    localStorage.removeItem("bulwark_auth_key");
+
+    window.bulwarkAuth = {
+      authenticated: true,
+      mode: "wallet",
+      address: accounts[0],
+      privateKey: null,
+    };
+
     listenToProviderEvents(provider);
     updateWalletUI();
+    applyAuthStateUI();
     showToast(`Connected ${meta.name} (${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)})`, "success");
+    const modal = document.getElementById("walletModal");
+    if (modal) {
+      setTimeout(() => { modal.style.display = "none"; }, 350);
+    }
   } catch (err) {
     console.error("Wallet connection failed:", err);
     if (err.code === 4001) {
@@ -261,16 +417,40 @@ async function switchToActiveNetwork() {
   }
 }
 
-function disconnectWallet() {
+function disconnectAuth() {
+  localStorage.removeItem("bulwark_auth_mode");
+  localStorage.removeItem("bulwark_auth_address");
+  localStorage.removeItem("bulwark_auth_key");
+  localStorage.removeItem("bulwark_wallet_type");
+
+  window.bulwarkAuth = {
+    authenticated: false,
+    mode: null,
+    address: null,
+    privateKey: null,
+  };
+
   connectedWallet = {
     type: null,
     address: null,
     chainId: null,
     provider: null,
   };
-  localStorage.removeItem("bulwark_wallet_type");
+
   updateWalletUI();
-  showToast("Wallet disconnected", "info");
+  applyAuthStateUI();
+
+  const modal = document.getElementById("walletModal");
+  if (modal && modal.style.display === "flex") {
+    switchGatewayTab("wallet");
+  }
+
+  showToast("Disconnected. Authentication required to access BULWARK.", "info");
+}
+window.disconnectAuth = disconnectAuth;
+
+function disconnectWallet() {
+  disconnectAuth();
 }
 
 function updateWalletUI() {
@@ -365,10 +545,18 @@ function listenToProviderEvents(provider) {
 
   provider.on("accountsChanged", (accounts) => {
     if (!accounts || accounts.length === 0) {
-      disconnectWallet();
+      disconnectAuth();
     } else {
       connectedWallet.address = accounts[0];
+      window.bulwarkAuth = {
+        authenticated: true,
+        mode: "wallet",
+        address: accounts[0],
+        privateKey: null,
+      };
+      localStorage.setItem("bulwark_auth_address", accounts[0]);
       updateWalletUI();
+      applyAuthStateUI();
       // Notify page listeners
       window.dispatchEvent(new CustomEvent("walletAccountChanged", { detail: { address: accounts[0] } }));
     }
@@ -382,6 +570,11 @@ function listenToProviderEvents(provider) {
 }
 
 async function autoReconnectWallet() {
+  const savedMode = localStorage.getItem("bulwark_auth_mode");
+  if (savedMode === "private_key") {
+    initBulwarkAuth();
+    return;
+  }
   const savedType = localStorage.getItem("bulwark_wallet_type");
   if (!savedType) return;
 
@@ -398,8 +591,15 @@ async function autoReconnectWallet() {
         chainId: parseInt(chainIdHex, 16),
         provider,
       };
+      window.bulwarkAuth = {
+        authenticated: true,
+        mode: "wallet",
+        address: accounts[0],
+        privateKey: null,
+      };
       listenToProviderEvents(provider);
       updateWalletUI();
+      applyAuthStateUI();
     }
   } catch (err) {
     console.warn("Silent auto-reconnect failed:", err);
@@ -446,12 +646,17 @@ function initPersistedHeaderAndKpis() {
 
     const keyChip = document.getElementById("keyChip");
     if (keyChip) {
-      if (cachedKey === "false") {
+      if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
         keyChip.className = "chip chip-unavailable";
-        keyChip.textContent = "KEY NOT SET";
-      } else {
+        keyChip.textContent = "INACTIVE • AUTH REQUIRED";
+      } else if (window.bulwarkAuth.mode === "wallet") {
+        const shortAddr = `${window.bulwarkAuth.address.slice(0, 6)}...${window.bulwarkAuth.address.slice(-4)}`;
         keyChip.className = "chip chip-keeperhub";
-        keyChip.textContent = "KEY ACTIVE";
+        keyChip.textContent = `WALLET: ${shortAddr}`;
+      } else if (window.bulwarkAuth.mode === "private_key") {
+        const shortAddr = `${window.bulwarkAuth.address.slice(0, 6)}...${window.bulwarkAuth.address.slice(-4)}`;
+        keyChip.className = "chip chip-keeperhub";
+        keyChip.textContent = `24/7 GUARDIAN: ${shortAddr}`;
       }
     }
 
@@ -545,12 +750,17 @@ function renderDeskKpis(data, shouldPersist = true) {
 
   const keyChip = document.getElementById("keyChip");
   if (keyChip) {
-    if (data.hasKey) {
-      keyChip.className = "chip chip-keeperhub";
-      keyChip.textContent = "KEY ACTIVE";
-    } else {
+    if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
       keyChip.className = "chip chip-unavailable";
-      keyChip.textContent = "KEY NOT SET";
+      keyChip.textContent = "INACTIVE • AUTH REQUIRED";
+    } else if (window.bulwarkAuth.mode === "wallet") {
+      const shortAddr = `${window.bulwarkAuth.address.slice(0, 6)}...${window.bulwarkAuth.address.slice(-4)}`;
+      keyChip.className = "chip chip-keeperhub";
+      keyChip.textContent = `WALLET: ${shortAddr}`;
+    } else if (window.bulwarkAuth.mode === "private_key") {
+      const shortAddr = `${window.bulwarkAuth.address.slice(0, 6)}...${window.bulwarkAuth.address.slice(-4)}`;
+      keyChip.className = "chip chip-keeperhub";
+      keyChip.textContent = `24/7 GUARDIAN: ${shortAddr}`;
     }
   }
 
@@ -680,6 +890,241 @@ function injectLiquidCanvas() {
   document.body.prepend(canvas);
 }
 
+// ── BULWARK Access Gateway Modal (Dual-Mode: Web3 Wallet & 24/7 Guardian Key) ─
+function ensureGatewayModalStructure(modalBackdrop) {
+  if (!modalBackdrop) return;
+  const modal = modalBackdrop.querySelector(".wallet-modal");
+  if (!modal) return;
+
+  // Title
+  const titleH3 = modal.querySelector(".wallet-modal-title h3");
+  const titleP = modal.querySelector(".wallet-modal-title p");
+  if (titleH3) titleH3.textContent = "BULWARK Access Gateway";
+  if (titleP) titleP.textContent = "Select authentication mode to access Autonomous Backstop & Settlement Engine.";
+
+  // Mode Switcher Tabs
+  let tabs = modal.querySelector("#gatewayModeTabs");
+  if (!tabs) {
+    tabs = document.createElement("div");
+    tabs.id = "gatewayModeTabs";
+    tabs.className = "gateway-mode-tabs";
+    tabs.innerHTML = `
+      <button class="gateway-tab active" data-mode="wallet" type="button" id="tabModeWallet">
+        <span class="gateway-tab-title">Option 1: Connect Web3 Wallet</span>
+        <span class="gateway-tab-sub">Interactive Self-Custody &bull; Sign each transaction</span>
+      </button>
+      <button class="gateway-tab" data-mode="private_key" type="button" id="tabModeKey">
+        <span class="gateway-tab-title">Option 2: 24/7 Autonomous Key</span>
+        <span class="gateway-tab-sub">Zero-Prompt Guardian &bull; 24/7 autonomous rescues</span>
+      </button>
+    `;
+    const header = modal.querySelector(".wallet-modal-header");
+    if (header && header.nextSibling) {
+      modal.insertBefore(tabs, header.nextSibling);
+    } else {
+      modal.prepend(tabs);
+    }
+
+    const tabWallet = modal.querySelector("#tabModeWallet");
+    const tabKey = modal.querySelector("#tabModeKey");
+    if (tabWallet) tabWallet.addEventListener("click", () => switchGatewayTab("wallet"));
+    if (tabKey) tabKey.addEventListener("click", () => switchGatewayTab("private_key"));
+  }
+
+  // Gateway Wallet Section wrapper
+  let walletSection = modal.querySelector("#gatewayWalletSection");
+  if (!walletSection) {
+    walletSection = document.createElement("div");
+    walletSection.id = "gatewayWalletSection";
+    const connectedSection = modal.querySelector("#walletConnectedSection");
+    const listSection = modal.querySelector("#walletListSection");
+    if (connectedSection && listSection) {
+      listSection.parentNode.insertBefore(walletSection, connectedSection);
+      walletSection.appendChild(connectedSection);
+      walletSection.appendChild(listSection);
+    }
+  }
+
+  // Gateway Key Section
+  let keySection = modal.querySelector("#gatewayKeySection");
+  if (!keySection) {
+    keySection = document.createElement("div");
+    keySection.id = "gatewayKeySection";
+    keySection.style.display = "none";
+    modal.appendChild(keySection);
+  }
+}
+
+function switchGatewayTab(mode) {
+  const modal = document.getElementById("walletModal");
+  if (!modal) return;
+
+  const tabWallet = modal.querySelector("#tabModeWallet");
+  const tabKey = modal.querySelector("#tabModeKey");
+  const walletSection = modal.querySelector("#gatewayWalletSection");
+  const keySection = modal.querySelector("#gatewayKeySection");
+
+  if (mode === "wallet") {
+    if (tabWallet) tabWallet.classList.add("active");
+    if (tabKey) tabKey.classList.remove("active");
+    if (walletSection) walletSection.style.display = "block";
+    if (keySection) keySection.style.display = "none";
+  } else {
+    if (tabKey) tabKey.classList.add("active");
+    if (tabWallet) tabWallet.classList.remove("active");
+    if (walletSection) walletSection.style.display = "none";
+    if (keySection) {
+      keySection.style.display = "block";
+      renderGatewayKeySection(keySection);
+    }
+  }
+}
+
+function renderGatewayKeySection(keySection) {
+  const isKeyActive = !!(window.bulwarkAuth && window.bulwarkAuth.authenticated && window.bulwarkAuth.mode === "private_key");
+  if (isKeyActive) {
+    const address = window.bulwarkAuth.address;
+    keySection.innerHTML = `
+      <div class="wallet-connected-section" style="display: flex; margin-bottom: 0;">
+        <div class="wallet-active-card">
+          <div class="wallet-avatar" style="background: linear-gradient(135deg, #10b981, #047857); color: white; font-weight: bold; font-size: 11px;">24/7</div>
+          <div class="wallet-details">
+            <div class="wallet-name-row">
+              <span class="connected-wallet-name">24/7 Autonomous Guardian Active</span>
+              <span class="chip chip-chain">Base Sepolia 84532</span>
+            </div>
+            <span class="connected-address-full" style="font-family: var(--font-mono); font-size: 11px; word-break: break-all;">${address}</span>
+            <div style="margin-top: 6px; font-size: 11px; color: var(--accent-emerald, #10b981); font-weight: 600;">
+              ✓ Zero manual confirmations required &bull; Continuous background protection active
+            </div>
+          </div>
+        </div>
+        <div class="wallet-actions-row">
+          <button id="disconnectKeyBtn" class="btn-danger" type="button">Disconnect 24/7 Guardian</button>
+        </div>
+      </div>
+    `;
+    const discBtn = keySection.querySelector("#disconnectKeyBtn");
+    if (discBtn) {
+      discBtn.addEventListener("click", () => {
+        disconnectAuth();
+      });
+    }
+  } else {
+    keySection.innerHTML = `
+      <div class="gateway-key-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--text-primary);" for="gatewayPrivateKeyInput">
+            Ethereum Private Key (secp256k1)
+          </label>
+          <button type="button" id="btnUseDemoKey" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+            ⚡ Use Demo 24/7 Key (Testnet)
+          </button>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <input type="password" id="gatewayPrivateKeyInput" class="gateway-key-input" placeholder="0x... or 64-character hex private key" autocomplete="off" />
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px;">
+          <strong style="color: var(--text-primary);">24/7 Autonomous Protection:</strong> Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, and execute backstop debt repayments continuously without waiting for browser signatures.
+        </div>
+        <button type="button" id="btnSubmitPrivateKey" class="btn-primary" style="width: 100%; justify-content: center; padding: 11px 16px; font-weight: 700; cursor: pointer;">
+          Authenticate 24/7 Autonomous Key &rarr;
+        </button>
+        <div id="gatewayKeyError" class="auth-error-msg" style="display: none; color: #dc2626; font-size: 11.5px; font-weight: 600; margin-top: 10px; padding: 8px 12px; background: #fee2e2; border-radius: 6px;"></div>
+      </div>
+    `;
+    const demoBtn = keySection.querySelector("#btnUseDemoKey");
+    const input = keySection.querySelector("#gatewayPrivateKeyInput");
+    const submitBtn = keySection.querySelector("#btnSubmitPrivateKey");
+
+    if (demoBtn && input) {
+      demoBtn.addEventListener("click", () => {
+        input.value = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+        input.type = "text";
+        setTimeout(() => { input.type = "password"; }, 2500);
+      });
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener("click", submitPrivateKey);
+    }
+  }
+}
+
+async function submitPrivateKey() {
+  const input = document.getElementById("gatewayPrivateKeyInput");
+  const errEl = document.getElementById("gatewayKeyError");
+  const submitBtn = document.getElementById("btnSubmitPrivateKey");
+  if (!input) return;
+
+  const key = input.value.trim();
+  if (!key) {
+    if (errEl) {
+      errEl.textContent = "Please enter a valid 32-byte hex private key.";
+      errEl.style.display = "block";
+    }
+    return;
+  }
+
+  if (errEl) errEl.style.display = "none";
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Verifying on-chain key...";
+  }
+
+  try {
+    const res = await fetch("/api/auth/verify-key", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ privateKey: key }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Failed to verify private key");
+    }
+
+    window.bulwarkAuth = {
+      authenticated: true,
+      mode: "private_key",
+      address: data.address,
+      privateKey: key,
+    };
+    localStorage.setItem("bulwark_auth_mode", "private_key");
+    localStorage.setItem("bulwark_auth_address", data.address);
+    localStorage.setItem("bulwark_auth_key", key);
+
+    applyAuthStateUI();
+    showToast(`24/7 Autonomous Guardian Activated for ${data.address.slice(0, 6)}...${data.address.slice(-4)}`, "success");
+
+    const modal = document.getElementById("walletModal");
+    if (modal) modal.style.display = "none";
+  } catch (err) {
+    if (errEl) {
+      errEl.textContent = err.message || "Failed to verify private key";
+      errEl.style.display = "block";
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Authenticate 24/7 Autonomous Key →";
+    }
+  }
+}
+
+function openAccessGatewayModal(preferredTab) {
+  const modalBackdrop = document.getElementById("walletModal");
+  if (!modalBackdrop) return;
+
+  ensureGatewayModalStructure(modalBackdrop);
+  detectInstalledWallets();
+  showWalletError(null);
+
+  const initialTab = preferredTab || (window.bulwarkAuth && window.bulwarkAuth.mode === "private_key" ? "private_key" : "wallet");
+  switchGatewayTab(initialTab);
+  modalBackdrop.style.display = "flex";
+}
+window.openAccessGatewayModal = openAccessGatewayModal;
+
 // ── Setup Shared Handlers on Page Load ──────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   injectLiquidCanvas();
@@ -701,11 +1146,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (connectBtn && modalBackdrop) {
     connectBtn.addEventListener("click", () => {
-      detectInstalledWallets();
-      showWalletError(null);
-      modalBackdrop.style.display = "flex";
+      openAccessGatewayModal();
     });
   }
+
+  // Intercept Logo click to open Gateway Modal when unauthenticated
+  document.querySelectorAll(".logo-link, .logo-area").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+        e.preventDefault();
+        e.stopPropagation();
+        openAccessGatewayModal();
+      }
+    });
+  });
 
   if (closeBtn && modalBackdrop) {
     closeBtn.addEventListener("click", () => {
@@ -731,18 +1185,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (scanMyPosBtn && modalBackdrop) {
     scanMyPosBtn.addEventListener("click", () => {
-      if (connectedWallet.address) {
+      const activeAddress = window.bulwarkAuth?.address || connectedWallet.address;
+      if (activeAddress) {
         modalBackdrop.style.display = "none";
         // If on /positions, trigger local scan, else navigate
         if (window.location.pathname.startsWith("/positions")) {
           const scanInput = document.getElementById("scanAddressInput");
           if (scanInput) {
-            scanInput.value = connectedWallet.address;
+            scanInput.value = activeAddress;
             const runScanBtn = document.getElementById("runScanBtn");
             if (runScanBtn) runScanBtn.click();
           }
         } else {
-          window.location.href = `/positions?scan=${connectedWallet.address}`;
+          window.location.href = `/positions?scan=${activeAddress}`;
         }
       }
     });
@@ -755,6 +1210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  initBulwarkAuth();
   detectInstalledWallets();
   autoReconnectWallet();
   fetchDeskState();

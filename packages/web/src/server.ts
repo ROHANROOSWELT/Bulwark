@@ -9,6 +9,7 @@ import * as http from "node:http";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as child_process from "node:child_process";
+import { createECDH } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -18,9 +19,22 @@ import {
   PositionSnapshot,
   PoaaBundle,
   CHAINS,
+  keccak256,
 } from "@bulwark/core";
 
 export const SERVER_VERSION = "0.1.0";
+
+export function deriveAddressFromPrivateKey(privKeyHex: string): string {
+  const clean = privKeyHex.replace(/^0x/, "").trim();
+  if (clean.length !== 64 || !/^[0-9a-fA-F]{64}$/.test(clean)) {
+    throw new Error("Invalid private key: must be exactly 64 hexadecimal characters.");
+  }
+  const ecdh = createECDH("secp256k1");
+  ecdh.setPrivateKey(Buffer.from(clean, "hex"));
+  const uncompressedPubKey = ecdh.getPublicKey().subarray(1); // 64 bytes (X and Y)
+  const hash = keccak256(uncompressedPubKey);
+  return "0x" + hash.slice(-40).toLowerCase();
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -288,6 +302,26 @@ export async function handleRequest(
           audit,
           watchlist: watchlistSnapshots,
         });
+        return;
+      }
+
+      // 1c. POST /api/auth/verify-key (Verifies 24/7 Autonomous Guardian Private Key)
+      if (method === "POST" && pathname === "/api/auth/verify-key") {
+        const body = await readBody<{ privateKey?: string }>().catch(() => ({ privateKey: undefined }));
+        const rawKey = (body && "privateKey" in body && typeof body.privateKey === "string") ? body.privateKey.trim() : "";
+        try {
+          const address = deriveAddressFromPrivateKey(rawKey);
+          sendJson(200, {
+            success: true,
+            address,
+            mode: "private_key",
+            message: "24/7 Autonomous Guardian credentials verified."
+          });
+        } catch (err: any) {
+          sendJson(400, {
+            error: err.message || "Invalid private key format"
+          });
+        }
         return;
       }
 

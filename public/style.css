@@ -4014,5 +4014,164 @@ main.dashboard-grid.landing-container {
   box-shadow: 0 0 0 1px #10b981;
 }
 
+/* ── Dual-Access Gateway & Application Lock System ───────────────────────── */
+body.bulwark-locked header.app-header .logo-area,
+body.bulwark-locked header.app-header .logo-link {
+  filter: grayscale(1);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
+body.bulwark-locked header.app-header .logo-area:hover {
+  opacity: 0.85;
+}
 
+body.bulwark-locked .live-dot-ping {
+  display: none !important;
+}
+
+body.bulwark-locked .live-dot-core {
+  background: #94a3b8 !important;
+  box-shadow: none !important;
+}
+
+body.bulwark-locked main.dashboard-grid,
+body.bulwark-locked .page-container,
+body.bulwark-locked .stats-grid,
+body.bulwark-locked .table-wrapper {
+  filter: grayscale(0.85);
+  opacity: 0.55;
+  pointer-events: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Floating Inactive / Locked Banner */
+.locked-gateway-banner {
+  display: none;
+  margin: 12px 24px 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 16px 20px;
+  position: relative;
+  z-index: 60;
+  animation: fadeIn 0.3s ease-out;
+}
+
+body.bulwark-locked .locked-gateway-banner {
+  display: block;
+}
+
+.locked-gateway-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.locked-gateway-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.locked-gateway-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.locked-gateway-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.locked-gateway-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Gateway Mode Tabs in Modal */
+.gateway-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.gateway-tab {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.gateway-tab:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.gateway-tab.active {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+}
+
+.gateway-tab-title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.gateway-tab-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.gateway-tab.active .gateway-tab-sub {
+  color: #94a3b8;
+}
+
+.gateway-key-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.gateway-key-input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.gateway-key-input:focus {
+  border-color: #000000;
+}

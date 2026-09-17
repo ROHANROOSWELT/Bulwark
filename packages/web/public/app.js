@@ -304,6 +304,11 @@ async function dryRunGrant(id) {
 }
 
 async function executeGrant(id) {
+  if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+    if (typeof openAccessGatewayModal === "function") openAccessGatewayModal();
+    if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before executing rescue grants.", "error");
+    return;
+  }
   try {
     const doFetch = window.bulwarkFetch || fetch;
     const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
@@ -311,9 +316,15 @@ async function executeGrant(id) {
     if (!res.ok) {
       throw new Error(json.error || "Execution rejected by policy compiler");
     }
+    if (typeof showToast === "function") {
+      showToast(`Execution dispatched successfully for grant ${id}!`, "success");
+    }
     alert("Execution submitted successfully:\n" + JSON.stringify(json.execution || json, null, 2));
     fetchState();
   } catch (err) {
+    if (typeof showToast === "function") {
+      showToast(`Execution failed: ${err.message}`, "error");
+    }
     alert("Error executing grant:\n" + err.message);
   }
 }
@@ -440,10 +451,18 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
          <div class="term-line" style="color: #94a3b8; font-size: 11px; margin-bottom: 6px;">
            State-bound policy armed &bull; Prompting Gemini 3.5 Flash-Lite with 44 KeeperHub MCP tools without asking user.
          </div>`
-      : "";
+    const authMode = window.bulwarkAuth?.mode;
+    const authAddr = window.bulwarkAuth?.address;
+    let authNotice = "";
+    if (authMode === "wallet") {
+      authNotice = `<div class="term-line" style="color: #38bdf8; font-size: 11px; margin-top: 2px;">[BULWARK GATEWAY] Interactive Self-Custody Mode: Connected wallet (${authAddr}) &bull; On-chain broadcast requires manual signature.</div>`;
+    } else if (authMode === "private_key") {
+      authNotice = `<div class="term-line" style="color: #10b981; font-size: 11px; margin-top: 2px;">[BULWARK GATEWAY] 24/7 Autonomous Guardian Mode: Active key for (${authAddr}) &bull; Zero manual signatures required.</div>`;
+    }
 
     termBody.innerHTML = `
       <div class="term-line" style="color: #64748b;">BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP</div>
+      ${authNotice}
       ${autoHeader}
       <div class="term-line term-cmd" style="margin: 8px 0;">gemini@bulwark:~$ pnpm agent ask "${escapeHtml(promptText)}"</div>
     `;
@@ -704,9 +723,44 @@ function initAgentDecisionConsole() {
   const promptForm = document.getElementById("agentPromptForm");
   const promptInput = document.getElementById("agentCustomPromptInput");
 
+  function syncPresetsWithAuth(auth) {
+    const addr = auth?.address || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
+    document.querySelectorAll(".term-chip-preset").forEach(chip => {
+      if (!chip.hasAttribute("data-template-prompt")) {
+        chip.setAttribute("data-template-prompt", chip.getAttribute("data-prompt"));
+      }
+      const template = chip.getAttribute("data-template-prompt");
+      chip.setAttribute("data-prompt", template.replace(/0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123/g, addr));
+    });
+  }
+
+  window.addEventListener("bulwarkAuthChanged", (e) => {
+    syncPresetsWithAuth(e.detail);
+    const termActive = document.getElementById("termActiveText");
+    if (termActive) {
+      if (e.detail?.authenticated) {
+        const modeLabel = e.detail.mode === "private_key" ? "24/7 Autonomous Guardian" : "Interactive Self-Custody Wallet";
+        const short = `${e.detail.address.slice(0, 6)}...${e.detail.address.slice(-4)}`;
+        termActive.textContent = `Standby • ${modeLabel} (${short}) ready for autonomous dispatch...`;
+      } else {
+        termActive.textContent = "Locked • Click BULWARK logo or Connect Wallet to authenticate...";
+      }
+    }
+  });
+
+  if (window.bulwarkAuth) {
+    syncPresetsWithAuth(window.bulwarkAuth);
+  }
+
   if (btnDemo) {
     btnDemo.addEventListener("click", () => {
-      runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", true);
+      if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+        if (typeof openAccessGatewayModal === "function") openAccessGatewayModal();
+        if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before triggering cycles.", "error");
+        return;
+      }
+      const activeAddress = window.bulwarkAuth.address;
+      runAgentDecisionFlow(`Scan borrower ${activeAddress} on Aave V3 Base Sepolia and formulate rescue strategy`, true);
     });
   }
 
@@ -718,7 +772,8 @@ function initAgentDecisionConsole() {
 
   if (btnReplay) {
     btnReplay.addEventListener("click", () => {
-      runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", false);
+      const activeAddress = window.bulwarkAuth?.address || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
+      runAgentDecisionFlow(`Scan borrower ${activeAddress} on Aave V3 Base Sepolia and formulate rescue strategy`, false);
     });
   }
 
@@ -745,7 +800,16 @@ function initAgentDecisionConsole() {
   // Quick preset chips
   document.querySelectorAll(".term-chip-preset").forEach(chip => {
     chip.addEventListener("click", () => {
-      const p = chip.getAttribute("data-prompt");
+      if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+        if (typeof openAccessGatewayModal === "function") openAccessGatewayModal();
+        if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before running agent tasks.", "error");
+        return;
+      }
+      let p = chip.getAttribute("data-prompt");
+      const activeAddress = window.bulwarkAuth?.address;
+      if (activeAddress && p) {
+        p = p.replace(/0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123/g, activeAddress);
+      }
       if (promptInput) promptInput.value = p;
       runAgentDecisionFlow(p, true);
     });
@@ -754,6 +818,11 @@ function initAgentDecisionConsole() {
   if (promptForm) {
     promptForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      if (!window.bulwarkAuth || !window.bulwarkAuth.authenticated) {
+        if (typeof openAccessGatewayModal === "function") openAccessGatewayModal();
+        if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before running agent tasks.", "error");
+        return;
+      }
       const val = promptInput?.value?.trim();
       if (val) {
         runAgentDecisionFlow(val, true);
