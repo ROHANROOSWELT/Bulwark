@@ -18,6 +18,7 @@
 [![Tests](https://img.shields.io/badge/Vitest-1%2C308%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8%20Strict-3178C6?style=for-the-badge&logo=typescript)](tsconfig.base.json)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Security Policy](https://img.shields.io/badge/Security-Policy%20Enforced-critical?style=for-the-badge&logo=shield)](SECURITY.md)
 [![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20--%20$17.4B%20TVL-2EBAC6?style=for-the-badge)](https://aave.com)
 [![Execution](https://img.shields.io/badge/Execution%20Engine-KeeperHub%20Turnkey-000000?style=for-the-badge)](https://keeperhub.com)
 
@@ -721,7 +722,7 @@ BULWARK features **1,308 actual, non-mocked, passing tests** across 36 test file
 
 ## 11. Security Architecture & Threat Model
 
-BULWARK treats all off-chain agents—including its own Guardian and underwriter models—as potentially adversarial.
+BULWARK treats all off-chain agents—including its own Guardian and underwriter models—as potentially adversarial. For full disclosure guidelines, supported versions, and cryptographic invariants, see the complete [**Security Policy (`SECURITY.md`)**](SECURITY.md).
 
 ```
 ┌───────────────────────────────┬────────────────────────────────────────────────────────────┐
