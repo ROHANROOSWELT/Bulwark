@@ -188,6 +188,138 @@
       </div>
     </section>
 
+    <!-- ── 4. GEMINI 3.5 & KEEPERHUB MCP AUTONOMOUS DECISION STREAM ────────── -->
+    <section class="live-agent-console-card" id="agentDecisionConsoleSection">
+      <div class="agent-console-header">
+        <div class="agent-console-title-area">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="live-dot" style="margin: 0;"><span class="live-dot-ping"></span><span class="live-dot-core"></span></span>
+            <span class="card-subtitle-tag highlight" style="color: var(--accent-emerald);">Live Autonomous Agent Engine</span>
+            <span class="chip chip-compiler" style="font-size: 10px;">gemini-3.5-flash-lite</span>
+            <span class="chip chip-chain" style="font-size: 10px;">KeeperHub MCP (44 Tools)</span>
+          </div>
+          <h2 class="card-headline large" style="margin-top: 4px;">Gemini 3.5 AI &amp; KeeperHub MCP Decision Stream</h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+            Watch Gemini inspect on-chain Aave positions, invoke KeeperHub MCP tools via JSON-RPC 2.0, and enforce invariant safety clamps in real time.
+          </p>
+        </div>
+
+        <div class="agent-console-actions">
+          <button id="btnRunAgentDemo" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16,185,129,0.35); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            <span>⚡ Run 10s Demo: Scan &amp; Rescue</span>
+          </button>
+          <button id="btnReplayTrace" class="btn-secondary" title="Replay verified trace from live Base Sepolia on-chain scan">
+            <span>🔄 Replay Live Trace</span>
+          </button>
+          <button id="btnClearTerminal" class="btn-secondary" title="Clear console output">
+            <span>🧹 Clear</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 5-Stage Visual Decision Pipeline Tracker -->
+      <div class="agent-flow-tracker" id="agentFlowTracker">
+        <!-- Stage 1: MCP Discovery -->
+        <div class="flow-stage-node" id="stageNode1">
+          <div class="flow-node-top">
+            <span class="flow-node-num">Stage 01</span>
+            <span id="stageBadge1" class="chip chip-chain" style="font-size: 9px;">Ready</span>
+          </div>
+          <div class="flow-node-title">🌐 MCP Discovery</div>
+          <div class="flow-node-sub" id="stageSub1">44 KeeperHub tools loaded</div>
+        </div>
+
+        <!-- Stage 2: Gemini AI Reasoning -->
+        <div class="flow-stage-node" id="stageNode2">
+          <div class="flow-node-top">
+            <span class="flow-node-num">Stage 02</span>
+            <span id="stageBadge2" class="chip chip-compiler" style="font-size: 9px;">Standby</span>
+          </div>
+          <div class="flow-node-title">🧠 Gemini AI Intent</div>
+          <div class="flow-node-sub" id="stageSub2">Strategy triage formulation</div>
+        </div>
+
+        <!-- Stage 3: MCP Tool Call -->
+        <div class="flow-stage-node" id="stageNode3">
+          <div class="flow-node-top">
+            <span class="flow-node-num">Stage 03</span>
+            <span id="stageBadge3" class="chip chip-keeperhub" style="font-size: 9px;">Pending</span>
+          </div>
+          <div class="flow-node-title">⚡ Tool Invocation</div>
+          <div class="flow-node-sub" id="stageSub3">execute_contract_call</div>
+        </div>
+
+        <!-- Stage 4: Invariant Clamp -->
+        <div class="flow-stage-node" id="stageNode4">
+          <div class="flow-node-top">
+            <span class="flow-node-num">Stage 04</span>
+            <span id="stageBadge4" class="chip chip-policy" style="font-size: 9px;">Guard</span>
+          </div>
+          <div class="flow-node-title">🔒 Invariant Clamp</div>
+          <div class="flow-node-sub" id="stageSub4">Target HF 1.500 &bull; $5.00 Cap</div>
+        </div>
+
+        <!-- Stage 5: Strategy Verdict -->
+        <div class="flow-stage-node" id="stageNode5">
+          <div class="flow-node-top">
+            <span class="flow-node-num">Stage 05</span>
+            <span id="stageBadge5" class="chip chip-chain" style="font-size: 9px;">Awaiting</span>
+          </div>
+          <div class="flow-node-title">🛡️ Autonomous Strategy</div>
+          <div class="flow-node-sub" id="stageSub5">Deterministic execution plan</div>
+        </div>
+      </div>
+
+      <!-- Terminal Emulator Window -->
+      <div class="term-window">
+        <div class="term-header">
+          <div class="term-dots">
+            <span class="term-dot red"></span>
+            <span class="term-dot yellow"></span>
+            <span class="term-dot green"></span>
+          </div>
+          <div class="term-title">gemini-3.5-flash-lite@bulwark: ~/agent/mcp — Base Sepolia (84532)</div>
+          <span id="termStatusPill" class="term-status-pill">CONNECTED &bull; IDLE</span>
+        </div>
+
+        <div class="term-body" id="agentTerminalBody">
+          <div class="term-line" style="color: #64748b;">
+            BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP
+          </div>
+          <div class="term-line" style="color: #64748b; margin-bottom: 12px;">
+            Type a prompt below or click <strong style="color: #10b981;">⚡ Run 10s Demo: Scan &amp; Rescue</strong> to observe Gemini taking live tool-calling decisions.
+          </div>
+          <div class="term-line" id="termCurrentLine">
+            <span style="color: #10b981;">gemini@bulwark:~$</span> <span id="termActiveText">Ready for prompt...</span><span class="term-cursor" id="termCursor"></span>
+          </div>
+        </div>
+
+        <div class="term-controls">
+          <!-- Preset Prompt Chips -->
+          <div class="term-chips-row">
+            <span style="font-size: 11px; color: #64748b; font-family: var(--font-mono); font-weight: 700;">QUICK ACTIONS:</span>
+            <button class="term-chip-preset" data-prompt="Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy">⚡ Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy</button>
+            <button class="term-chip-preset" data-prompt="Query Aave V3 pool for borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 using execute_contract_call">🔍 Query Aave V3 getUserAccountData via MCP</button>
+            <button class="term-chip-preset" data-prompt="Verify invariant clamping bounds and adaptive bands for health factor 1.256">🔒 Verify Adaptive Band Clamping ($5.00 Cap)</button>
+          </div>
+
+          <!-- Custom Input Row -->
+          <form id="agentPromptForm" class="term-input-row" onsubmit="return false;">
+            <input
+              type="text"
+              id="agentCustomPromptInput"
+              class="term-input-field"
+              placeholder="Ask Gemini AI with live KeeperHub MCP tool execution (e.g., 'Scan borrower 0xE406... on Base Sepolia')..."
+              autocomplete="off"
+            />
+            <button type="submit" id="btnSendCustomPrompt" class="btn-primary" style="white-space: nowrap; padding: 0 16px;">
+              Execute via MCP &rarr;
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
     <!-- Hidden containers for background data persistence -->
     <div id="executionsList" style="display: none;"></div>
     <div id="auditList" style="display: none;"></div>

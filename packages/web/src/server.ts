@@ -8,6 +8,7 @@
 import * as http from "node:http";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as child_process from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -288,6 +289,145 @@ export async function handleRequest(
           watchlist: watchlistSnapshots,
         });
         return;
+      }
+
+      // 1b. POST /api/agent/ask or GET /api/agent/stream (Live Gemini + MCP streaming)
+      if (
+        (method === "POST" && pathname === "/api/agent/ask") ||
+        (method === "GET" && (pathname === "/api/agent/stream" || pathname === "/api/agent/ask"))
+      ) {
+        let prompt = "Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy";
+        if (method === "POST") {
+          const body: { prompt?: string } = await readBody<{ prompt?: string }>().catch(() => ({ prompt: undefined }));
+          if (body?.prompt && typeof body.prompt === "string" && body.prompt.trim().length > 0) {
+            prompt = body.prompt.trim();
+          }
+        } else {
+          const qPrompt = url.searchParams.get("prompt");
+          if (qPrompt && qPrompt.trim().length > 0) {
+            prompt = qPrompt.trim();
+          }
+        }
+
+        const isSse = req.headers.accept?.includes("text/event-stream") || pathname === "/api/agent/stream";
+        const possibleAgentPaths: string[] = [
+          path.resolve(__dirname, "../../agent/dist/index.js"),
+          path.resolve(process.cwd(), "packages/agent/dist/index.js"),
+        ];
+        const agentScript: string = possibleAgentPaths.find((p) => fs.existsSync(p)) || possibleAgentPaths[0]!;
+
+        if (isSse) {
+          res.writeHead(200, {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+          });
+
+          const sendEvent = (event: { type: string; text: string; data?: any }) => {
+            if (!res.writableEnded) {
+              res.write(`data: ${JSON.stringify(event)}\n\n`);
+            }
+          };
+
+          sendEvent({ type: "start", text: `[AGENT PROMPT] ${prompt}` });
+
+          const child: any = child_process.spawn(
+            process.execPath,
+            ["--env-file-if-exists=.env", agentScript, "ask", prompt],
+            {
+              cwd: process.cwd(),
+              env: { ...process.env },
+            }
+          );
+
+          if (child.stdout) {
+            child.stdout.on("data", (chunk: Buffer) => {
+              const lines = chunk.toString("utf-8").split("\n");
+              for (const line of lines) {
+                if (line.trim().length > 0) {
+                  let eventType = "log";
+                  if (line.includes("Gemini decided to call KeeperHub MCP tool")) {
+                    eventType = "tool_call";
+                  } else if (line.includes("Loaded") && line.includes("MCP tools")) {
+                    eventType = "discovery";
+                  } else if (line.includes("[POLICY INVARIANT]")) {
+                    eventType = "policy";
+                  } else if (line.includes("[KEEPERHUB FACT]")) {
+                    eventType = "fact";
+                  } else if (line.includes("[AGENT OUTPUT] Response:")) {
+                    eventType = "response_header";
+                  }
+                  sendEvent({ type: eventType, text: line });
+                }
+              }
+            });
+          }
+
+          if (child.stderr) {
+            child.stderr.on("data", (chunk: Buffer) => {
+              const lines = chunk.toString("utf-8").split("\n");
+              for (const line of lines) {
+                if (line.trim().length > 0) {
+                  sendEvent({ type: "stderr", text: line });
+                }
+              }
+            });
+          }
+
+          child.on("close", (code: number) => {
+            sendEvent({ type: "done", text: `Agent execution finished (exit code ${code})`, data: { code } });
+            res.end();
+          });
+
+          child.on("error", (err: Error) => {
+            sendEvent({ type: "error", text: `Failed to spawn agent process: ${err.message}` });
+            res.end();
+          });
+
+          req.on("close", () => {
+            try { child.kill(); } catch {}
+          });
+          return;
+        } else {
+          // Standard JSON API response
+          const logs: string[] = [];
+          const child: any = child_process.spawn(
+            process.execPath,
+            ["--env-file-if-exists=.env", agentScript, "ask", prompt],
+            {
+              cwd: process.cwd(),
+              env: { ...process.env },
+            }
+          );
+
+          if (child.stdout) {
+            child.stdout.on("data", (chunk: Buffer) => {
+              const lines = chunk.toString("utf-8").split("\n");
+              for (const line of lines) {
+                if (line.trim().length > 0) logs.push(line);
+              }
+            });
+          }
+
+          if (child.stderr) {
+            child.stderr.on("data", (chunk: Buffer) => {
+              const lines = chunk.toString("utf-8").split("\n");
+              for (const line of lines) {
+                if (line.trim().length > 0) logs.push(line);
+              }
+            });
+          }
+
+          child.on("close", (code: number) => {
+            sendJson(200, { success: code === 0, code, prompt, logs });
+          });
+
+          child.on("error", (err: Error) => {
+            sendJson(500, { error: err.message, logs });
+          });
+          return;
+        }
       }
 
       // 2. POST /api/tick

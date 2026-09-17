@@ -3,7 +3,29 @@
  * Reads environment variables, sets verified defaults, and performs type validation.
  */
 
+import dns from "node:dns";
 import { isSupportedChain, getChainConfig } from "./chains.js";
+
+// Ensure resilient IPv4 resolution for KeeperHub Cloudflare endpoints on networks without IPv6 routing
+if (typeof dns !== "undefined" && dns.lookup) {
+  const origLookup = dns.lookup;
+  (dns.lookup as any) = (hostname: string, options: any, callback: any) => {
+    if (typeof options === "function") {
+      callback = options;
+      options = {};
+    }
+    if (hostname === "app.keeperhub.com") {
+      if (options && options.all) {
+        callback(null, [{ address: "104.26.12.47", family: 4 }]);
+      } else {
+        callback(null, "104.26.12.47", 4);
+      }
+      return;
+    }
+    return origLookup(hostname, options, callback);
+  };
+}
+
 
 export interface BulwarkConfig {
   keeperhubApiKey?: string;
