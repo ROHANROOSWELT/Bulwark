@@ -257,19 +257,34 @@ async function approveGrant(id) {
   try {
     const doFetch = window.bulwarkFetch || fetch;
     const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/approve`, { method: "POST" });
-    if (res.ok) fetchState();
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json.error || "Approval failed");
+    }
+    if (typeof showToast === "function") {
+      showToast(`Grant ${id} armed successfully.`, "success");
+    }
+    fetchState();
   } catch (err) {
-    alert("Error approving grant: " + err.message);
+    alert("Error approving grant:\n" + err.message);
   }
 }
 
 async function revokeGrant(id) {
+  if (!confirm(`Are you sure you want to revoke grant ${id}?`)) return;
   try {
     const doFetch = window.bulwarkFetch || fetch;
     const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/revoke`, { method: "POST" });
-    if (res.ok) fetchState();
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json.error || "Revocation failed");
+    }
+    if (typeof showToast === "function") {
+      showToast(`Grant ${id} revoked.`, "info");
+    }
+    fetchState();
   } catch (err) {
-    alert("Error revoking grant: " + err.message);
+    alert("Error revoking grant:\n" + err.message);
   }
 }
 
@@ -277,11 +292,14 @@ async function dryRunGrant(id) {
   try {
     const doFetch = window.bulwarkFetch || fetch;
     const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/dry`, { method: "POST" });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json.error || "Simulation failed");
+    }
     alert("Simulation Result:\n" + JSON.stringify(json, null, 2));
     fetchState();
   } catch (err) {
-    alert("Error running simulation: " + err.message);
+    alert("Error running simulation:\n" + err.message);
   }
 }
 
@@ -289,11 +307,14 @@ async function executeGrant(id) {
   try {
     const doFetch = window.bulwarkFetch || fetch;
     const res = await doFetch(`/api/grants/${encodeURIComponent(id)}/execute`, { method: "POST" });
-    const json = await res.json();
-    alert("Execution submitted:\n" + JSON.stringify(json.execution, null, 2));
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json.error || "Execution rejected by policy compiler");
+    }
+    alert("Execution submitted successfully:\n" + JSON.stringify(json.execution || json, null, 2));
     fetchState();
   } catch (err) {
-    alert("Error executing grant: " + err.message);
+    alert("Error executing grant:\n" + err.message);
   }
 }
 
