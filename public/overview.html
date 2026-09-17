@@ -65,11 +65,11 @@
           </p>
         </div>
         <div class="hero-terminal-toggle-area">
-          <button id="btnToggleTerminal" class="btn-terminal-toggle active" type="button" aria-pressed="true" title="Toggle visibility of the Gemini 3.5 &amp; KeeperHub MCP Live Terminal">
+          <button id="btnToggleTerminal" class="btn-terminal-toggle" type="button" aria-pressed="false" title="Toggle visibility of the Gemini 3.5 &amp; KeeperHub MCP Live Terminal">
             <span class="terminal-toggle-icon" style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent);">&gt;_</span>
             <div class="terminal-toggle-text">
-              <span class="terminal-toggle-title" id="terminalToggleTitle">Hide Live Terminal</span>
-              <span class="terminal-toggle-sub" id="terminalToggleSub">Gemini 3.5 + KeeperHub MCP (Visible)</span>
+              <span class="terminal-toggle-title" id="terminalToggleTitle">Show Live Terminal</span>
+              <span class="terminal-toggle-sub" id="terminalToggleSub">Gemini 3.5 + KeeperHub MCP (Hidden)</span>
             </div>
             <span class="terminal-toggle-switch" id="terminalToggleSwitch">
               <span class="terminal-toggle-knob"></span>
@@ -187,7 +187,7 @@
     </section>
 
     <!-- ── 4. GEMINI 3.5 & KEEPERHUB MCP AUTONOMOUS DECISION STREAM ────────── -->
-    <section class="live-agent-console-card" id="agentDecisionConsoleSection">
+    <section class="live-agent-console-card terminal-hidden" id="agentDecisionConsoleSection" style="display: none;">
       <div class="agent-console-header">
         <div class="agent-console-title-area">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">

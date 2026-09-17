@@ -595,7 +595,7 @@ function initAgentDecisionConsole() {
       }
       if (toggleTitle) toggleTitle.textContent = "Hide Live Terminal";
       if (toggleSub) toggleSub.textContent = "Showing Terminal (3 Cards Hidden)";
-      localStorage.setItem("bulwark_terminal_visible", "true");
+      localStorage.setItem("bulwark_terminal_visible_v2", "true");
       if (animateScroll) {
         setTimeout(() => {
           terminalSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -614,8 +614,8 @@ function initAgentDecisionConsole() {
         btnToggle.setAttribute("aria-pressed", "false");
       }
       if (toggleTitle) toggleTitle.textContent = "Show Live Terminal";
-      if (toggleSub) toggleSub.textContent = "Showing 3-Card Triad Overview";
-      localStorage.setItem("bulwark_terminal_visible", "false");
+      if (toggleSub) toggleSub.textContent = "Gemini 3.5 + KeeperHub MCP (Hidden)";
+      localStorage.setItem("bulwark_terminal_visible_v2", "false");
       if (animateScroll && triadSection) {
         setTimeout(() => {
           triadSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -632,11 +632,11 @@ function initAgentDecisionConsole() {
       setTerminalVisibility(!isCurrentlyVisible, true);
     });
 
-    const saved = localStorage.getItem("bulwark_terminal_visible");
-    if (saved === "false") {
-      setTerminalVisibility(false, false);
-    } else {
+    const saved = localStorage.getItem("bulwark_terminal_visible_v2");
+    if (saved === "true") {
       setTerminalVisibility(true, false);
+    } else {
+      setTerminalVisibility(false, false);
     }
   }
 
