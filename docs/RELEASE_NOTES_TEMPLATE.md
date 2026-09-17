@@ -25,8 +25,8 @@
 
 | Asset | SHA-256 Checksum |
 |---|---|
-| `bulwark-core-0.1.0.tgz` | `fa024a0da0bdd85f007f169c3035cad811285b6b3ce2f49add1a632a53c75578` |
-| `bulwark-cli-0.1.0.tgz` | `dcf3148bcd6c10a3eb8096b24e915c9db76a2b41641b34ab2d7cb2b12ba14f5c` |
+| `bulwark-core-0.1.0.tgz` | `4b16363853f2ea9d1407e27563b4ccb55a8408df91596e53508eb6530d94f59c` |
+| `bulwark-cli-0.1.0.tgz` | `64bee05dab194a31dfeabe64b2178023f04267128ce58d219846157ea281e783` |
 
 ### Integrity Verification
 
