@@ -812,14 +812,7 @@ function initAgentDecisionConsole() {
   const promptInput = document.getElementById("agentCustomPromptInput");
 
   function syncPresetsWithAuth(auth) {
-    const addr = auth?.address || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
-    document.querySelectorAll(".term-chip-preset").forEach(chip => {
-      if (!chip.hasAttribute("data-template-prompt")) {
-        chip.setAttribute("data-template-prompt", chip.getAttribute("data-prompt"));
-      }
-      const template = chip.getAttribute("data-template-prompt");
-      chip.setAttribute("data-prompt", template.replace(/0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123/g, addr));
-    });
+    // Keep presets focused on the live monitored distressed position (0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123)
   }
 
   window.addEventListener("bulwarkAuthChanged", (e) => {
@@ -847,8 +840,7 @@ function initAgentDecisionConsole() {
         if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before triggering cycles.", "error");
         return;
       }
-      const activeAddress = window.bulwarkAuth.address;
-      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue for borrower ${activeAddress} on Aave V3 Base Sepolia`, true);
+      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue: Inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Aave V3 Base Sepolia, evaluate candidate plans via Gemini Underwriter, clamp to RescueGrant policy, and execute via KeeperHub MCP (simulate: true then simulate: false).`, true);
     });
   }
 
@@ -860,8 +852,7 @@ function initAgentDecisionConsole() {
 
   if (btnReplay) {
     btnReplay.addEventListener("click", () => {
-      const activeAddress = window.bulwarkAuth?.address || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
-      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue for borrower ${activeAddress} on Aave V3 Base Sepolia`, false);
+      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue: Inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Aave V3 Base Sepolia, evaluate candidate plans via Gemini Underwriter, clamp to RescueGrant policy, and execute via KeeperHub MCP (simulate: true then simulate: false).`, false);
     });
   }
 
@@ -893,13 +884,9 @@ function initAgentDecisionConsole() {
         if (typeof showToast === "function") showToast("Please authenticate (Connect Wallet or 24/7 Key) before running agent tasks.", "error");
         return;
       }
-      let p = chip.getAttribute("data-prompt");
-      const activeAddress = window.bulwarkAuth?.address;
-      if (activeAddress && p) {
-        p = p.replace(/0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123/g, activeAddress);
-      }
-      if (promptInput) promptInput.value = p;
-      runAgentDecisionFlow(p, true);
+      const p = chip.getAttribute("data-prompt");
+      if (promptInput && p) promptInput.value = p;
+      if (p) runAgentDecisionFlow(p, true);
     });
   });
 

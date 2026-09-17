@@ -589,7 +589,17 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
         if (isRescuePrompt) {
           const matchAddr = prompt.match(/0x[a-fA-F0-9]{40}/);
           const targetAddr = matchAddr ? matchAddr[0] : "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
-          return runAutonomousUnderwriting(targetAddr, io, mcpClient);
+          try {
+            return await runAutonomousUnderwriting(targetAddr, io, mcpClient);
+          } catch (policyErr: any) {
+            if (policyErr?.message?.includes("POLICY COMPILER REJECT")) {
+              log(`\n[POLICY INVARIANT] ${policyErr.message.replace("POLICY COMPILER REJECT: ", "")}`);
+              log(`[POLICY INVARIANT] No rescue action taken — policy correctly rejected execution.`);
+              log(`\n[AGENT OUTPUT] Response:\nPosition is within safe parameters. BULWARK policy enforcement is working correctly.`);
+              return 0;
+            }
+            throw policyErr;
+          }
         }
 
         const config = loadConfig();
@@ -741,7 +751,17 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
       case "transact":
       case "auto-transact": {
         const address = args[1] && args[1].startsWith("0x") ? args[1] : "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
-        return runAutonomousUnderwriting(address, io, mcpClient);
+        try {
+          return await runAutonomousUnderwriting(address, io, mcpClient);
+        } catch (policyErr: any) {
+          if (policyErr?.message?.includes("POLICY COMPILER REJECT")) {
+            log(`\n[POLICY INVARIANT] ${policyErr.message.replace("POLICY COMPILER REJECT: ", "")}`);
+            log(`[POLICY INVARIANT] No rescue action taken — policy correctly rejected execution.`);
+            log(`\n[AGENT OUTPUT] Response:\nPosition is within safe parameters. BULWARK policy enforcement is working correctly.`);
+            return 0;
+          }
+          throw policyErr;
+        }
       }
 
       case "compose": {

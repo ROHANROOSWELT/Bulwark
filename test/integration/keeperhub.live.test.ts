@@ -68,7 +68,7 @@ describe("KeeperHub REST Live Integration & Key Security Contract", () => {
         expect(sim).toBeDefined();
         expect(sim.status === "simulated" || sim.success !== undefined || sim.result !== undefined).toBe(true);
       } catch (e: any) {
-        if (e.message?.includes("fetch failed") || e.message?.includes("ENOTFOUND")) {
+        if (e.message?.includes("fetch failed") || e.message?.includes("ENOTFOUND") || e.status === 429 || e.message?.includes("Rate limit")) {
           ctx.skip();
         } else {
           throw e;
