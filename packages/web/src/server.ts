@@ -382,13 +382,13 @@ export async function handleRequest(
                 line = line.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1FA70}-\u{1FAFF}\u{FE0F}]/gu, "").trim();
                 if (line.length > 0) {
                   let eventType = "log";
-                  if (line.includes("Gemini decided to call KeeperHub MCP tool")) {
-                    eventType = "tool_call";
+                  if (line.includes("Gemini decided to call KeeperHub MCP tool") || line.includes("[GEMINI]")) {
+                    eventType = "gemini";
                   } else if (line.includes("Loaded") && line.includes("MCP tools")) {
                     eventType = "discovery";
-                  } else if (line.includes("[POLICY INVARIANT]")) {
+                  } else if (line.includes("[POLICY]") || line.includes("[POLICY INVARIANT]")) {
                     eventType = "policy";
-                  } else if (line.includes("[KEEPERHUB FACT]")) {
+                  } else if (line.includes("[KEEPERHUB FACT]") || line.includes("[KEEPERHUB MCP]")) {
                     eventType = "fact";
                   } else if (line.includes("[AGENT OUTPUT] Response:")) {
                     eventType = "response_header";

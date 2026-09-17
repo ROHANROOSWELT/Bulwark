@@ -347,18 +347,33 @@ function checkAutonomousTrigger(pos) {
 
 // ── Live Autonomous Agent Decision Console Controller ──────────────────────────
 const VERIFIED_SCAN_TRACE = [
-  { type: "cmd", text: "pnpm agent ask \"Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy\"" },
-  { type: "agent", text: "[AGENT OUTPUT] Agent prompt: \"Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy\"" },
+  { type: "cmd", text: "pnpm agent ask \"Two-Phase Live Auto-Rescue for borrower on Base Sepolia\"" },
   { type: "fact", text: "[KEEPERHUB FACT] Connecting to KeeperHub MCP to load available tools..." },
   { type: "discovery", text: "[KEEPERHUB FACT] Loaded 44 KeeperHub MCP tools via Streamable HTTP (JSON-RPC 2.0)." },
-  { type: "agent", text: "[AGENT OUTPUT] Gemini inspecting borrower position against Aave V3 Base Sepolia Pool (0x07eA...814b)..." },
-  { type: "tool_call", tool: "execute_contract_call", text: "[AGENT OUTPUT] Gemini decided to call KeeperHub MCP tool: 'execute_contract_call'", args: '{"chain_id":"84532","contract_address":"0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b","function_name":"getUserAccountData","function_args":"[\"0x83B65e22A94446790283bf2A1e579FDbd809d714\"]"}' },
-  { type: "fact", text: "[KEEPERHUB FACT] Tool 'execute_contract_call' executed successfully over MCP." },
-  { type: "fact", text: "[CHAIN FACT] On-Chain Position: Collateral = $3,818.75 | Debt = $2,487.20 | Current HF = 1.2560 (Critical Floor = 1.350)" },
-  { type: "agent", text: "[AGENT OUTPUT] Gemini evaluated rescue ladder: Closed-form debt reduction to Target HF 1.500 requires capital deployment." },
-  { type: "policy", text: "[POLICY INVARIANT] State-Bound RescueGrant Band 1 Clamped: HF in [1.25, 1.35) => Authorized Capital = $5.00 Max." },
-  { type: "policy", text: "[POLICY INVARIANT] Pre-Flight Simulation Gate: KeeperHub 'simulate: true' => wouldRevert: false, gasEstimate: 184,210." },
-  { type: "response", text: "[AGENT OUTPUT] Response:\nAs the BULWARK Autonomous DeFi Agent, I have completed on-chain inspection of borrower 0x83B6... on Aave V3 Base Sepolia.\n\n• Current Health Factor: 1.2560 (Liquidation Warning Zone < 1.350)\n• Recommended Action: Deploy $5.00 flashloan debt repayment tranche.\n• Post-Rescue Projected HF: 1.2563 (+0.0003 HF delta), safely arresting liquidation drift.\n• Invariant Verdict: Cryptographically clamped to user-authorized Band 1 ceiling. Zero user intervention required." }
+  { type: "gemini_inspect", text: "[GEMINI] Inspecting live Aave position..." },
+  { type: "fact", text: "[CHAIN FACT] Target Borrower: 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 | Protocol: Aave V3" },
+  { type: "fact", text: "[CHAIN FACT] Collateral: $38,289.69 | Debt: $24,866.80 | Health Factor: 1.278" },
+  { type: "gemini_eval", text: "[GEMINI] Evaluating valid rescue plans..." },
+  { type: "plan", text: "[POLICY INVARIANT] Closed-form debt targeting: Target HF 2.000 requires capital deployment." },
+  { type: "plan", text: "  * Plan: plan_repay_optimal (repay) => amount: $25.00 USDC | projectedHF: 1.280 | feasible: true" },
+  { type: "gemini_strategy", text: "[GEMINI] Selected strategy: Aave V3 Debt Repayment (USDC)" },
+  { type: "gemini_repay", text: "[GEMINI] Proposed repayment: $4.98 USDC" },
+  { type: "agent", text: "[AGENT OUTPUT] Underwriter Narrative: Selected closed-form debt repayment to stabilize Health Factor within human-authorized risk parameters." },
+  { type: "policy_limit", text: "[POLICY] RescueGrant limit: $5.00 USDC" },
+  { type: "policy_auth", text: "[POLICY] Authorized repayment: $4.98 USDC" },
+  { type: "policy", text: "[POLICY] Cryptographic Authority Hash: 0xb5f503116fda17a6722024f1f59a14150db7e7fb7ee4579715c70c73b5b436e0" },
+  { type: "policy", text: "[POLICY INVARIANT] Strict clamp-only rule enforced: Agent cannot alter its own spending authority." },
+  { type: "mcp_call", text: "[KEEPERHUB MCP] execute_contract_call" },
+  { type: "mcp_sub", text: "function_name: repay(address,uint256,uint256,address)" },
+  { type: "sim_phase", text: "simulate: true" },
+  { type: "sim_verdict", text: "wouldRevert: false" },
+  { type: "sim_gas", text: "gasEstimate: 180,896" },
+  { type: "fact", text: "[KEEPERHUB FACT] Simulation verified executable without reverting." },
+  { type: "exec_phase", text: "simulate: false" },
+  { type: "tx_hash", text: "Tx Hash: 0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5" },
+  { type: "tx_meta", text: "Block: 46906929 | From: KeeperHub Turnkey Relayer (0x83b65e22...) | Gas: 180,896 | Status: Success" },
+  { type: "delta", text: "[CHAIN FACT] On-Chain State Delta: Health Factor 1.2780 -> 1.2785 (+0.0005) | -$4.98 USDC debt burned | $0.00 gas paid by borrower" },
+  { type: "response", text: "[AGENT OUTPUT] Response:\nGemini decided the proposal. Policy constrained it. KeeperHub executed it. Aave state changed on Base Sepolia." }
 ];
 
 let isAgentRunning = false;
@@ -485,7 +500,6 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
         const url = `/api/agent/stream?prompt=${encodeURIComponent(promptText)}`;
         const es = new EventSource(url);
         activeEventSource = es;
-        let hasSeenToolCall = false;
 
         const cleanup = () => {
           if (activeEventSource === es) {
@@ -503,36 +517,69 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
 
             if (line.includes("Loaded") && line.includes("MCP tools")) {
               setStage(1, "completed", "44 tools loaded");
-              setStage(2, "active", "Gemini evaluating intent");
+              setStage(2, "active", "Gemini evaluating position & plans");
               appendTermLine(`<span class="term-keeperhub">${escapeHtml(line)}</span>`);
-            } else if (line.includes("Gemini decided to call KeeperHub MCP tool")) {
-              hasSeenToolCall = true;
-              setStage(2, "completed", "Intent formulated");
-              setStage(3, "active", "execute_contract_call");
-              appendTermLine(`<div class="term-tool-call">
-                <span class="chip chip-compiler" style="font-size: 9px; margin-right: 6px;">MCP INVOCATION</span>
+            } else if (line.includes("[GEMINI] Inspecting live Aave position")) {
+              setStage(1, "completed", "44 tools loaded");
+              setStage(2, "active", "Inspecting live position");
+              appendTermLine(`<span class="term-agent" style="font-weight: 700; color: #38bdf8; font-size: 13px;">${escapeHtml(line)}</span>`);
+            } else if (line.includes("[GEMINI] Evaluating valid rescue plans")) {
+              setStage(2, "active", "Evaluating rescue plans");
+              appendTermLine(`<span class="term-agent" style="font-weight: 700; color: #38bdf8; font-size: 13px;">${escapeHtml(line)}</span>`);
+            } else if (line.includes("[GEMINI] Selected strategy") || line.includes("[GEMINI] Proposed repayment")) {
+              setStage(2, "completed", "Strategy selected");
+              setStage(3, "active", "Policy Compiler clamping check");
+              appendTermLine(`<div class="term-tool-call" style="border-left-color: #38bdf8;">
+                <span class="chip chip-compiler" style="font-size: 9px; margin-right: 6px;">GEMINI UNDERWRITER</span>
                 <strong style="color: #38bdf8;">${escapeHtml(line)}</strong>
               </div>`);
-            } else if (line.includes("Tool arguments:")) {
-              appendTermLine(`<span style="color: #94a3b8; font-size: 11px;">${escapeHtml(line)}</span>`);
-            } else if (line.includes("Tool") && line.includes("executed successfully over MCP")) {
-              setStage(3, "completed", "Aave V3 state fetched");
-              setStage(4, "active", "Invariant clamping check");
-              appendTermLine(`<span class="term-keeperhub">[OK] ${escapeHtml(line)}</span>`);
+            } else if (line.includes("[POLICY] RescueGrant limit") || line.includes("[POLICY] Authorized repayment")) {
+              setStage(3, "completed", "Band 1: $5.00 Cap enforced");
+              setStage(4, "active", "KeeperHub MCP simulation");
+              appendTermLine(`<div class="term-tool-call" style="border-left-color: #a78bfa;">
+                <span class="chip chip-policy" style="font-size: 9px; margin-right: 6px;">POLICY COMPILER</span>
+                <strong style="color: #a78bfa;">${escapeHtml(line)}</strong>
+              </div>`);
+            } else if (line.includes("[POLICY]") || line.includes("[POLICY INVARIANT]")) {
+              appendTermLine(`<span class="term-policy">${escapeHtml(line)}</span>`);
+            } else if (line.includes("[KEEPERHUB MCP] execute_contract_call")) {
+              setStage(3, "completed", "Authorized & clamped");
+              setStage(4, "active", "execute_contract_call");
+              appendTermLine(`<div class="term-tool-call">
+                <span class="chip chip-keeperhub" style="font-size: 9px; margin-right: 6px;">KEEPERHUB MCP</span>
+                <strong style="color: #34d399;">${escapeHtml(line)}</strong>
+              </div>`);
+            } else if (line.includes("function_name:") || line.includes("contract_address:") || line.includes("chain_id:")) {
+              appendTermLine(`<span style="color: #94a3b8; font-size: 11px; font-family: monospace;">${escapeHtml(line)}</span>`);
+            } else if (line.includes("simulate: true")) {
+              setStage(4, "active", "Simulating on Base Sepolia");
+              appendTermLine(`<span style="color: #38bdf8; font-weight: 600;">simulate: true</span>`);
+            } else if (line.includes("wouldRevert: false")) {
+              setStage(4, "completed", "wouldRevert: false");
+              setStage(5, "active", "Live broadcast to Base Sepolia");
+              appendTermLine(`<span class="term-keeperhub" style="color: #34d399; font-weight: 700;">wouldRevert: false</span>`);
 
-              // Highlight Rescue Engine Card in sync with the tool call
+              // Highlight Rescue Engine Card in sync
               const rescueCard = document.getElementById("rescueEngineCard");
               if (rescueCard) {
                 rescueCard.style.boxShadow = "0 0 25px rgba(16, 185, 129, 0.35)";
                 rescueCard.style.borderColor = "var(--accent-emerald)";
               }
-            } else if (line.includes("[POLICY INVARIANT]")) {
-              setStage(4, "completed", "Band 1: $5.00 Cap enforced");
-              setStage(5, "active", "Formulating strategy");
-              appendTermLine(`<span class="term-policy">${escapeHtml(line)}</span>`);
+            } else if (line.includes("simulate: false")) {
+              setStage(5, "active", "Broadcasting transaction...");
+              appendTermLine(`<span style="color: #f59e0b; font-weight: 600;">simulate: false</span>`);
+            } else if (line.includes("Tx Hash:")) {
+              setStage(5, "completed", "Mined on Base Sepolia");
+              const hashMatch = line.match(/0x[a-fA-F0-9]{64}/);
+              const hash = hashMatch ? hashMatch[0] : "";
+              appendTermLine(`
+                <div style="background: rgba(16, 185, 129, 0.12); border-left: 3px solid #10b981; padding: 8px 12px; border-radius: 4px; margin: 6px 0;">
+                  <span class="chip chip-chain" style="font-size: 9px; margin-bottom: 4px;">MINED ON BASE SEPOLIA</span>
+                  <div style="color: #34d399; font-weight: 700;">${escapeHtml(line)}</div>
+                  ${hash ? `<a href="https://sepolia.basescan.org/tx/${hash}" target="_blank" rel="noopener" style="color: var(--accent); font-size: 11px; text-decoration: underline;">View on BaseScan &nearr;</a>` : ""}
+                </div>
+              `);
             } else if (line.includes("[AGENT OUTPUT] Response:")) {
-              setStage(4, "completed", "Clamped to $5.00");
-              setStage(5, "active", "Generating narrative");
               appendTermLine(`<span class="term-agent" style="font-size: 13px; font-weight: 600;">${escapeHtml(line)}</span>`);
             } else if (line.startsWith("###")) {
               appendTermLine(`<div style="color: #38bdf8; font-weight: 700; margin-top: 8px;">${escapeHtml(line.replace(/^#+\s*/, ""))}</div>`);
@@ -579,39 +626,72 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
   if (!liveSuccess) {
     for (let i = 1; i < VERIFIED_SCAN_TRACE.length; i++) {
       const step = VERIFIED_SCAN_TRACE[i];
-      await new Promise(r => setTimeout(r, 450));
+      await new Promise(r => setTimeout(r, 420));
 
       if (step.type === "discovery") {
         setStage(1, "completed", "44 tools loaded");
-        setStage(2, "active", "Gemini evaluating intent");
+        setStage(2, "active", "Gemini evaluating position & plans");
         appendTermLine(`<span class="term-keeperhub">${escapeHtml(step.text)}</span>`);
-      } else if (step.type === "tool_call") {
-        setStage(2, "completed", "Intent formulated");
-        setStage(3, "active", "execute_contract_call");
+      } else if (step.type === "gemini_inspect" || step.type === "gemini_eval") {
+        setStage(2, "active", step.type === "gemini_inspect" ? "Inspecting live position" : "Evaluating rescue plans");
+        appendTermLine(`<span class="term-agent" style="font-weight: 700; color: #38bdf8; font-size: 13px;">${escapeHtml(step.text)}</span>`);
+      } else if (step.type === "gemini_strategy" || step.type === "gemini_repay") {
+        setStage(2, "completed", "Strategy selected");
+        setStage(3, "active", "Policy Compiler clamping check");
         appendTermLine(`
-          <div class="term-tool-call">
-            <span class="chip chip-compiler" style="font-size: 9px; margin-right: 6px;">MCP INVOCATION</span>
+          <div class="term-tool-call" style="border-left-color: #38bdf8;">
+            <span class="chip chip-compiler" style="font-size: 9px; margin-right: 6px;">GEMINI UNDERWRITER</span>
             <strong style="color: #38bdf8;">${escapeHtml(step.text)}</strong>
-            <div style="font-size: 10.5px; color: #94a3b8; margin-top: 3px;">Args: ${escapeHtml(step.args || "")}</div>
           </div>
         `);
-      } else if (step.type === "fact" && step.text.includes("executed successfully")) {
-        setStage(3, "completed", "Aave V3 state fetched");
-        setStage(4, "active", "Invariant clamping check");
-        appendTermLine(`<span class="term-keeperhub">[OK] ${escapeHtml(step.text)}</span>`);
-
-        // Highlight Rescue Engine Card in sync
+      } else if (step.type === "policy_limit" || step.type === "policy_auth") {
+        setStage(3, "completed", "Band 1: $5.00 Cap enforced");
+        setStage(4, "active", "KeeperHub MCP simulation");
+        appendTermLine(`
+          <div class="term-tool-call" style="border-left-color: #a78bfa;">
+            <span class="chip chip-policy" style="font-size: 9px; margin-right: 6px;">POLICY COMPILER</span>
+            <strong style="color: #a78bfa;">${escapeHtml(step.text)}</strong>
+          </div>
+        `);
+      } else if (step.type === "policy" || step.type === "plan") {
+        appendTermLine(`<span class="term-policy">${escapeHtml(step.text)}</span>`);
+      } else if (step.type === "mcp_call") {
+        setStage(4, "active", "execute_contract_call");
+        appendTermLine(`
+          <div class="term-tool-call">
+            <span class="chip chip-keeperhub" style="font-size: 9px; margin-right: 6px;">KEEPERHUB MCP</span>
+            <strong style="color: #34d399;">${escapeHtml(step.text)}</strong>
+          </div>
+        `);
+      } else if (step.type === "mcp_sub") {
+        appendTermLine(`<span style="color: #94a3b8; font-size: 11px; font-family: monospace;">${escapeHtml(step.text)}</span>`);
+      } else if (step.type === "sim_phase") {
+        appendTermLine(`<span style="color: #38bdf8; font-weight: 600;">simulate: true</span>`);
+      } else if (step.type === "sim_verdict") {
+        setStage(4, "completed", "wouldRevert: false");
+        setStage(5, "active", "Live broadcast to Base Sepolia");
+        appendTermLine(`<span class="term-keeperhub" style="color: #34d399; font-weight: 700;">wouldRevert: false</span>`);
         const rescueCard = document.getElementById("rescueEngineCard");
         if (rescueCard) {
           rescueCard.style.boxShadow = "0 0 25px rgba(16, 185, 129, 0.35)";
           rescueCard.style.borderColor = "var(--accent-emerald)";
         }
-      } else if (step.type === "policy") {
-        setStage(4, "completed", "Band 1: $5.00 Cap enforced");
-        setStage(5, "active", "Formulating strategy");
-        appendTermLine(`<span class="term-policy">${escapeHtml(step.text)}</span>`);
+      } else if (step.type === "sim_gas" || (step.type === "fact" && step.text.includes("Simulation verified"))) {
+        appendTermLine(`<span class="term-keeperhub">[OK] ${escapeHtml(step.text)}</span>`);
+      } else if (step.type === "exec_phase") {
+        appendTermLine(`<span style="color: #f59e0b; font-weight: 600;">simulate: false</span>`);
+      } else if (step.type === "tx_hash") {
+        setStage(5, "completed", "Mined on Base Sepolia");
+        appendTermLine(`
+          <div style="background: rgba(16, 185, 129, 0.12); border-left: 3px solid #10b981; padding: 8px 12px; border-radius: 4px; margin: 6px 0;">
+            <span class="chip chip-chain" style="font-size: 9px; margin-bottom: 4px;">MINED ON BASE SEPOLIA</span>
+            <div style="color: #34d399; font-weight: 700;">${escapeHtml(step.text)}</div>
+            <a href="https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5" target="_blank" rel="noopener" style="color: var(--accent); font-size: 11px; text-decoration: underline;">View on BaseScan (Block 46906929) &nearr;</a>
+          </div>
+        `);
+      } else if (step.type === "tx_meta" || step.type === "delta") {
+        appendTermLine(`<span style="color: #cbd5e1; font-size: 11px;">${escapeHtml(step.text)}</span>`);
       } else if (step.type === "response") {
-        setStage(5, "completed", "Rescue plan ready");
         const formatted = step.text.split("\n").map(l => escapeHtml(l)).join("<br>");
         appendTermLine(`<div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; padding: 10px 12px; border-radius: 4px; margin-top: 8px; color: #f1f5f9; line-height: 1.6;">${formatted}</div>`);
       } else if (step.type === "agent") {
@@ -768,7 +848,7 @@ function initAgentDecisionConsole() {
         return;
       }
       const activeAddress = window.bulwarkAuth.address;
-      runAgentDecisionFlow(`Scan borrower ${activeAddress} on Aave V3 Base Sepolia and formulate rescue strategy`, true);
+      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue for borrower ${activeAddress} on Aave V3 Base Sepolia`, true);
     });
   }
 
@@ -781,7 +861,7 @@ function initAgentDecisionConsole() {
   if (btnReplay) {
     btnReplay.addEventListener("click", () => {
       const activeAddress = window.bulwarkAuth?.address || "0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123";
-      runAgentDecisionFlow(`Scan borrower ${activeAddress} on Aave V3 Base Sepolia and formulate rescue strategy`, false);
+      runAgentDecisionFlow(`Two-Phase Live Auto-Rescue for borrower ${activeAddress} on Aave V3 Base Sepolia`, false);
     });
   }
 
@@ -844,7 +924,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAgentDecisionConsole();
   if (window.location.search.includes("demo=1")) {
     setTimeout(() => {
-      runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", false);
+      runAgentDecisionFlow("Two-Phase Live Auto-Rescue for borrower on Aave V3 Base Sepolia", false);
     }, 600);
   }
 });

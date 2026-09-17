@@ -297,7 +297,7 @@ export function underwritePosition(
   return {
     snapshot,
     costToSafetyUsd: Math.round(costToSafetyUsd * 100) / 100,
-    plans,
+    plans: eligiblePlans,
     selectedPlan,
     ladder,
     selectionMode: "DETERMINISTIC_CHEAPEST",
