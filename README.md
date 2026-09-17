@@ -13,12 +13,12 @@
 
 ### *The Deterministic, State-Bound Liquidation Backstop Economy for Live Aave V3 Positions on KeeperHub*
 
-[![DoraHacks](https://img.shields.io/badge/DoraHacks-KeeperHub%20Hackathon%202026-blueviolet?style=for-the-badge)](https://dorahacks.io/hackathon/keeperhub)
+[![DoraHacks](https://img.shields.io/badge/DoraHacks-KeeperHub%20Hackathon%202026-blueviolet?style=for-the-badge)](https://dorahacks.io)
 [![Track](https://img.shields.io/badge/Track-Best%20Integration%20into%20a%20Live%20Project-FF5722?style=for-the-badge)](#)
 [![Tests](https://img.shields.io/badge/Vitest-1%2C308%20Passed%20%7C%200%20Skipped-success?style=for-the-badge&logo=vitest)](test/reports/last-run.txt)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8%20Strict-3178C6?style=for-the-badge&logo=typescript)](tsconfig.base.json)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
-[![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20($17.4B%20TVL)-2EBAC6?style=for-the-badge)](https://aave.com)
+[![Protocol](https://img.shields.io/badge/Live%20Protocol-Aave%20V3%20--%20$17.4B%20TVL-2EBAC6?style=for-the-badge)](https://aave.com)
 [![Execution](https://img.shields.io/badge/Execution%20Engine-KeeperHub%20Turnkey-000000?style=for-the-badge)](https://keeperhub.com)
 
 ---

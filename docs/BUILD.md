@@ -16,11 +16,9 @@ Working directory: `D:\keeperhub` · Stack: TypeScript (strict, ESM, Node ≥22)
 |---|---|
 | [`docs/WINNER.md`](./WINNER.md) | The finalized problem statement, architecture, authority model, failure model, honest limits |
 | [`docs/ORIGINALITY_UPGRADE.md`](./ORIGINALITY_UPGRADE.md) | **The upgraded mechanism spec**: adaptive RescueGrant fields, policy compiler, PoAA 11-check chain, economic model, implementation delta (MUST/SHOULD/DO-NOT-BUILD), demo script |
-| [`docs/archive/IDEATION.md`](./archive/IDEATION.md) | Why this idea won — 15 candidates considered & rejected, rubric scores, removal-test gates (historical record; do not re-open ideation) |
 | [`docs/RESEARCH_KEEPERHUB.md`](./RESEARCH_KEEPERHUB.md) | **Every verified KeeperHub endpoint/tool/field.** The REST client must match these shapes exactly. Open uncertainties in §10 must never be silently guessed |
 | [`docs/RESEARCH_AAVE.md`](./RESEARCH_AAVE.md) | Verified Aave V3 addresses, `getUserAccountData`/`repay`/`withdraw` signatures, HF semantics, units |
-| [`docs/archive/RESEARCH_COMPETITIVE.md`](./archive/RESEARCH_COMPETITIVE.md) | Why LIFELINE/LendGuard/DeFi Saver do NOT invalidate our originality — keep every originality claim true against this |
-| [`docs/archive/MASTER_PROMPT.md`](./archive/MASTER_PROMPT.md) | The hackathon master prompt: evidence standards, zero-mock discipline, judging rubric, submission gates |
+| Ideation & Architecture Archive | Why this idea won — 15 candidates considered & rejected, rubric scores, competitive research |
 
 Conflict rule: verified research docs > this file > anything else. Tag every unverifiable fact
 `VERIFIED / OBSERVED / INFERRED / UNVERIFIED` and never mix them.

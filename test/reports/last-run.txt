@@ -1,0 +1,64 @@
+
+ RUN  v3.2.7 /home/rohan/Desktop/Keeperhub
+
+ ✓ test/e2e/cli.e2e.test.ts (4 tests) 6722ms
+   ✓ BULWARK CLI E2E Process Execution > executes CLI doctor command in isolated env  6275ms
+ ✓ test/e2e/web.e2e.test.ts (6 tests) 6741ms
+   ✓ BULWARK Web Dashboard & Public /verify (P11) > handles POST /api/tick  6614ms
+ ✓ test/unit/client/client.test.ts (14 tests) 2017ms
+   ✓ KeeperHubClient - FIXTURE suite > subscribes to execution status with reactive fallback to polling  2003ms
+ ✓ test/security/security.test.ts (8 tests) 10035ms
+   ✓ Security & Attack Invariance Suite (BUILD.md §6.5) > LLM triage bounding: prompt-injected LLM response is clamped strictly to candidate math plans  10002ms
+ ✓ test/integration/keeperhub.live.test.ts (4 tests) 1427ms
+   ✓ KeeperHub REST Live Integration & Key Security Contract > checks keys metadata against live KeeperHub API or enforces key presence  473ms
+   ✓ KeeperHub REST Live Integration & Key Security Contract > executes safe simulate:true contract call or enforces simulate safety boundaries  383ms
+ ✓ test/unit/proof/poaa.fuzz.test.ts (150 tests) 256ms
+ ✓ test/integration/mcp.live.test.ts (1 test) 984ms
+   ✓ KeeperHub Public MCP Endpoint Live Integration > discovers tools from public MCP endpoint or skips if network absent  983ms
+ ✓ test/unit/crypto/keccak.vectors.test.ts (256 tests) 151ms
+ ✓ test/unit/proof/poaa.matrix.test.ts (100 tests) 245ms
+ ✓ test/unit/poaa.test.ts (10 tests) 38ms
+ ✓ test/unit/policy/compiler.clamp.test.ts (150 tests) 37ms
+ ✓ test/e2e/guardian.e2e.test.ts (4 tests) 5854ms
+   ✓ BulwarkGuardian Full Lifecycle E2E (FIXTURE Suite) > completes full happy path: propose -> approve -> arm -> dry run -> execute -> verify -> PoAA PROVEN  5565ms
+ ✓ test/unit/capacity.test.ts (4 tests) 35ms
+ ✓ test/unit/store.test.ts (3 tests) 16ms
+ ✓ test/unit/desk/orderbook.auction.test.ts (100 tests) 28ms
+ ✓ test/unit/math/hf.invariants.test.ts (200 tests) 30ms
+ ✓ test/unit/abi/abi.properties.test.ts (200 tests) 25ms
+ ✓ test/e2e/gemini.autonomous.mcp.test.ts (3 tests) 12897ms
+   ✓ Gemini + KeeperHub MCP Autonomous Transaction Execution > discovers all 44 KeeperHub MCP tools  1598ms
+   ✓ Gemini + KeeperHub MCP Autonomous Transaction Execution > executes smart contract query autonomously via MCP execute_contract_call  964ms
+   ✓ Gemini + KeeperHub MCP Autonomous Transaction Execution > executes fully autonomous transaction pipeline with Gemini + MCP without user intervention  10333ms
+ ✓ test/unit/reader.test.ts (3 tests) 11ms
+ ✓ test/failure/failure.test.ts (4 tests) 19ms
+ ✓ test/unit/config.test.ts (7 tests) 5ms
+ ✓ test/unit/plans.test.ts (9 tests) 11ms
+ ✓ test/unit/cli.test.ts (10 tests) 13380ms
+   ✓ BULWARK CLI (P9) > runs doctor command and reports environment and store status  6205ms
+   ✓ BULWARK CLI (P9) > runs positions scan command  1435ms
+   ✓ BULWARK CLI (P9) > runs full grants lifecycle via CLI: propose, list, show, approve, revoke  1427ms
+   ✓ BULWARK CLI (P9) > runs workflow compile command  2847ms
+   ✓ BULWARK CLI (P9) > runs audit export command  1440ms
+ ✓ test/unit/policy.test.ts (9 tests) 12ms
+ ✓ test/unit/abi.test.ts (8 tests) 5ms
+ ✓ test/unit/oracle.test.ts (4 tests) 7ms
+ ✓ test/unit/compiler.test.ts (4 tests) 6ms
+ ✓ test/unit/receipts.test.ts (3 tests) 7ms
+ ✓ test/unit/compile.test.ts (4 tests) 6ms
+ ✓ test/unit/keccak.test.ts (3 tests) 7ms
+ ✓ test/unit/reputation.test.ts (3 tests) 6ms
+ ✓ test/unit/orderbook.test.ts (3 tests) 4ms
+ ✓ test/unit/grant.test.ts (3 tests) 7ms
+ ✓ test/unit/escrow.test.ts (4 tests) 3ms
+ ✓ test/unit/mcp.test.ts (9 tests) 21011ms
+   ✓ BULWARK Agent CLI Commands > validates workflow file locally when network absent  1577ms
+   ✓ BULWARK Agent CLI Commands > runs guard loop for 1 tick  19417ms
+ ✓ test/e2e/guardian.live.e2e.test.ts (1 test) 24874ms
+   ✓ BulwarkGuardian Live End-to-End Cycle > executes full real rescue preparation cycle against live KeeperHub & Sepolia  24873ms
+
+ Test Files  36 passed (36)
+      Tests  1308 passed (1308)
+   Start at  23:39:07
+   Duration  25.77s (transform 1.08s, setup 0ms, collect 3.44s, tests 106.92s, environment 7ms, prepare 2.71s)
+

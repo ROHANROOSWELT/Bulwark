@@ -88,7 +88,7 @@ All endpoints were tested across **Vercel Edge** (`https://bulwark-keeperhub.ver
 
 ## 5. Verification of Proof Bundles & Live On-Chain Data
 
-All Proof of Authorized Agency (PoAA) bundles across the entire codebase were tested against the cryptographic verifier [`verifyPoaaBundle`](file:///home/rohan/Desktop/Keeperhub/packages/core/src/proof/poaa.ts):
+All Proof of Authorized Agency (PoAA) bundles across the entire codebase were tested against the cryptographic verifier [`verifyPoaaBundle`](../packages/core/src/proof/poaa.ts):
 
 | Proof Bundle Path | Verdict | Checks Passed | Invariants Verified |
 |---|---|---|---|
