@@ -235,6 +235,13 @@ function renderState(data) {
   if (auditContainer && data.audit) {
     auditContainer.innerHTML = data.audit.slice(-5).map(a => `<div data-id="${a.id}">${a.type}</div>`).join("");
   }
+
+  // 8. AUTONOMOUS GUARDIAN TRIGGER (Zero Manual Intervention)
+  // When a monitored borrower's Health Factor breaches the critical floor (< 1.350),
+  // automatically dispatch Gemini 3.5 + KeeperHub MCP tools without waiting for user action.
+  if (pos && typeof checkAutonomousTrigger === "function") {
+    checkAutonomousTrigger(pos);
+  }
 }
 
 async function approveGrant(id) {
@@ -279,6 +286,37 @@ async function executeGrant(id) {
   } catch (err) {
     alert("Error executing grant: " + err.message);
   }
+}
+
+// ── Autonomous Guardian Zero-Touch Trigger ─────────────────────────────────────
+let hasAutoTriggeredForRisk = false;
+
+function checkAutonomousTrigger(pos) {
+  if (hasAutoTriggeredForRisk || isAgentRunning) return;
+  if (!pos || typeof pos.healthFactor !== "number" || pos.healthFactor <= 0 || pos.healthFactor >= 1.350) return;
+
+  hasAutoTriggeredForRisk = true;
+
+  const autoPill = document.getElementById("autoDispatchPill");
+  if (autoPill) {
+    autoPill.className = "chip chip-caution";
+    autoPill.textContent = `⚡ AUTO-TRIGGER ARMED (HF ${pos.healthFactor.toFixed(3)} < 1.350)`;
+  }
+
+  const termStatus = document.getElementById("termStatusPill");
+  if (termStatus) {
+    termStatus.className = "term-status-pill busy";
+    termStatus.textContent = `CRITICAL HF ${pos.healthFactor.toFixed(3)} DETECTED • AUTO-DISPATCHING`;
+  }
+
+  // Auto-launch autonomous decision flow after 1.2s delay so user sees cards render first
+  setTimeout(() => {
+    runAgentDecisionFlow(
+      `Autonomous Alert: Borrower ${pos.userAddress.slice(0, 8)}... HF ${pos.healthFactor.toFixed(3)} is below critical threshold 1.350. Autonomously inspect position, call execute_contract_call via KeeperHub MCP, and execute rescue strategy without manual confirmation.`,
+      true,
+      true
+    );
+  }, 1200);
 }
 
 // ── Live Autonomous Agent Decision Console Controller ──────────────────────────
@@ -349,21 +387,31 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-async function runAgentDecisionFlow(promptText, useLiveStream = true) {
+async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTriggered = false) {
   if (isAgentRunning) return;
   isAgentRunning = true;
 
   const termStatus = document.getElementById("termStatusPill");
   if (termStatus) {
     termStatus.className = "term-status-pill busy";
-    termStatus.textContent = "BUSY • ORCHESTRATING MCP";
+    termStatus.textContent = isAutoTriggered ? "AUTO-DISPATCHED • ORCHESTRATING MCP" : "BUSY • ORCHESTRATING MCP";
   }
 
   // Clear previous output
   const termBody = document.getElementById("agentTerminalBody");
   if (termBody) {
+    const autoHeader = isAutoTriggered
+      ? `<div class="term-line" style="color: #f59e0b; font-weight: 700; margin: 4px 0 2px 0;">
+           [AUTONOMOUS MONITOR] Health Factor Breached Critical Threshold (&lt; 1.350)
+         </div>
+         <div class="term-line" style="color: #94a3b8; font-size: 11px; margin-bottom: 6px;">
+           State-bound policy armed &bull; Prompting Gemini 3.5 Flash-Lite with 44 KeeperHub MCP tools without asking user.
+         </div>`
+      : "";
+
     termBody.innerHTML = `
       <div class="term-line" style="color: #64748b;">BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP</div>
+      ${autoHeader}
       <div class="term-line term-cmd" style="margin: 8px 0;">gemini@bulwark:~$ pnpm agent ask "${escapeHtml(promptText)}"</div>
     `;
   }
@@ -508,14 +556,14 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true) {
   // Completion summary footer in terminal
   appendTermLine(`
     <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center;">
-      <span style="color: #34d399; font-weight: 700;">✓ Autonomous MCP Cycle Completed &bull; Invariants Preserved</span>
+      <span style="color: #34d399; font-weight: 700;">✓ Autonomous MCP Cycle Completed &bull; Zero Manual Intervention &bull; Invariants Preserved</span>
       <a href="/verify" style="color: var(--accent); text-decoration: underline; font-size: 11px;">Verify PoAA Proof &rarr;</a>
     </div>
   `);
 
   if (termStatus) {
     termStatus.className = "term-status-pill";
-    termStatus.textContent = "COMPLETED • VERIFIED";
+    termStatus.textContent = "COMPLETED • ZERO-TOUCH AUTONOMOUS";
   }
 
   isAgentRunning = false;
