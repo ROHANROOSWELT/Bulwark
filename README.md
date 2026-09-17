@@ -239,6 +239,41 @@ $$\text{authorityHash} = \text{keccak256}(\text{grantId} \mathbin{\Vert} \text{b
 
 If any parameter is tampered with post-compilation, the hash mismatches and KeeperHub execution aborts fail-closed.
 
+### D. Dual-Access Authentication & Security Gateway (Self-Custody vs. 24/7 Autonomous Guardian)
+
+A core challenge in autonomous DeFi agents is the **Trust & Custody Dilemma**:
+* If an agent relies on hardcoded keys or executes transactions in the background without clear boundaries, users surrender self-custody.
+* If an agent requires manual browser wallet popups for every single micro-intervention, it cannot protect borrowers at 3:00 AM during sudden market crashes when they are asleep.
+
+BULWARK solves this with a **Dual-Access Security Gateway**:
+
+1. **Option 1: Interactive Self-Custody Mode (Web3 Browser Wallet)**
+   * Integrates standard EIP-1193 providers (MetaMask, OKX, Coinbase Wallet, Rabby, Browser Injected).
+   * The borrower or operator retains complete custody over their keys.
+   * Every on-chain mutation or debt repayment requires an interactive signature approval prompt in the user's browser wallet.
+   * Ideal for active daytime monitoring, position audits, and operators who require per-transaction human sign-off.
+
+2. **Option 2: 24/7 Autonomous Guardian Mode (Zero-Signature Continuous Backstop)**
+   * Operators can enter an Ethereum private key or use the built-in **"⚡ Use Demo 24/7 Key (Testnet)"** shortcut (`0xac09...ff80` &rarr; [`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`](https://sepolia.basescan.org/address/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)).
+   * The backend validates the key server-side using pure `secp256k1` address derivation via `POST /api/auth/verify-key` with zero external dependencies.
+   * Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, simulate, and execute repayments continuously in the background without waking the borrower up for signatures.
+   * Ideal for 24/7 liquidation protection, overnight monitoring, and autonomous testnet demonstrations.
+
+3. **The Application Lock Gate (`body.bulwark-locked`)**
+   * Until an operator authenticates via either Option 1 or Option 2, the application operates in a **fail-closed security lock**:
+     * The BULWARK logo and all dashboard views are rendered in grayscale (`filter: grayscale(0.85)`).
+     * Action cards and tables are non-interactive (`pointer-events: none`).
+     * The live status indicator is turned off (grey inactive core, pulsing ping disabled).
+     * A floating amber security banner alerts: *"BULWARK Application Locked &bull; Authentication Required"*.
+     * Clicking the BULWARK logo, the locked banner, or the Connect Wallet button opens the Access Gateway Modal.
+     * Upon successful verification, the UI unlocks instantly in full vibrant color, the green status indicator begins pulsing, and the header chip reflects the active custody state (`WALLET: 0x...` or `24/7 GUARDIAN: 0x...`).
+
+4. **Dynamic Address Binding in Agent Consoles**
+   * All preset prompt chips in the Gemini 3.5 AI decision console dynamically bind their target borrower address to the currently authenticated address.
+   * Terminal output logs explicitly identify the active custody mode:
+     * `[BULWARK GATEWAY] Interactive Self-Custody Mode: Connected wallet (0x...) • On-chain broadcast requires manual signature.`
+     * `[BULWARK GATEWAY] 24/7 Autonomous Guardian Mode: Active key for (0x...) • Zero manual signatures required.`
+
 ---
 
 ## 3. The Multi-Agent Dutch Auction Orderbook
@@ -583,6 +618,12 @@ npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 # See docs/TEST_REPORT_GEMINI_AUTONOMOUS_MCP.md
 ```
 
+#### The Two-Phase Live Auto-Rescue Pipeline (Simulation ➔ Broadcast)
+
+To prevent spending gas on reverting transactions, Gemini 3.5 executes a strict two-phase protocol via KeeperHub MCP:
+1. **Phase 1 (Simulated Dry-Run):** Gemini calls `execute_contract_call` with `simulate: true` targeting Aave V3 `Pool.repay(...)`. If the borrower has no active debt or insufficient collateral, the simulation returns `wouldRevert: true` with a clear on-chain revert reason (`Aave V3 contract simulation reverted (Account has no active debt or insufficient collateral)`). The agent halts safely without broadcast.
+2. **Phase 2 (Live On-Chain Broadcast):** When `wouldRevert === false`, Gemini immediately triggers `execute_contract_call` with `simulate: false`. KeeperHub Turnkey signers broadcast the live transaction to Base Sepolia (`chain_id: 84532`), returning the verified transaction hash and Basescan link.
+
 ---
 
 ## 9. Comprehensive CLI Guide (`bulwark`)
@@ -717,14 +758,13 @@ Ready-to-record video script matching the DoraHacks judging rubric:
 
 | Time | Screen Display | Narration Voiceover Script |
 | :---: | :--- | :--- |
-| **0:00 - 0:10** | **Title Slide & Hero Architecture:** Show BULWARK overview and Aave V3 / KeeperHub logos. | *"DeFi liquidations cost borrowers millions in penalties and slippage. Meet BULWARK: the first autonomous, deterministic agent backstop economy built on KeeperHub."* |
-| **0:10 - 0:25** | **Ops Console (`http://localhost:4567`):** Monitored positions view displaying live Sepolia borrower with $HF = 1.18$. | *"BULWARK monitors live Aave V3 positions in real time. Here, a borrower on Sepolia has an unhealthy health factor of 1.18, facing imminent liquidation."* |
-| **0:25 - 0:35** | **Underwriter Desk & Orderbook:** Display counterfactual rescue ladder and dynamic premium quote. | *"Our bounded underwriter calculates an exact closed-form repayment ladder, finding the precise debt repay needed to restore health to 2.03, priced via our Dutch auction backstop market."* |
-| **0:35 - 0:45** | **RescueGrant Modal:** Show grant in `proposed` state with adaptive health factor bands. | *"The borrower pre-authorizes a state-bound RescueGrant. Crucially, a proposed grant can never execute on-chain without explicit human owner approval."* |
-| **0:45 - 0:55** | **Approval & Policy Compiler:** Click **Approve**. Show agent intent clamped to the $15 band cap. | *"Once approved, the Guardian forms an intent. Even if the agent requests an excessive amount, our Policy Compiler deterministically clamps the execution to the approved ceiling."* |
-| **0:55 - 1:10** | **KeeperHub Execution:** Show `simulate:true` dry-run passing, followed by live execution with `Idempotency-Key`. | *"BULWARK dry-runs the call via KeeperHub's simulation engine, then broadcasts the transaction with Turnkey key custody, idempotency protection, and private mempool routing."* |
-| **1:10 - 1:20** | **Etherscan & Telemetry:** Etherscan confirmation shown; borrower HF updates from $1.18 \to 2.03$. | *"The transaction settles on Sepolia. Aave V3 debt is repaid, and the borrower's health factor jumps to a safe 2.03, neutralizing liquidation risk."* |
-| **1:20 - 1:30** | **Public `/verify` Portal:** Paste PoAA bundle; 11/11 green checkmarks appear. | *"Anyone can verify the agency on the public /verify portal. All 11 checks pass. Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."* |
+| **0:00 - 0:12** | **Title & Security Lock Gate:** Load `http://20.244.4.11`. Show grayscale locked UI, inactive grey dot, and amber security banner. Click the BULWARK logo to reveal the **Access Gateway Modal**. | *"DeFi liquidations cost borrowers millions in penalties. Meet BULWARK: an autonomous, state-bound liquidation backstop on KeeperHub. To guarantee self-custody, the app starts locked until the operator authenticates via our Access Gateway."* |
+| **0:12 - 0:26** | **Dual-Access Gateway:** Toggle between Option 1 (Interactive Web3 Wallet) and Option 2 (24/7 Autonomous Guardian). Click **"⚡ Use Demo 24/7 Key (Testnet)"** & Authenticate. | *"Borrowers choose between Interactive Self-Custody—signing every rescue in MetaMask—or 24/7 Autonomous Guardian mode with a zero-signature private key. We'll authenticate with our 1-click testnet key."* |
+| **0:26 - 0:40** | **Vibrant Dashboard & Monitored Position:** The UI turns full color, live green dot pulses. Show monitored Aave V3 position on Base Sepolia with low Health Factor ($HF = 1.256$). | *"Immediately, the UI unlocks into full color. BULWARK monitors live Aave V3 positions on Base Sepolia. Here, borrower 0xf39F... has a distressed health factor of 1.25, facing imminent liquidation."* |
+| **0:40 - 0:55** | **Closed-Form Underwriting & Policy Clamp:** Show Gemini 3.5 underwriter selecting flash-deleverage plan and Policy Compiler clamping to the $15 invariant cap. | *"Our closed-form underwriting formula computes the exact repayment needed to restore safety. The clamp-only Policy Compiler mathematically clamps the plan to human-authorized caps before any broadcast."* |
+| **0:55 - 1:12** | **Gemini 3.5 AI Terminal (Two-Phase Live Auto-Rescue):** Click the preset prompt chip. Show Phase 1 (`simulate: true` &rarr; `wouldRevert: false`), then Phase 2 (`simulate: false` &rarr; live broadcast via KeeperHub). | *"In our live terminal, Gemini executes a two-phase protocol over KeeperHub MCP: first dry-running simulation to verify safety, then broadcasting live to Base Sepolia through KeeperHub's Turnkey relayer."* |
+| **1:12 - 1:22** | **BaseScan Explorer & Telemetry:** Show confirmed transaction hash on BaseScan with ~180k gas and instant HF recovery. | *"The transaction mines on Base Sepolia block 46906960. $5 USDC debt is burned, health factor recovers to safe territory, and the borrower pays zero gas fees."* |
+| **1:22 - 1:30** | **Public `/verify` Portal:** Click PoAA /verify, load the bundle, and show 11/11 cryptographic checkmarks passing. | *"Every rescue produces a Proof of Authorized Agency bundle. Paste it into /verify: all 11 invariant checks pass. Agents propose. Policy compiles. KeeperHub executes. Anyone can prove it."* |
 
 ---
 
