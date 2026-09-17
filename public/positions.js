@@ -4,6 +4,21 @@
 
 let allPositions = [];
 
+// Immediately hydrate table from cached state if available so page switches never search or flicker
+(function initCachedPositions() {
+  try {
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.watchlist && data.watchlist.length > 0) {
+        allPositions = data.watchlist;
+        renderPositionsMetrics(allPositions);
+        renderPositionsTable(allPositions);
+      }
+    }
+  } catch (e) {}
+})();
+
 async function loadPositionsData() {
   const data = await fetchDeskState();
   if (!data || !data.watchlist) return;

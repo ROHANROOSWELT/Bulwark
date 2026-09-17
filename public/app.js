@@ -7,6 +7,15 @@ async function fetchState() {
     const res = await fetch("/api/state");
     if (!res.ok) return;
     const data = await res.json();
+    try {
+      localStorage.setItem("bulwark_desk_state", JSON.stringify(data));
+      if (typeof data.hasKey === "boolean") {
+        localStorage.setItem("bulwark_has_key", data.hasKey ? "true" : "false");
+      }
+      if (data.chainId) {
+        localStorage.setItem("bulwark_chain_id", String(data.chainId));
+      }
+    } catch (e) {}
     renderState(data);
   } catch (err) {
     console.error("Failed to fetch desk state:", err);
@@ -712,6 +721,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 600);
   }
 });
+
+// Synchronously render from cached state so navigating back to /overview never flickers
+(function initCachedOverviewState() {
+  try {
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      renderState(data);
+    }
+  } catch (e) {}
+})();
+
 fetchState();
 setInterval(fetchState, 3000);
 

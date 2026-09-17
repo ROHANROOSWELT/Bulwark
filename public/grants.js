@@ -5,6 +5,21 @@
 let allGrants = [];
 let activeStatusFilter = "all";
 
+// Immediately hydrate grants table from cached state if available so page switches never search or flicker
+(function initCachedGrants() {
+  try {
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.grants && data.grants.length > 0) {
+        allGrants = data.grants;
+        renderGrantsMetrics(allGrants);
+        renderGrantsTable(allGrants);
+      }
+    }
+  } catch (e) {}
+})();
+
 async function loadGrantsData() {
   const data = await fetchDeskState();
   if (!data || !data.grants) return;

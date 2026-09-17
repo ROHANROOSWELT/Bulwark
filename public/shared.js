@@ -428,22 +428,101 @@ function showToast(message, type = "info") {
   }, 4000);
 }
 
-// ── Desk State & KPIs Helper ────────────────────────────────────────────────
-async function fetchDeskState() {
+// ── Desk State & KPIs Helper (Fast Shared Cache Across All Pages) ────────────
+function getCachedDeskState() {
   try {
-    const res = await fetch("/api/state");
-    if (!res.ok) return null;
-    const data = await res.json();
-    renderDeskKpis(data);
-    return data;
-  } catch (err) {
-    console.error("Failed to fetch desk state:", err);
-    return null;
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+window.getCachedDeskState = getCachedDeskState;
+
+function initPersistedHeaderAndKpis() {
+  try {
+    const cachedKey = localStorage.getItem("bulwark_has_key");
+    const cachedChain = localStorage.getItem("bulwark_chain_id") || "84532";
+    const cachedData = getCachedDeskState();
+
+    const keyChip = document.getElementById("keyChip");
+    if (keyChip) {
+      if (cachedKey === "false") {
+        keyChip.className = "chip chip-unavailable";
+        keyChip.textContent = "KEY NOT SET";
+      } else {
+        keyChip.className = "chip chip-keeperhub";
+        keyChip.textContent = "KEY ACTIVE";
+      }
+    }
+
+    const chainChip = document.getElementById("chainChip");
+    if (chainChip) {
+      if (cachedChain === "11155111") {
+        chainChip.className = "chip chip-chain";
+        chainChip.textContent = "Sepolia 11155111";
+      } else {
+        chainChip.className = "chip chip-chain";
+        chainChip.textContent = "Base Sepolia 84532";
+      }
+    }
+
+    let backendChip = document.getElementById("backendChip");
+    if (!backendChip) {
+      backendChip = document.createElement("span");
+      backendChip.id = "backendChip";
+      const headerStatus = document.querySelector(".header-status");
+      if (headerStatus && keyChip) {
+        headerStatus.insertBefore(backendChip, keyChip);
+      }
+    }
+    if (backendChip) {
+      backendChip.className = "chip chip-policy";
+      backendChip.title = "Backend hosted on Microsoft Azure VM (20.244.4.11)";
+      backendChip.innerHTML = "Azure: 20.244.4.11";
+    }
+
+    if (cachedData) {
+      renderDeskKpis(cachedData, false);
+    }
+  } catch (e) {}
+}
+
+// Run immediately to guarantee zero flicker across all page navigations
+if (typeof window !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPersistedHeaderAndKpis);
+  } else {
+    initPersistedHeaderAndKpis();
   }
 }
 
-function renderDeskKpis(data) {
+async function fetchDeskState() {
+  try {
+    const res = await fetch("/api/state");
+    if (!res.ok) return getCachedDeskState();
+    const data = await res.json();
+    renderDeskKpis(data, true);
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch desk state:", err);
+    return getCachedDeskState();
+  }
+}
+
+function renderDeskKpis(data, shouldPersist = true) {
   if (!data) return;
+
+  if (shouldPersist) {
+    try {
+      localStorage.setItem("bulwark_desk_state", JSON.stringify(data));
+      if (typeof data.hasKey === "boolean") {
+        localStorage.setItem("bulwark_has_key", data.hasKey ? "true" : "false");
+      }
+      if (data.chainId) {
+        localStorage.setItem("bulwark_chain_id", String(data.chainId));
+      }
+    } catch (e) {}
+  }
 
   if (data.chainId) {
     window.BULWARK_ACTIVE_CHAIN_ID = data.chainId;

@@ -5,6 +5,21 @@
 let allAuditLogs = [];
 let activeCategoryFilter = "all";
 
+// Immediately hydrate audit logs from cached state if available so page switches never search or flicker
+(function initCachedAudit() {
+  try {
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.audit && data.audit.length > 0) {
+        allAuditLogs = data.audit;
+        renderAuditMetrics(allAuditLogs);
+        renderAuditTimeline(allAuditLogs);
+      }
+    }
+  } catch (e) {}
+})();
+
 async function loadAuditData() {
   const data = await fetchDeskState();
   if (!data || !data.audit) return;

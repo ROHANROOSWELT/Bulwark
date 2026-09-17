@@ -4,6 +4,21 @@
 
 let allExecutions = [];
 
+// Immediately hydrate executions table from cached state if available so page switches never search or flicker
+(function initCachedExecutions() {
+  try {
+    const raw = localStorage.getItem("bulwark_desk_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.executions && data.executions.length > 0) {
+        allExecutions = data.executions;
+        renderExecutionsMetrics(allExecutions);
+        renderExecutionsTable(allExecutions);
+      }
+    }
+  } catch (e) {}
+})();
+
 async function loadExecutionsData() {
   const data = await fetchDeskState();
   if (!data || !data.executions) return;
