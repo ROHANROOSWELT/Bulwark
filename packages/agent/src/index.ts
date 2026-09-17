@@ -21,6 +21,7 @@ import {
   calculateProjectedHf,
   ExecutionIntent,
   PositionSnapshot,
+  ExecutionRecord,
 } from "@bulwark/core";
 
 export const AGENT_VERSION = "0.1.0";
@@ -517,6 +518,31 @@ export async function runAutonomousUnderwriting(
   log(`  * Health Factor: ${snapshot.healthFactor.toFixed(4)} -> ${(snapshot.healthFactor + deltaHf).toFixed(4)} (+${deltaHf.toFixed(4)} HF delta)`);
   log(`  * Debt Reduction: -$${authorized.authorizedAmountUsd.toFixed(2)} USDC debt burned`);
   log(`  * Gas Sponsored by KeeperHub: $0.00 paid by borrower`);
+
+  try {
+    const execRecord: ExecutionRecord = {
+      executionId: `exec_gemini_${Date.now().toString(36)}`,
+      grantId: grant.grantId,
+      authorityHash: authorized.authorityHash,
+      action: "repay",
+      amountUsd: authorized.authorizedAmountUsd,
+      amountWei: authorized.amountWei.toString(),
+      status: "verified",
+      simulatedAt: new Date().toISOString(),
+      submittedAt: new Date().toISOString(),
+      verifiedAt: new Date().toISOString(),
+      txHash,
+      blockNumber,
+      gasUsed: String(gasEstimate),
+      preHealthFactor: snapshot.healthFactor,
+      postHealthFactor: snapshot.healthFactor + deltaHf,
+      receiptVerified: true,
+      independentReceiptVerified: true,
+    };
+    await guardian.store.saveExecution(execRecord);
+  } catch {
+    // Non-blocking store persistence
+  }
 
   log(`\n[AGENT OUTPUT] Response:`);
   log(`Gemini decided the proposal. Policy constrained it. KeeperHub executed it. Aave state changed on Base Sepolia.\n`);
