@@ -303,9 +303,10 @@
         <div class="term-controls">
           <!-- Preset Prompt Chips -->
           <div class="term-chips-row">
-            <button class="term-chip-preset" data-prompt="Autonomously inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute simulated rescue via KeeperHub MCP without asking for confirmation">Zero-Touch Auto-Rescue</button>
-            <button class="term-chip-preset" data-prompt="Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy">Scan &amp; Formulate Rescue</button>
+            <button class="term-chip-preset" style="border-color: #10b981; color: #047857; font-weight: 700;" data-prompt="You are the BULWARK Autonomous Agent. Execute a two-phase rescue workflow on Aave V3 Pool 0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b on Base Sepolia (chain 84532) for borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123: Step 1: Call execute_contract_call for function repay(address,uint256,uint256,address) with parameters asset 0x036CbD53842c5426634e7929541eC2318f3dCF7e (USDC), amount 5000000 (5 USDC), interestRateMode 2 (variable), onBehalfOf 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123, and simulate: true. Step 2: Inspect the simulation result. If wouldRevert is false, immediately call execute_contract_call with the exact same arguments and simulate: false to broadcast the live on-chain transaction to Base Sepolia and return the verified transaction hash. If simulation reverts, report the on-chain revert reason.">Two-Phase Live Auto-Rescue (Sim &rarr; Broadcast)</button>
+            <button class="term-chip-preset" data-prompt="Autonomously inspect borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 on Base Sepolia and execute simulated rescue via KeeperHub MCP without asking for confirmation">Simulated Auto-Rescue</button>
             <button class="term-chip-preset" data-prompt="Query Aave V3 pool for borrower 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123 using execute_contract_call">Query Aave V3 getUserAccountData via MCP</button>
+            <button class="term-chip-preset" data-prompt="Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy">Scan &amp; Formulate Rescue</button>
             <button class="term-chip-preset" data-prompt="Verify invariant clamping bounds and adaptive bands for health factor 1.256">Verify Adaptive Band Clamping ($5.00 Cap)</button>
           </div>
 
