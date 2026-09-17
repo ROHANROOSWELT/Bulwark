@@ -43,7 +43,13 @@ function renderExecutionsTable(executions) {
   const tbody = document.getElementById("execsTableBody");
   const filter = (document.getElementById("filterExecsInput")?.value || "").toLowerCase();
 
-  const filtered = executions.filter((e) => {
+  const sorted = [...executions].sort((a, b) => {
+    const tA = new Date(a.verifiedAt || a.submittedAt || a.simulatedAt || 0).getTime();
+    const tB = new Date(b.verifiedAt || b.submittedAt || b.simulatedAt || 0).getTime();
+    return tB - tA;
+  });
+
+  const filtered = sorted.filter((e) => {
     if (!filter) return true;
     return (
       e.executionId.toLowerCase().includes(filter) ||
