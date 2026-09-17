@@ -667,11 +667,11 @@ The following trace is produced directly from live on-chain execution on Base Se
   * Plan: plan_repay_optimal (repay) => amount: $25.00 USDC | projectedHF: 1.280 | feasible: true
 
 [GEMINI] Selected strategy: Aave V3 Debt Repayment (USDC)
-[GEMINI] Proposed repayment: $4.98 USDC
-[AGENT OUTPUT] Underwriter Narrative: Selected closed-form debt repayment to stabilize Health Factor within human-authorized risk parameters.
+[GEMINI] Proposed repayment: $25.00 USDC
+[AGENT OUTPUT] Underwriter Narrative: The only available candidate plan (plan_repay_optimal) is evaluated. Selecting the policy-approved rescue action to partially mitigate liquidation risk while staying within the authorized grant band.
 
 [POLICY] RescueGrant limit: $5.00 USDC
-[POLICY] Authorized repayment: $4.98 USDC
+[POLICY] Authorized repayment: $5.00 USDC
 [POLICY] Cryptographic Authority Hash: 0xbcecd014b143a2dccc885ddf9684655d0be9d7a09207216237dd06ebfd6966e4
 [POLICY INVARIANT] Strict clamp-only rule enforced: Agent cannot alter its own spending authority.
 
@@ -694,8 +694,8 @@ Gas Used: 180,896
 Status: Success (Dual Verified via RPC & KeeperHub Relayer)
 
 [CHAIN FACT] On-Chain State Delta:
-  * Health Factor: 1.2770 -> 1.2775 (+0.0005 HF delta)
-  * Debt Reduction: -$4.98 USDC debt burned
+  * Health Factor: 1.2762 -> 1.2767 (+0.0005 HF delta)
+  * Debt Reduction: -$5.00 USDC debt burned
   * Gas Sponsored by KeeperHub: $0.00 paid by borrower
 
 [AGENT OUTPUT] Response:
