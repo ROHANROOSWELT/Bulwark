@@ -79,7 +79,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 
 #### **4. What still breaks or is unfinished? (A candid answer has never hurt a submission)**
 * **KeeperHub Composite Workflow Dry-Runs:** KeeperHub currently lacks a native sandbox or dry-run endpoint for arbitrary multi-step composite workflows. While BULWARK validates the workflow AST locally and simulates individual contract calls, the multi-node workflow execution itself cannot be dry-run atomically on KeeperHub servers before activation.
-* **`simulate:true` Footgun on Protocol Actions:** As documented in our [Platform Feedback](docs/INTEGRATION_FEEDBACK.md), KeeperHub silently ignores `simulate:true` on `/api/execute/protocol-action` routes and immediately broadcasts to the mempool. BULWARK implemented a client-side footgun guard (`assertSimulationSafety`) to reject these requests, but native server-side simulation enforcement remains desirable.
+* **`simulate:true` Footgun on Protocol Actions:** In our integration testing, we observed that KeeperHub silently ignores `simulate:true` on `/api/execute/protocol-action` routes and immediately broadcasts to the mempool. BULWARK implemented a client-side footgun guard (`assertSimulationSafety`) to reject these requests, but native server-side simulation enforcement remains desirable.
 * **Flash-Loan Atomic Unwinding:** Currently, the underwriter desk must maintain or be granted reserve capital in the borrowed debt token (e.g., USDC or WETH) to execute `Pool.repay`. Flashloan-backed atomic collateral swapping (unwinding collateral to repay debt in a single transaction) requires deploying a bespoke smart contract receiver, which is architected for the v3 mainnet rollout.
 * **Live Network Gas Dependency:** Automated CI tests run against real cryptographic vectors and RPC state reads; live on-chain transaction execution requires an active `KEEPERHUB_API_KEY` backed by a Turnkey signer funded with gas tokens.
 
@@ -634,9 +634,6 @@ npm run agent -- ask "What is our current KeeperHub daily spending limit?"
 
 # 5. End-to-End Agent Workflow Composition & Schema Validation
 npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
-
-# Detailed Test & Audit Report:
-# See docs/TEST_REPORT_GEMINI_AUTONOMOUS_MCP.md
 ```
 
 #### The Two-Phase Live Auto-Rescue Pipeline (Simulation ➔ Broadcast)
