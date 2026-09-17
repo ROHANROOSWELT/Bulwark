@@ -611,6 +611,7 @@ BULWARK natively supports KeeperHub's Streamable MCP endpoint (`https://app.keep
 
 BULWARK is fully aligned with the official DoraHacks **KeeperHub - The Agent Economy Hackathon** theme:
 - **Primary Driver:** The LLM Agent powered by Google Gemini 3.5 Flash-Lite loaded directly with all **44 KeeperHub Model Context Protocol (MCP)** tools. The agent operates **autonomously without human intervention**, querying on-chain positions, resolving Solidity function overload signatures, and simulating or executing smart contract calls.
+- **ABI Overload Resolution:** The Aave V3 Pool ABI contains multiple overloaded function signatures (e.g., two `repay` variants). BULWARK's Gemini system instruction enforces strict CRITICAL RULES requiring the agent to always pass the full canonical Solidity signature (`repay(address,uint256,uint256,address)`) to KeeperHub's `execute_contract_call`, preventing 400 ambiguity errors at the execution layer.
 - **Fail-Safe Invariant Rail:** Deterministic underwriting math, the clamp-only Policy Compiler, and Turnkey MPC signing act as the **tamper-proof execution and fallback layer**.
 - **Quota Safeguards:** Strict protection against the 500 requests/day free tier limit is enforced via an in-memory triage cache (2-minute TTL) and a daily budget cap (`DAILY_MAX = 480`) with automatic graceful fallback to deterministic math on HTTP 429.
 
@@ -794,8 +795,8 @@ Pre-compiled production tarballs and SHA-256 integrity checksums are generated i
 
 ```
 release-artifacts/
-├── bulwark-cli-0.1.0.tgz       (SHA-256: 735f0d9c1ec73356f9a17c11c3d557e41e7a14a304e47bc7a7b980edd0b8bba6)
-├── bulwark-core-0.1.0.tgz      (SHA-256: 6bf1204967afbd0b88f5bc811a1b4ecf2896334bd85c39d4e3e9de3739b27b78)
+├── bulwark-cli-0.1.0.tgz       (SHA-256: 64bee05dab194a31dfeabe64b2178023f04267128ce58d219846157ea281e783)
+├── bulwark-core-0.1.0.tgz      (SHA-256: 4b16363853f2ea9d1407e27563b4ccb55a8408df91596e53508eb6530d94f59c)
 └── CHECKSUMS.txt
 ```
 
