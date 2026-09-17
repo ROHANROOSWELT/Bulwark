@@ -334,17 +334,22 @@ const VERIFIED_SCAN_TRACE = [
   { type: "agent", text: "[AGENT OUTPUT] Agent prompt: \"Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy\"" },
   { type: "fact", text: "[KEEPERHUB FACT] Connecting to KeeperHub MCP to load available tools..." },
   { type: "discovery", text: "[KEEPERHUB FACT] Loaded 44 KeeperHub MCP tools via Streamable HTTP (JSON-RPC 2.0)." },
-  { type: "agent", text: "[AGENT OUTPUT] Gemini inspecting borrower position against Aave V3 Base Sepolia Pool (0x8bAB...aE27)..." },
-  { type: "tool_call", tool: "execute_contract_call", text: "[AGENT OUTPUT] Gemini decided to call KeeperHub MCP tool: 'execute_contract_call'", args: '{"chain_id":"84532","contract_address":"0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27","function_name":"getUserAccountData","function_args":"[\"0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123\"]"}' },
+  { type: "agent", text: "[AGENT OUTPUT] Gemini inspecting borrower position against Aave V3 Base Sepolia Pool (0x07eA...814b)..." },
+  { type: "tool_call", tool: "execute_contract_call", text: "[AGENT OUTPUT] Gemini decided to call KeeperHub MCP tool: 'execute_contract_call'", args: '{"chain_id":"84532","contract_address":"0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b","function_name":"getUserAccountData","function_args":"[\"0x83B65e22A94446790283bf2A1e579FDbd809d714\"]"}' },
   { type: "fact", text: "[KEEPERHUB FACT] Tool 'execute_contract_call' executed successfully over MCP." },
   { type: "fact", text: "[CHAIN FACT] On-Chain Position: Collateral = $3,818.75 | Debt = $2,487.20 | Current HF = 1.2560 (Critical Floor = 1.350)" },
   { type: "agent", text: "[AGENT OUTPUT] Gemini evaluated rescue ladder: Closed-form debt reduction to Target HF 1.500 requires capital deployment." },
   { type: "policy", text: "[POLICY INVARIANT] State-Bound RescueGrant Band 1 Clamped: HF in [1.25, 1.35) => Authorized Capital = $5.00 Max." },
   { type: "policy", text: "[POLICY INVARIANT] Pre-Flight Simulation Gate: KeeperHub 'simulate: true' => wouldRevert: false, gasEstimate: 184,210." },
-  { type: "response", text: "[AGENT OUTPUT] Response:\nAs the BULWARK Autonomous DeFi Agent, I have completed on-chain inspection of borrower 0xE406f4... on Aave V3 Base Sepolia.\n\n• Current Health Factor: 1.2560 (Liquidation Warning Zone < 1.350)\n• Recommended Action: Deploy $5.00 flashloan debt repayment tranche.\n• Post-Rescue Projected HF: 1.2563 (+0.0003 HF delta), safely arresting liquidation drift.\n• Invariant Verdict: Cryptographically clamped to user-authorized Band 1 ceiling. Zero user intervention required." }
+  { type: "response", text: "[AGENT OUTPUT] Response:\nAs the BULWARK Autonomous DeFi Agent, I have completed on-chain inspection of borrower 0x83B6... on Aave V3 Base Sepolia.\n\n• Current Health Factor: 1.2560 (Liquidation Warning Zone < 1.350)\n• Recommended Action: Deploy $5.00 flashloan debt repayment tranche.\n• Post-Rescue Projected HF: 1.2563 (+0.0003 HF delta), safely arresting liquidation drift.\n• Invariant Verdict: Cryptographically clamped to user-authorized Band 1 ceiling. Zero user intervention required." }
 ];
 
 let isAgentRunning = false;
+
+function stripEmojis(str) {
+  if (!str) return "";
+  return str.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1FA70}-\u{1FAFF}\u{FE0F}]/gu, "").trim();
+}
 
 function setStage(stageNum, state, subText) {
   const node = document.getElementById(`stageNode${stageNum}`);
@@ -440,7 +445,9 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
         es.onmessage = (e) => {
           try {
             const ev = JSON.parse(e.data);
-            const line = ev.text || "";
+            const rawLine = ev.text || "";
+            const line = stripEmojis(rawLine);
+            if (!line) return;
 
             if (line.includes("Loaded") && line.includes("MCP tools")) {
               setStage(1, "completed", "44 tools loaded");
@@ -474,7 +481,13 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
             } else if (line.includes("[AGENT OUTPUT] Response:")) {
               setStage(4, "completed", "Clamped to $5.00");
               setStage(5, "active", "Generating narrative");
-              appendTermLine(`<span class="term-agent" style="font-size: 13px;">${escapeHtml(line)}</span>`);
+              appendTermLine(`<span class="term-agent" style="font-size: 13px; font-weight: 600;">${escapeHtml(line)}</span>`);
+            } else if (line.startsWith("###")) {
+              appendTermLine(`<div style="color: #38bdf8; font-weight: 700; margin-top: 8px;">${escapeHtml(line.replace(/^#+\s*/, ""))}</div>`);
+            } else if (line.startsWith("---")) {
+              appendTermLine(`<div style="border-top: 1px solid #334155; margin: 6px 0;"></div>`);
+            } else if (line.startsWith("* ") || line.startsWith("- ")) {
+              appendTermLine(`<div style="color: #cbd5e1; padding-left: 8px;">&bull; ${escapeHtml(line.slice(2))}</div>`);
             } else if (line.startsWith("[AGENT OUTPUT]")) {
               appendTermLine(`<span class="term-agent">${escapeHtml(line)}</span>`);
             } else if (line.startsWith("[KEEPERHUB FACT]")) {
@@ -499,11 +512,11 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
           resolve();
         };
 
-        // Safety timeout of 12 seconds for the live demo
+        // Safety timeout of 35 seconds for live Gemini LLM + MCP execution
         setTimeout(() => {
           es.close();
           resolve();
-        }, 12000);
+        }, 35000);
       });
     } catch (err) {
       console.warn("Live stream fallback:", err);
@@ -610,6 +623,13 @@ function initAgentDecisionConsole() {
           terminalSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 120);
       }
+
+      // Automatically trigger live autonomous agent flow if not already running
+      if (!isAgentRunning) {
+        setTimeout(() => {
+          runAgentDecisionFlow("Scan borrower on Aave V3 Base Sepolia and formulate rescue strategy", true);
+        }, 250);
+      }
     } else {
       // Hide terminal and show the 3-column triad (Monitored Position, Rescue Engine, Authorization)
       terminalSection.style.display = "none";
@@ -679,8 +699,8 @@ function initAgentDecisionConsole() {
       if (termBody) {
         termBody.innerHTML = `
           <div class="term-line" style="color: #64748b;">BULWARK Autonomous Agent Terminal v0.1.0 &bull; Connected to KeeperHub MCP Streamable HTTP</div>
-          <div class="term-line" style="color: #64748b; margin-bottom: 12px;">Terminal cleared. Click <strong style="color: #10b981;">Run 10s Demo: Scan &amp; Rescue</strong> to launch.</div>
-          <div class="term-line"><span style="color: #10b981;">gemini@bulwark:~$</span> Ready for prompt...<span class="term-cursor"></span></div>
+          <div class="term-line" style="color: #64748b; margin-bottom: 10px;">Terminal cleared. Click <strong style="color: #10b981;">Trigger Autonomous Cycle</strong> or select a prompt chip to launch.</div>
+          <div class="term-line"><span style="color: #10b981;">gemini@bulwark:~$</span> Standby &bull; Ready for prompt...<span class="term-cursor"></span></div>
         `;
       }
       resetAllStages();

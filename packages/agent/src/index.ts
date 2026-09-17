@@ -365,7 +365,8 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
                 "- To call smart contracts or simulate transactions, call 'execute_contract_call' with 'contract_address', 'chain_id', 'function_name', 'function_args' (JSON array encoded as string), and 'simulate: true' for safe dry-runs.\n" +
                 "- For Aave V3 Pool repayments, the pool is 0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b, chain 84532, and the exact signature is 'repay(address,uint256,uint256,address)'.\n" +
                 "- To inspect account positions, call 'getUserAccountData' on the pool.\n" +
-                "- Always execute the appropriate KeeperHub tools to verify on-chain facts and perform transactions autonomously before summarizing your result."
+                "- Always execute the appropriate KeeperHub tools to verify on-chain facts and perform transactions autonomously before summarizing your result.\n" +
+                "- Do NOT include emojis in your response. Keep formatting clean, markdown-compliant, and professional."
             }
           ]
         };
@@ -438,7 +439,8 @@ export async function runAgentCli(rawArgs: string[], io: AgentCliIo = {}): Promi
           } else {
             const textPart = parts.find((p: any) => p.text);
             if (textPart && textPart.text) {
-              log(`\n[AGENT OUTPUT] Response:\n${textPart.text}\n`);
+              const cleanText = textPart.text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1FA70}-\u{1FAFF}\u{FE0F}]/gu, "");
+              log(`\n[AGENT OUTPUT] Response:\n${cleanText}\n`);
             }
             return 0;
           }
