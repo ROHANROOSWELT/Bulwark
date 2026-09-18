@@ -370,8 +370,8 @@ const VERIFIED_SCAN_TRACE = [
   { type: "sim_gas", text: "gasEstimate: 180,896" },
   { type: "fact", text: "[KEEPERHUB FACT] Simulation verified executable without reverting." },
   { type: "exec_phase", text: "simulate: false" },
-  { type: "tx_hash", text: "Tx Hash: 0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5" },
-  { type: "tx_meta", text: "Block: 46906929 | From: KeeperHub Turnkey Relayer (0x83b65e22...) | Gas: 180,896 | Status: Success" },
+  { type: "tx_hash", text: "Tx Hash: 0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394" },
+  { type: "tx_meta", text: "Block: 46969555 | From: KeeperHub Turnkey Relayer (0x83b65e22...) | Gas: 163,410 | Status: Success" },
   { type: "delta", text: "[CHAIN FACT] On-Chain State Delta: Health Factor 1.2780 -> 1.2785 (+0.0005) | -$4.98 USDC debt burned | $0.00 gas paid by borrower" },
   { type: "response", text: "[AGENT OUTPUT] Response:\nGemini decided the proposal. Policy constrained it. KeeperHub executed it. Aave state changed on Base Sepolia." }
 ];
@@ -686,7 +686,7 @@ async function runAgentDecisionFlow(promptText, useLiveStream = true, isAutoTrig
           <div style="background: rgba(16, 185, 129, 0.12); border-left: 3px solid #10b981; padding: 8px 12px; border-radius: 4px; margin: 6px 0;">
             <span class="chip chip-chain" style="font-size: 9px; margin-bottom: 4px;">MINED ON BASE SEPOLIA</span>
             <div style="color: #34d399; font-weight: 700;">${escapeHtml(step.text)}</div>
-            <a href="https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5" target="_blank" rel="noopener" style="color: var(--accent); font-size: 11px; text-decoration: underline;">View on BaseScan (Block 46906929) &nearr;</a>
+            <a href="https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394" target="_blank" rel="noopener" style="color: var(--accent); font-size: 11px; text-decoration: underline;">View on BaseScan (Block 46969555) &nearr;</a>
           </div>
         `);
       } else if (step.type === "tx_meta" || step.type === "delta") {
