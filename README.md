@@ -11,7 +11,7 @@
   ╚═════╝  ╚═════╝ ╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 ```
 
-### *The Deterministic, State-Bound Liquidation Backstop Economy for Live Aave V3 Positions on KeeperHub*
+### *The Policy-Bounded, State-Governed Liquidation Backstop Economy for Live Aave V3 Positions on KeeperHub*
 
 [![DoraHacks](https://img.shields.io/badge/DoraHacks-KeeperHub%20Hackathon%202026-blueviolet?style=for-the-badge)](https://dorahacks.io)
 [![Track](https://img.shields.io/badge/Track-Best%20Integration%20into%20a%20Live%20Project-FF5722?style=for-the-badge)](#)
@@ -44,7 +44,7 @@
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
 | 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube)**](https://youtu.be/qhUvINUcefg) | ✅ Recorded & Live |
-| ⚡ **3. KeeperHub On-Chain Tx** | [**Latest Autonomous Rescue Tx (`0xe772e1...`)**](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220), [**Tx (`0xd15b60...`)**](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394), [**Tx (`0x61c575...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5) & [**Tx (`0xc26cd5...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f) | ✅ **100% Live On-Chain Confirmed (Base Sepolia Blocks 46969887, 46969555, 46906929, 46906960)** |
+| ⚡ **3. KeeperHub On-Chain Tx** | [**Latest Autonomous Rescue Tx (`0xe772e1...`)**](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220), [**Tx (`0xd15b60...`)**](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394), [**Tx (`0x61c575...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5) & [**Tx (`0xc26cd5...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f) | ✅ **Live On-Chain Confirmed (Base Sepolia Blocks 46969887, 46969555, 46906929, 46906960)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
 
@@ -56,12 +56,12 @@
 * **Project Integrated:** [**Aave V3**](https://aave.com) ($17.4B TVL across EVM chains; live contracts on Base Sepolia at `0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`, Ethereum Sepolia at `0x6Ae43d041c5E8AEe1117f170400777174e508F87`, and Base Mainnet at `0xA238Dd80C259a72e81d7e4664a9801593F98d1c5`).
 * **What the Integration Does:**  
   DeFi liquidations are brutal, zero-sum market events causing 5%–10% collateral penalties, liquidation cascade MEV, and total position dismantlement. Existing automation consists of static stop-loss keepers (which fail during gas spikes) or autonomous agent demos that make probabilistic decisions *during* the panic—precisely when an unconstrained model is most dangerous.  
-  **BULWARK** introduces the first **state-bound, autonomous agent backstop economy**:
+  **BULWARK** implements a **policy-bounded, autonomous agent backstop architecture**:
   1. Borrowers issue cryptographically bound, adaptive **RescueGrants** to an underwriting desk with EIP-712 human owner approval.
   2. The Guardian agent continuously monitors real Aave V3 health factors via `getUserAccountData` and calculates an **exact closed-form rescue ladder** ($\Delta D^*$) to restore positions to safety ($HF \ge 2.00$).
   3. When liquidation threatens ($HF < 1.35$), the agent forms an execution intent.
   4. The **Policy Compiler** clamps the intent against immutable human-approved bands, grant caps, daily velocity budgets, and desk real reserve capacity (`authorityHash` binding). Raising limits is structurally impossible.
-  5. **KeeperHub executes the debt rescue deterministically** via Turnkey-signed direct contract calls (`Pool.repay(...)`), idempotency keys, and private mempool routing on Base Sepolia.
+  5. **KeeperHub executes the authorized debt rescue** via Turnkey-signed direct contract calls (`Pool.repay(...)`), cryptographic idempotency keys, and private mempool routing on Base Sepolia.
   6. Anyone can independently verify the execution on the public **`/verify`** portal via the **11-Check Proof of Authorized Agency (PoAA)** chain.
 
 #### **2. Which KeeperHub surfaces did you use?**
@@ -70,7 +70,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 2. **Simulation Preflight (`simulate: true`)**: Dry-runs transactions against real node state prior to mempool submission, asserting `wouldRevert === false` and validating gas parameters before spending borrower capital.
 3. **Streamable Model Context Protocol (MCP)**: Native TypeScript MCP client interfacing with both authenticated (`https://app.keeperhub.com/mcp`) and anonymous (`https://app.keeperhub.com/mcp/public`) endpoints over JSON-RPC 2.0 and Server-Sent Events (SSE). BULWARK dynamically discovers available tools (44 tools) and parameter schemas at runtime without hardcoded assumptions.
 4. **Agent-Authored Workflows & Schemas**: Dynamically compiles multi-step declarative workflows (`trigger: schedule` + `condition: read_contract` + `action: execute`) targeting KeeperHub workflow runners, validating schemas via MCP `validate_workflow`.
-5. **Idempotency & Dual-Receipt Verification**: Enforces unique `Idempotency-Key` headers on every mutation, preventing double-execution; cross-verifies execution receipts against both KeeperHub API and independent public RPCs to guarantee state finality.
+5. **Idempotency & Dual-Receipt Verification**: Enforces unique `Idempotency-Key` headers on every mutation, preventing double-execution; cross-verifies execution receipts against both KeeperHub API and independent public RPCs to confirm state finality.
 6. **Audit Trail & Spend-Cap Analytics (`GET /api/analytics/spend-cap`)**: Reads operational spend caps and outputs portable cryptographically chained JSONL audit logs with SHA-256 integrity checks.
 
 #### **3. Testnet or mainnet?**
@@ -98,15 +98,15 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 | Rubric Criterion | How BULWARK Addresses It | Verifiable Evidence |
 | :--- | :--- | :--- |
 | **1. Integration Depth** | Deep, protocol-native integration with **Aave V3** ($17.4B TVL). Decodes live borrower account data, computes closed-form repayment ladders, reads Chainlink oracle feeds, and compiles exact `IPool.repay(...)` calldata. | Real Aave V3 Base Sepolia Pool (`0x8bAB...aE27`); verified live on-chain. |
-| **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Live on-chain debt rescues were executed autonomously on Base Sepolia with gas sponsorship. | Tx [`0x61c5754c...`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5), [`0xc26cd5b6...`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [`0xfabb40aa...`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [`0x43dbc027...`](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16). |
-| **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; deterministic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
+| **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Live on-chain debt rescues were executed autonomously on Base Sepolia with gas sponsorship. | Tx [`0xe772e1...`](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220), [`0xd15b60...`](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394), [`0xc26cd5...`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [`0x61c575...`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5). |
+| **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; cryptographic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
 | **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores $HF \ge 2.00$ without over-repaying. |
 | **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,308 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
 
 ## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
 
 > [!IMPORTANT]
-> **ZERO-MOCK & ZERO-FABRICATION GUARANTEE:** BULWARK was tested and executed **100% live on-chain** against real Aave V3 smart contracts with real Turnkey non-custodial signing via KeeperHub. Zero mock data, zero fake hashes, and zero fallback numbers exist in the execution path.
+> **ZERO-MOCK & AUDITABLE EXECUTION INTEGRITY:** BULWARK was tested and executed **live on-chain** against real Aave V3 smart contracts with Turnkey signing via KeeperHub. Zero mock data, zero fake hashes, and zero fallback numbers exist in the execution path.
 
 ### 📜 Verified On-Chain Transactions
 
@@ -173,14 +173,14 @@ Across Aave V3's **$17.4 Billion TVL**, sudden market volatility pushes healthy 
 
                   BULWARK AUTONOMOUS RESCUE (VALUE PRESERVED)
   HF = 1.18 ──► [Agent Proposes Rescue] ──► [Policy Clamps] ──► [KeeperHub Repays $15]
-            └──► Position Health Restored (HF = 2.03) ──► Small Deterministic Fee
+            └──► Position Health Restored (HF = 2.03) ──► Small Pre-Authorized Fee
 ```
 
 ### The Autonomous Backstop Solution
 BULWARK replaces toxic liquidations with an **autonomous underwriter economy**:
 * **Borrowers** pre-authorize bounded, adaptive safety bands (`RescueGrant`) while positions are healthy.
 * **Underwriter Desks** compete in an autonomous Dutch auction orderbook to supply emergency debt repayment liquidity.
-* **KeeperHub** acts as the high-availability execution kernel, guaranteeing transaction simulation, non-custodial Turnkey signing, private mempool routing, and idempotent execution.
+* **KeeperHub** acts as the execution backbone, providing transaction simulation, autonomous Turnkey signing, private mempool routing, and idempotent execution.
 * **Public Verifiers** audit agency using **Proof of Authorized Agency (PoAA)**—a 11-step cryptographic proof verifying that no agent exceeded its human-approved grant mandate.
 
 ---
@@ -238,7 +238,7 @@ $$\text{AuthorizedAmount} \le \min \begin{cases}
 \text{DeskAvailableCapacity}
 \end{cases}$$
 
-Every authorized execution generates a deterministic `authorityHash`:
+Every authorized execution generates a cryptographically bound `authorityHash`:
 $$\text{authorityHash} = \text{keccak256}(\text{grantId} \mathbin{\Vert} \text{bandIndex} \mathbin{\Vert} \text{intentHash} \mathbin{\Vert} \text{authorizedAmount} \mathbin{\Vert} \text{nonce})$$
 
 If any parameter is tampered with post-compilation, the hash mismatches and KeeperHub execution aborts fail-closed.
@@ -258,9 +258,9 @@ BULWARK solves this with a **Dual-Access Security Gateway**:
    * Ideal for active daytime monitoring, position audits, and operators who require per-transaction human sign-off.
 
 2. **Option 2: 24/7 Autonomous Guardian Mode (Zero-Signature Continuous Backstop)**
-   * Operators can enter an Ethereum private key or use the built-in **"⚡ Use Demo 24/7 Key (Testnet)"** shortcut (`0xac09...ff80` &rarr; [`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`](https://sepolia.basescan.org/address/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)).
-   * The backend validates the key server-side using pure `secp256k1` address derivation via `POST /api/auth/verify-key` with zero external dependencies.
-   * Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, simulate, and execute repayments continuously in the background without waking the borrower up for signatures.
+   * Operators can provide a testnet guardian session key or use the built-in **"⚡ Use Demo 24/7 Key (Testnet)"** shortcut (`0xac09...ff80` &rarr; [`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`](https://sepolia.basescan.org/address/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)).
+   * The backend validates the address server-side in transient volatile memory via `POST /api/auth/verify-key` without writing credentials to persistent storage.
+   * Authorizes KeeperHub and Gemini 3.5 to formulate, clamp, simulate, and execute repayments continuously in the background without manual signature popups.
    * Ideal for 24/7 liquidation protection, overnight monitoring, and autonomous testnet demonstrations.
 
 3. **The Application Lock Gate (`body.bulwark-locked`)**
@@ -278,24 +278,29 @@ BULWARK solves this with a **Dual-Access Security Gateway**:
      * `[BULWARK GATEWAY] Interactive Self-Custody Mode: Connected wallet (0x...) • On-chain broadcast requires manual signature.`
      * `[BULWARK GATEWAY] 24/7 Autonomous Guardian Mode: Active key for (0x...) • Zero manual signatures required.`
 
-### E. Guaranteed Zero-Storage & Private Key Protection Architecture
+### E. Transient In-Memory Evaluation & Zero Persistent Storage Architecture
 
-BULWARK enforces a strict, mathematical **Zero-Storage Security Policy** for private keys entered into the application. Users and operators can rest assured that their private keys are **100% protected and NEVER stored anywhere**:
+BULWARK maintains a strict **Zero-Persistence Policy** for credentials provided to the application, establishing clear operational and custody boundaries:
 
-1. **Zero Client-Side Persistence**:
-   * **No LocalStorage**: Private keys are **never** written to `localStorage`, `sessionStorage`, IndexedDB, or web cookies. The client explicitly executes `localStorage.removeItem("bulwark_auth_key")` on startup to scrub any legacy artifact.
-   * **No Window / Global Variable Leakage**: The client runtime object `window.bulwarkAuth` retains strictly the public checksum address (`0x...`) and authentication mode (`"private_key"` or `"wallet"`). The private key itself is completely absent from browser memory.
+1. **Custody Model Separation**:
+   * **Interactive Self-Custody (Option 1)**: User keys reside exclusively in the operator's browser extension or hardware wallet (MetaMask, OKX, Rabby). BULWARK never touches private keys.
+   * **Autonomous Testnet Guardian Session Key (Option 2)**: For headless 24/7 testnet automation, session keys are processed strictly in volatile Node.js runtime memory to derive the account address and authenticate the session.
+   * **KeeperHub Relayer Custody**: Autonomous live on-chain rescues are executed and signed directly by KeeperHub's server-side Turnkey relayer (`0x83B65e22...`). The relayer holds its own execution balance and gas allowance, submitting `Pool.repay(...)` calls to burn borrower debt without requiring custody of the borrower's underlying collateral.
 
-2. **Transient In-Memory Verification Only**:
-   * When an operator inputs a key in Option 2 (or clicks the demo testnet shortcut), the key is evaluated purely in volatile memory via `POST /api/auth/verify-key`.
+2. **Zero Client-Side Persistence**:
+   * **No LocalStorage**: Credentials are **never** stored in `localStorage`, `sessionStorage`, IndexedDB, or cookies. The client explicitly executes `localStorage.removeItem("bulwark_auth_key")` on initialization to clear any legacy tokens.
+   * **No Global Variable Leakage**: The client runtime object `window.bulwarkAuth` stores only the public checksum address (`0x...`) and authentication mode (`"private_key"` or `"wallet"`). Raw private keys are never retained in browser state.
+
+3. **Transient Volatile Memory Evaluation**:
+   * When an operator inputs a session key in Option 2 (or selects the testnet shortcut), the key is evaluated purely in volatile memory via `POST /api/auth/verify-key`.
    * The backend applies native Node.js elliptic-curve cryptography (`crypto.createECDH("secp256k1")`) to derive the uncompressed public key and Keccak-256 address hash.
-   * As soon as the public address is derived, the input buffer is discarded. The private key is **never written to disk, databases, log files, or persisted in any form**.
+   * Once address derivation is complete, the input buffer is discarded. Credentials are **never written to disk, databases, or application log files**.
 
-3. **Instant DOM Sanitization & Permanent Masking**:
-   * The password input element is immediately cleared (`input.value = ""`) the millisecond authentication begins, preventing the key from lingering in the browser DOM tree or memory inspection snapshots.
-   * The input field is permanently locked to `type="password"`, `autocomplete="off"`, and `spellcheck="false"`, preventing browser auto-fill caches, screen scraping, or visual shoulder surfing.
+4. **DOM Sanitization & UI Masking**:
+   * The password input element is immediately cleared (`input.value = ""`) upon submission to minimize retention in DOM memory trees.
+   * The input field enforces `type="password"`, `autocomplete="off"`, and `spellcheck="false"`, preventing browser auto-fill caches and screen capture leakage.
 
-4. **Self-Custody Alternative Always Available**:
+5. **Self-Custody Alternative Always Available**:
    * For users who prefer zero key entry whatsoever, **Option 1 (Interactive Web3 Wallet)** integrates MetaMask, OKX, Coinbase Wallet, and Rabby via EIP-1193, where private keys never leave the hardware or extension sandbox and every transaction requires a physical signature prompt.
 
 ---
@@ -328,7 +333,7 @@ sequenceDiagram
 ### Orderbook Matching Invariants
 1. **Capacity Backing:** A desk can **never** commit more capital than its real-time verified on-chain wallet balance. Fake liquidity is banned by cryptographic capacity assertion (`reservedCapacity <= realBalance`).
 2. **Dutch Auction Decay:** Underwriter fees start at a ceiling and decay linearly over time until filled or expired.
-3. **Deterministic Tie-Breaking:** Ties between identical fee quotes are broken deterministically by verified execution reputation and desk age.
+3. **Algorithmic Tie-Breaking:** Ties between identical fee quotes are resolved algorithmically by verified execution reputation and desk age.
 
 ---
 
@@ -407,7 +412,7 @@ flowchart TD
     B --> C{"Health Factor < Critical Floor?\n(e.g., HF < 1.35)"}
     C -- No --> A
     C -- Yes --> D["3. Gemini AI Underwriter\n(Plan Selection: Repay / Flash-Deleverage)"]
-    D --> E["4. Policy Invariant Clamp\nΔDebt = TotalDebt - (Collateral × LiqThresh)/1.500"]
+    D --> E["4. Policy Invariant Clamp\nΔDebt = TotalDebt - (Collateral × LiqThresh)/2.000"]
     E --> F["5. Pre-Flight KeeperHub Simulation\n(simulate: true)"]
     F --> G{"Simulation Success?\n(wouldRevert == false)"}
     G -- Reverts --> H["Abort & Log Reason\n(Zero Gas Wasted)"]
@@ -420,10 +425,10 @@ flowchart TD
 1. **Continuous Ingestion:** Guardian daemon queries Aave V3 `getUserAccountData` on Base Sepolia (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`) or Ethereum Sepolia via RPC and KeeperHub views.
 2. **AI Underwriting:** When a position drops below critical threshold ($HF < 1.35$), Gemini 3.5 Flash-Lite evaluates candidate recovery strategies (`repay`, `flash-deleverage`, `add-collateral`) using 44 KeeperHub MCP tools and outputs an underwriter narrative.
 3. **Pre-Authorized Agency:** Borrowers pre-authorize rescue limits via EIP-712 RescueGrants. The Policy Compiler mathematically clamps the proposed action:
-   $$\Delta \text{Debt}^* = D - \frac{C \cdot L}{1.500}$$
-   Ensuring target $HF \ge 1.500$ without ever exceeding borrower-approved capital caps or desk available capacity.
+   $$\Delta \text{Debt}^* = D - \frac{C \cdot L}{2.000}$$
+   Ensuring target $HF \ge 2.000$ without ever exceeding borrower-approved capital caps or desk available capacity.
 4. **Pre-Flight Simulation:** Executes pre-flight dry-run via KeeperHub with `simulate: true`. If the transaction would revert (e.g., no debt or slippage), execution immediately halts with zero gas burned.
-5. **Autonomous Broadcast:** Dispatches transaction with `simulate: false` and a deterministic `Idempotency-Key` (`sha256(grantId:authorityHash:nonce)`), routing to private mempools via Turnkey signers.
+5. **Autonomous Broadcast:** Dispatches transaction with `simulate: false` and a cryptographic `Idempotency-Key` (`sha256(grantId:authorityHash:nonce)`), routing to private mempools via Turnkey signers.
 6. **Dual-Receipt Verification & PoAA:** Confirms receipt across both KeeperHub and independent Base Sepolia RPC nodes, verifies $HF_{\text{post}} > HF_{\text{pre}}$, and emits an exportable 11-check PoAA bundle.
 
 ---
@@ -438,7 +443,7 @@ BULWARK is not a superficial client; it is built ground-up on KeeperHub's techni
 | **Simulation Sandbox** | [`packages/core/src/keeperhub/client.ts`](packages/core/src/keeperhub/client.ts) | Runs pre-flight dry-runs (`simulate: true`) before spending real capital; blocks execution if `wouldRevert === true`. |
 | **Model Context Protocol (MCP)** | [`packages/agent/src/index.ts`](packages/agent/src/index.ts) | Connects to `/mcp` and `/mcp/public` via SSE/JSON-RPC, querying `tools/list` to discover network capabilities dynamically. |
 | **Agent Workflows** | [`packages/core/src/workflow/compile.ts`](packages/core/src/workflow/compile.ts) | Generates JSON AST workflows (`trigger: schedule` + `condition: read_contract` + `action: execute`) validated via MCP schemas. |
-| **Idempotency Guard** | [`packages/core/src/guardian.ts`](packages/core/src/guardian.ts) | Computes SHA-256 digests over execution payloads to guarantee zero duplicate executions during network retries. |
+| **Idempotency Guard** | [`packages/core/src/guardian.ts`](packages/core/src/guardian.ts) | Computes SHA-256 digests over execution payloads to prevent duplicate executions during network retries. |
 | **Dual Receipt Verification**| [`packages/core/src/receipts/verify.ts`](packages/core/src/receipts/verify.ts) | Cross-checks KeeperHub receipts against independent public RPC nodes (`eth_getTransactionReceipt`) to prove state finality. |
 | **Spend-Cap Analytics** | [`packages/core/src/keeperhub/client.ts`](packages/core/src/keeperhub/client.ts) | Queries `GET /api/analytics/spend-cap` to enforce underwriter operational budget constraints. |
 | **Audit Trail Export** | [`packages/cli/src/index.ts`](packages/cli/src/index.ts) | Serializes verifiable audit bundles with cryptographic hash chaining for external compliance. |
@@ -619,7 +624,7 @@ BULWARK is fully aligned with the official DoraHacks **KeeperHub - The Agent Eco
   $$\text{Authorized Amount} = \min(\text{Proposed Amount},\; \text{Effective Band Cap})$$
   Any attempt to execute above the cap is clamped fail-safe; any unapproved action or asset is rejected outright.
 - **ABI Overload Resolution:** The Aave V3 Pool ABI contains multiple overloaded function signatures (e.g., two `repay` variants). BULWARK's Gemini system instruction enforces strict CRITICAL RULES requiring the agent to always pass the full canonical Solidity signature (`repay(address,uint256,uint256,address)`) to KeeperHub's `execute_contract_call`, preventing 400 ambiguity errors at the execution layer.
-- **Quota Safeguards:** Strict protection against the 500 requests/day free tier limit is enforced via an in-memory triage cache (2-minute TTL) and a daily budget cap (`DAILY_MAX = 480`) with automatic graceful fallback to deterministic math on HTTP 429.
+- **Quota Safeguards:** Strict protection against the 500 requests/day free tier limit is enforced via an in-memory triage cache (2-minute TTL) and a daily budget cap (`DAILY_MAX = 480`) with automatic graceful fallback to closed-form mathematical calculations on HTTP 429.
 
 ```bash
 # 1. Full Autonomous Underwriting, Policy Clamping & KeeperHub MCP Execution
@@ -648,9 +653,9 @@ npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 
 #### The Two-Phase Live Auto-Rescue Pipeline (Simulation ➔ Broadcast)
 
-To guarantee zero gas is ever wasted on reverting transactions, Gemini 3.5 executes a strict two-phase protocol via KeeperHub MCP:
-1. **Phase 1 (Simulated Dry-Run):** Gemini calls `execute_contract_call` with `simulate: true` targeting Aave V3 `Pool.repay(...)`. If the borrower has no active debt or insufficient collateral, the simulation returns `wouldRevert: true` with a clear on-chain revert reason (`Aave V3 contract simulation reverted (Account has no active debt or insufficient collateral)`). The agent halts safely without broadcast.
-2. **Phase 2 (Live On-Chain Broadcast):** When `wouldRevert === false`, Gemini immediately triggers `execute_contract_call` with `simulate: false`. KeeperHub Turnkey signers broadcast the live transaction to Base Sepolia (`chain_id: 84532`), returning the verified transaction hash and BaseScan link.
+To prevent gas waste on reverting transactions, BULWARK executes a strict two-phase protocol via KeeperHub MCP:
+1. **Phase 1 (Pre-Flight Simulation):** The AI underwriter proposes the rescue strategy and repayment parameters, and the policy compiler clamps them to authorized boundaries. BULWARK then calls `execute_contract_call` with `simulate: true` targeting Aave V3 `Pool.repay(...)`. If the borrower has no active debt or insufficient collateral, KeeperHub simulation returns `wouldRevert: true` with the on-chain revert reason (e.g., `Aave V3 contract simulation reverted (Account has no active debt or insufficient collateral)`), halting execution safely before any broadcast.
+2. **Phase 2 (Live On-Chain Broadcast):** When simulation confirms `wouldRevert === false` and retrieves the gas estimate, simulation turns off (`simulate: false`). KeeperHub's autonomous Turnkey relayer signs and broadcasts the live transaction to Base Sepolia (`chain_id: 84532`), burning borrower debt on Aave V3 and returning the verified transaction hash and BaseScan link for independent verification.
 
 #### Verified Live Execution Terminal Trace
 
@@ -820,7 +825,8 @@ All primary deliverables, verification links, and confirmed on-chain transaction
 | **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | ✅ Public & Up to date |
 | **Live App (Vercel)** | Production hosted web application | `https://bulwark-keeperhub.vercel.app` | ✅ Deployed & Operational |
 | **Public Verifier** | 11-Check PoAA Verification Portal | `https://bulwark-keeperhub.vercel.app/verify` | ✅ PROVEN (11/11 Checks) |
-| **Autonomous Tx (Latest)** | BaseScan on-chain rescue transaction (Live Mined) | `0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220` | ✅ Mined in Block 46969887 |
+| **Autonomous Tx (Latest #6)** | BaseScan on-chain rescue transaction #6 (Live Mined) | `0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220` | ✅ Mined in Block 46969887 |
+| **Autonomous Tx #5** | BaseScan on-chain rescue transaction #5 (Live Mined) | `0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394` | ✅ Mined in Block 46969555 |
 | **Autonomous Tx #4** | BaseScan on-chain rescue transaction #4 | `0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f` | ✅ Mined in Block 46906960 |
 | **Autonomous Tx #3** | BaseScan on-chain rescue transaction #3 | `0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5` | ✅ Mined in Block 46906929 |
 | **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
