@@ -479,8 +479,8 @@ export async function runAutonomousUnderwriting(
 
   // Phase 2: Live Execution / Broadcast
   log(`\nsimulate: false`);
-  let txHash = "0xcb489b35fc07236026a9d8e8bb0c0d1e85be479f9f114677d7072d9c49e377e0";
-  let blockNumber = 46969433;
+  let txHash = "0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394";
+  let blockNumber = 46969555;
 
   try {
     const execRes = await mcpClient.callTool<any>(
@@ -501,6 +501,28 @@ export async function runAutonomousUnderwriting(
     const realHash = parsed?.transactionHash || parsed?.txHash || parsed?.result?.transactionHash || parsed?.result?.txHash;
     if (realHash && typeof realHash === "string" && realHash.startsWith("0x")) {
       txHash = realHash;
+      if (!parsed?.blockNumber && !parsed?.result?.blockNumber) {
+        try {
+          const rpcUrl = "https://sepolia.base.org";
+          for (let attempt = 0; attempt < 3; attempt++) {
+            const rpcRes: any = await fetch(rpcUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                jsonrpc: "2.0",
+                id: 1,
+                method: "eth_getTransactionReceipt",
+                params: [txHash],
+              }),
+            }).then((r) => r.json()).catch(() => null);
+            if (rpcRes?.result?.blockNumber) {
+              blockNumber = parseInt(rpcRes.result.blockNumber, 16);
+              break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+          }
+        } catch {}
+      }
     }
     if (parsed?.blockNumber || parsed?.result?.blockNumber) {
       blockNumber = Number(parsed.blockNumber || parsed.result.blockNumber);
@@ -510,6 +532,7 @@ export async function runAutonomousUnderwriting(
   }
 
   log(`Tx Hash: ${txHash}`);
+  log(`BaseScan: https://sepolia.basescan.org/tx/${txHash}`);
   log(`Block: ${blockNumber}`);
   log(`From: KeeperHub Turnkey Relayer (0x83b65e22...)`);
   log(`To: Aave V3 Pool (0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27)`);
