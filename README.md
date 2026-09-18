@@ -87,8 +87,8 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 
 #### **5. Reachable contact information:**
 * **Email:** `prohanrooswelt@gmail.com`
-* **X (Twitter):** [`@bulwark_agent`](https://x.com)
-* **Discord:** `rohan_bulwark`
+* **X (Twitter):** [`beaniexws6`]([https://x.com](https://x.com/beaniexws6))
+* **Discord:** `rohan006860`
 * **GitHub:** [`github.com/ROHANROOSWELT`](https://github.com/ROHANROOSWELT)
 
 ---
