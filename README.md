@@ -44,7 +44,7 @@
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
 | 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube)**](https://youtu.be/qhUvINUcefg) | ✅ Recorded & Live |
-| ⚡ **3. KeeperHub On-Chain Tx** | [**Autonomous Rescue Tx #3 (`0x61c57...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5), [**Tx #4 (`0xc26cd...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [**Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Base Sepolia Blocks 46906929, 46906960, 46859912, 46823633)** |
+| ⚡ **3. KeeperHub On-Chain Tx** | [**Latest Autonomous Rescue Tx (`0xe772e1...`)**](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220), [**Tx (`0xd15b60...`)**](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394), [**Tx (`0x61c575...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5) & [**Tx (`0xc26cd5...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f) | ✅ **100% Live On-Chain Confirmed (Base Sepolia Blocks 46969887, 46969555, 46906929, 46906960)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
 
@@ -75,7 +75,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 
 #### **3. Testnet or mainnet?**
 * **Primary Verified Testnets:**
-  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescues executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`), mined in blocks `46906960`, `46906929`, `46859912`, and `46823633`.
+  - **Base Sepolia Testnet (Chain ID: `84532`)**: Live on-chain rescues executed against Aave V3 Base Sepolia Pool (`0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`), mined in blocks `46969887`, `46969555`, `46906960`, `46906929`, `46859912`, and `46823633`.
   - **Ethereum Sepolia Testnet (Chain ID: `11155111`)**: Live pre-approval, token reader, and oracle verification against Aave V3 Sepolia Pool (`0x6Ae43d041c5E8AEe1117f170400777174e508F87`).
 * **Production Architecture:** The codebase is natively chain-agnostic. Pre-configured contracts and RPC adapters are implemented for **Base Mainnet (Chain ID: `8453`)** and **Ethereum Mainnet (Chain ID: `1`)**.
 
@@ -114,6 +114,8 @@ All transactions are publicly verifiable on public block explorers:
 
 | Action | Chain | Target Contract / Asset | Transaction Hash / Explorer Link | Block | Gas Used | Status |
 | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| 🤖 **Autonomous Two-Phase Rescue #6 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220`](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220) | `46969887` | `163,410` | **MINED (Success)** |
+| 🤖 **Autonomous Two-Phase Rescue #5 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394`](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394) | `46969555` | `163,410` | **MINED (Success)** |
 | 🤖 **Autonomous Daemon Rescue #4 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f) | `46906960` | `180,896` | **MINED (Success)** |
 | 🤖 **Autonomous Daemon Rescue #3 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5) | `46906929` | `180,896` | **MINED (Success)** |
 | 🚀 **Live Debt Rescue #2 (repay)** | **Base Sepolia (84532)** | Aave V3 Pool (`0x8bAB...aE27`) | [`0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1`](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) | `46859912` | `180,896` | **MINED (Success)** |
@@ -811,13 +813,14 @@ BULWARK treats all off-chain agents—including its own Guardian and underwriter
 
 ## 12. DoraHacks Submission Check-Off Matrix
 
-Before submitting the DoraHacks form, replace the marked placeholders with your final links:
+All primary deliverables, verification links, and confirmed on-chain transactions are fully populated and verified below:
 
 | Item | Description | Verified Value in README | Status |
 | :--- | :--- | :--- | :--- |
 | **Source Code** | Public GitHub repository URL | `https://github.com/ROHANROOSWELT/Bulwark` | ✅ Public & Up to date |
 | **Live App (Vercel)** | Production hosted web application | `https://bulwark-keeperhub.vercel.app` | ✅ Deployed & Operational |
 | **Public Verifier** | 11-Check PoAA Verification Portal | `https://bulwark-keeperhub.vercel.app/verify` | ✅ PROVEN (11/11 Checks) |
+| **Autonomous Tx (Latest)** | BaseScan on-chain rescue transaction (Live Mined) | `0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220` | ✅ Mined in Block 46969887 |
 | **Autonomous Tx #4** | BaseScan on-chain rescue transaction #4 | `0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f` | ✅ Mined in Block 46906960 |
 | **Autonomous Tx #3** | BaseScan on-chain rescue transaction #3 | `0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5` | ✅ Mined in Block 46906929 |
 | **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
