@@ -6,7 +6,9 @@
   "description": "BULWARK — the agent backstop economy for live Aave positions, executed deterministically by KeeperHub.",
   "license": "MIT",
   "packageManager": "pnpm@11.3.0",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "pnpm -r --filter './packages/*' build",
     "type-check": "pnpm -r --filter './packages/*' type-check",
@@ -23,7 +25,8 @@
   },
   "dependencies": {
     "@bulwark/core": "workspace:*",
-    "@bulwark/web": "workspace:*"
+    "@bulwark/web": "workspace:*",
+    "ethers": "^6.17.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

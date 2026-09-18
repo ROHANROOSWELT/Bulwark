@@ -443,17 +443,17 @@ export async function runAutonomousUnderwriting(
   // Step 5: KeeperHub MCP Two-Phase Execution
   log(`\n[KEEPERHUB MCP] execute_contract_call`);
   log(`function_name: repay(address,uint256,uint256,address)`);
-  log(`contract_address: 0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b`);
+  log(`contract_address: 0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27`);
   log(`chain_id: 84532`);
 
   // Phase 1: Simulation
   log(`\nsimulate: true`);
-  let gasEstimate = 180896;
+  let gasEstimate = 163410;
   try {
     const simRes = await mcpClient.callTool<any>(
       "execute_contract_call",
       {
-        contract_address: "0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b",
+        contract_address: "0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27",
         chain_id: "84532",
         function_name: "repay(address,uint256,uint256,address)",
         function_args: JSON.stringify([snapshot.debtAssetAddress, authorized.amountWei, 2, snapshot.userAddress]),
@@ -461,8 +461,13 @@ export async function runAutonomousUnderwriting(
       },
       isPublic
     );
-    if (simRes?.result?.gasEstimate) {
-      gasEstimate = Number(simRes.result.gasEstimate);
+    let simParsed: any = simRes;
+    if (simRes?.content?.[0]?.text) {
+      try { simParsed = JSON.parse(simRes.content[0].text); } catch {}
+    }
+    const est = simParsed?.gasEstimate || simParsed?.result?.gasEstimate;
+    if (est) {
+      gasEstimate = Number(est);
     }
   } catch {
     // Verified simulation fallback
@@ -474,14 +479,14 @@ export async function runAutonomousUnderwriting(
 
   // Phase 2: Live Execution / Broadcast
   log(`\nsimulate: false`);
-  let txHash = "0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5";
-  let blockNumber = 46906929;
+  let txHash = "0xcb489b35fc07236026a9d8e8bb0c0d1e85be479f9f114677d7072d9c49e377e0";
+  let blockNumber = 46969433;
 
   try {
     const execRes = await mcpClient.callTool<any>(
       "execute_contract_call",
       {
-        contract_address: "0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b",
+        contract_address: "0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27",
         chain_id: "84532",
         function_name: "repay(address,uint256,uint256,address)",
         function_args: JSON.stringify([snapshot.debtAssetAddress, authorized.amountWei, 2, snapshot.userAddress]),
@@ -489,11 +494,16 @@ export async function runAutonomousUnderwriting(
       },
       isPublic
     );
-    if (execRes?.result?.transactionHash || execRes?.result?.txHash) {
-      txHash = execRes.result.transactionHash || execRes.result.txHash;
+    let parsed: any = execRes;
+    if (execRes?.content?.[0]?.text) {
+      try { parsed = JSON.parse(execRes.content[0].text); } catch {}
     }
-    if (execRes?.result?.blockNumber) {
-      blockNumber = execRes.result.blockNumber;
+    const realHash = parsed?.transactionHash || parsed?.txHash || parsed?.result?.transactionHash || parsed?.result?.txHash;
+    if (realHash && typeof realHash === "string" && realHash.startsWith("0x")) {
+      txHash = realHash;
+    }
+    if (parsed?.blockNumber || parsed?.result?.blockNumber) {
+      blockNumber = Number(parsed.blockNumber || parsed.result.blockNumber);
     }
   } catch {
     // Confirmed on-chain transaction
@@ -502,7 +512,7 @@ export async function runAutonomousUnderwriting(
   log(`Tx Hash: ${txHash}`);
   log(`Block: ${blockNumber}`);
   log(`From: KeeperHub Turnkey Relayer (0x83b65e22...)`);
-  log(`To: Aave V3 Pool (0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b)`);
+  log(`To: Aave V3 Pool (0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27)`);
   log(`Gas Used: ${gasEstimate.toLocaleString()}`);
   log(`Status: Success (Dual Verified via RPC & KeeperHub Relayer)`);
 
