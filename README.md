@@ -58,7 +58,7 @@
   DeFi liquidations are brutal, zero-sum market events causing 5%–10% collateral penalties, liquidation cascade MEV, and total position dismantlement. Existing automation consists of static stop-loss keepers (which fail during gas spikes) or autonomous agent demos that make probabilistic decisions *during* the panic—precisely when an unconstrained model is most dangerous.  
   **BULWARK** implements a **policy-bounded, autonomous agent backstop architecture**:
   1. Borrowers issue cryptographically bound, adaptive **RescueGrants** to an underwriting desk with EIP-712 human owner approval.
-  2. The Guardian agent continuously monitors real Aave V3 health factors via `getUserAccountData` and calculates an **exact closed-form rescue ladder** ($\Delta D^*$) to restore positions to safety ($HF \ge 2.00$).
+  2. The Guardian agent continuously monitors real Aave V3 health factors via `getUserAccountData` and calculates an **exact closed-form rescue ladder** ($\Delta D^*$) to restore positions to safety (target $HF = 2.00$).
   3. When liquidation threatens ($HF < 1.35$), the agent forms an execution intent.
   4. The **Policy Compiler** clamps the intent against immutable human-approved bands, grant caps, daily velocity budgets, and desk real reserve capacity (`authorityHash` binding). Raising limits is structurally impossible.
   5. **KeeperHub executes the authorized debt rescue** via Turnkey-signed direct contract calls (`Pool.repay(...)`), cryptographic idempotency keys, and private mempool routing on Base Sepolia.
@@ -100,7 +100,7 @@ We integrated with **six distinct KeeperHub surfaces**, making KeeperHub deeply 
 | **1. Integration Depth** | Deep, protocol-native integration with **Aave V3** ($17.4B TVL). Decodes live borrower account data, computes closed-form repayment ladders, reads Chainlink oracle feeds, and compiles exact `IPool.repay(...)` calldata. | Real Aave V3 Base Sepolia Pool (`0x8bAB...aE27`); verified live on-chain. |
 | **2. Execution Through KeeperHub** | Value literally moved through KeeperHub Turnkey relayers. Live on-chain debt rescues were executed autonomously on Base Sepolia with gas sponsorship. | Tx [`0xe772e1...`](https://sepolia.basescan.org/tx/0xe772e1d878d61739433f5ec69a5159990cb7e869be231604118ef34e5c0e6220), [`0xd15b60...`](https://sepolia.basescan.org/tx/0xd15b609e39dce88af7c2e17b4fe353309cacf87b0ae0ffa3b82b9b603865d394), [`0xc26cd5...`](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [`0x61c575...`](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5). |
 | **3. Reliability & Observability** | Zero mocks; simulate-first dry-run before broadcast; fail-closed policy compiler; cryptographic idempotency keys; dual receipts (KeeperHub + public RPC); **11-Check PoAA verification engine**. | 11/11 checks pass on public [`/verify`](https://bulwark-keeperhub.vercel.app/verify) portal. |
-| **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores $HF \ge 2.00$ without over-repaying. |
+| **4. Usefulness & Originality** | Solves DeFi's largest liquidation pain point: borrowers avoid 5%–10% penalties and collateral confiscation through autonomous, underwritten micro-backstops. | Closed-form targeting equation restores target $HF = 2.00$ ($HF \ge 2.00$) without over-repaying. |
 | **5. Developer Experience & Code Quality** | Production pnpm monorepo, strict TypeScript, interactive CLI, hosted Vercel portal, Docker support, and **1,308 automated tests (100% green)**. | Run `npm test -- --run` or `./scripts/live-proof.sh` in any terminal. |
 
 ## 🛡️ Live On-Chain Proof & Verification (Zero Mocks)
@@ -416,7 +416,7 @@ flowchart TD
     E --> F["5. Pre-Flight KeeperHub Simulation\n(simulate: true)"]
     F --> G{"Simulation Success?\n(wouldRevert == false)"}
     G -- Reverts --> H["Abort & Log Reason\n(Zero Gas Wasted)"]
-    G -- Safe --> I["6. Autonomous KeeperHub Broadcast\n(simulate: false + Idempotency-Key)"]
+    G -- Feasible --> I["6. Autonomous KeeperHub Broadcast\n(simulate: false + Idempotency-Key)"]
     I --> J["Dual-Receipt On-Chain Verification\n(KeeperHub + Independent RPC)"]
     J --> K["11-Invariant PoAA Bundle Generated\n(Verdict: PROVEN)"]
 ```
@@ -427,8 +427,8 @@ flowchart TD
 3. **Pre-Authorized Agency:** Borrowers pre-authorize rescue limits via EIP-712 RescueGrants. The Policy Compiler mathematically clamps the proposed action:
    $$\Delta \text{Debt}^* = D - \frac{C \cdot L}{2.000}$$
    Ensuring target $HF \ge 2.000$ without ever exceeding borrower-approved capital caps or desk available capacity.
-4. **Pre-Flight Simulation:** Executes pre-flight dry-run via KeeperHub with `simulate: true`. If the transaction would revert (e.g., no debt or slippage), execution immediately halts with zero gas burned.
-5. **Autonomous Broadcast:** Dispatches transaction with `simulate: false` and a cryptographic `Idempotency-Key` (`sha256(grantId:authorityHash:nonce)`), routing to private mempools via Turnkey signers.
+4. **Pre-Flight Simulation:** Executes pre-flight simulation via KeeperHub with `simulate: true`. KeeperHub verifies `wouldRevert === false`, confirming execution feasibility under the simulated state. If the transaction would revert (e.g., no debt or slippage), execution immediately halts with zero gas burned.
+5. **Autonomous Broadcast:** Only after the pre-flight check passes does BULWARK dispatch the live transaction with `simulate: false` and a cryptographic `Idempotency-Key` (`sha256(grantId:authorityHash:nonce)`), routing to private mempools via Turnkey signers.
 6. **Dual-Receipt Verification & PoAA:** Confirms receipt across both KeeperHub and independent Base Sepolia RPC nodes, verifies $HF_{\text{post}} > HF_{\text{pre}}$, and emits an exportable 11-check PoAA bundle.
 
 ---
@@ -654,8 +654,8 @@ npm run agent -- compose 0xE406f471E711A2C8012e95c4B09fa9F1C9ae8123
 #### The Two-Phase Live Auto-Rescue Pipeline (Simulation ➔ Broadcast)
 
 To prevent gas waste on reverting transactions, BULWARK executes a strict two-phase protocol via KeeperHub MCP:
-1. **Phase 1 (Pre-Flight Simulation):** The AI underwriter proposes the rescue strategy and repayment parameters, and the policy compiler clamps them to authorized boundaries. BULWARK then calls `execute_contract_call` with `simulate: true` targeting Aave V3 `Pool.repay(...)`. If the borrower has no active debt or insufficient collateral, KeeperHub simulation returns `wouldRevert: true` with the on-chain revert reason (e.g., `Aave V3 contract simulation reverted (Account has no active debt or insufficient collateral)`), halting execution safely before any broadcast.
-2. **Phase 2 (Live On-Chain Broadcast):** When simulation confirms `wouldRevert === false` and retrieves the gas estimate, simulation turns off (`simulate: false`). KeeperHub's autonomous Turnkey relayer signs and broadcasts the live transaction to Base Sepolia (`chain_id: 84532`), burning borrower debt on Aave V3 and returning the verified transaction hash and BaseScan link for independent verification.
+1. **Phase 1 (Pre-Flight Simulation):** The AI underwriter proposes the rescue strategy and repayment parameters, and the policy compiler clamps them to authorized boundaries. BULWARK then calls `execute_contract_call` with `simulate: true` targeting Aave V3 `Pool.repay(...)`. KeeperHub verifies `wouldRevert === false`, confirming execution feasibility under the simulated state and retrieving the gas estimate. If the call would revert (e.g., borrower has no active debt or insufficient collateral), simulation returns `wouldRevert: true` with the on-chain revert reason, halting execution safely before any broadcast.
+2. **Phase 2 (Live On-Chain Broadcast):** Only after the pre-flight check passes does BULWARK dispatch the live transaction with `simulate: false`. KeeperHub's autonomous Turnkey relayer signs and broadcasts the live transaction to Base Sepolia (`chain_id: 84532`), burning borrower debt on Aave V3 and returning the verified transaction hash and BaseScan link for independent verification.
 
 #### Verified Live Execution Terminal Trace
 
