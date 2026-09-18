@@ -43,7 +43,7 @@
 | Required Artifact | Link / Resource | Status & Verification |
 | :--- | :--- | :---: |
 | 📦 **1. Source Code Link** | [**github.com/ROHANROOSWELT/Bulwark**](https://github.com/ROHANROOSWELT/Bulwark) | ✅ Complete (13,211 LOC, Monorepo) |
-| 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo**](https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER) *(⚠️ REPLACE with final recorded YouTube/Loom link before submitting)* | 🟡 Record & Upload Required |
+| 🎥 **2. Short Demo Video (90s)** | [**Watch BULWARK Integration Demo (YouTube)**](https://youtu.be/qhUvINUcefg) | ✅ Recorded & Live |
 | ⚡ **3. KeeperHub On-Chain Tx** | [**Autonomous Rescue Tx #3 (`0x61c57...`)**](https://sepolia.basescan.org/tx/0x61c5754c04a25845907eca92986feacd246cb88b77ff44f4f9b6b4b75d768ef5), [**Tx #4 (`0xc26cd...`)**](https://sepolia.basescan.org/tx/0xc26cd5b6b79e60ad8833f030817a8ee4fb6a7243f14e219b7aa26987a651984f), [**Tx #2 (`0xfabb4...`)**](https://sepolia.basescan.org/tx/0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1) & [**Tx #1 (`0x43dbc...`)**](https://sepolia.basescan.org/tx/0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16) | ✅ **100% Live On-Chain Confirmed (Base Sepolia Blocks 46906929, 46906960, 46859912, 46823633)** |
 
 *(See [Section 12: DoraHacks Submission Check-Off Matrix](#12-dorahacks-submission-check-off-matrix) for exact submission links).*
@@ -823,7 +823,7 @@ Before submitting the DoraHacks form, replace the marked placeholders with your 
 | **Executed Tx #2** | BaseScan on-chain rescue transaction #2 | `0xfabb40aa45c1b40d4dba787a3ef824d961c4d521753ec2393e61c5d1b066d6f1` | ✅ Mined in Block 46859912 |
 | **Executed Tx #1** | BaseScan on-chain rescue transaction #1 | `0x43dbc0270f7a05608e0db944aa214e625278e1cfb898cdd6764e54deb184fa16` | ✅ Mined in Block 46823633 |
 | **Execution IDs** | KeeperHub execution records | `e74rcjzawd1pftopcwt3v`, `zrifs7n8qe5oufxk1eq8r`, `l970z8w4g4duxj9baub4m`, `vp4sp6951ipz00q2b65bv` | ✅ Verified via KeeperHub API |
-| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/BULWARK_DEMO_VIDEO_ID_PLACEHOLDER` | ⚠️ **Replace with final link before submitting** |
+| **Demo Video** | 90-second YouTube or Loom video | `https://youtu.be/qhUvINUcefg` | ✅ Live on YouTube |
 | **Contact Email** | Primary submitter contact | `prohanrooswelt@gmail.com` | Primary contact email |
 | **X / Twitter** | Submitter handle | `@bulwark_agent` | Primary X handle |
 | **Discord** | Submitter Discord username | `rohan_bulwark` | Primary Discord username |
