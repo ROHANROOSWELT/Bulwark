@@ -16,3 +16,4 @@ coverage/
 *.key
 .vercel
 .env*
+dorahacks.md
